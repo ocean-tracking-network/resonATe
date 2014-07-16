@@ -1,0 +1,53 @@
+0,0,no parameter
+1,1,One {0}
+2,2,two parameters{0}{1}
+3,3,three parameters{0}{1}{2}
+4,2,{0} has detected a fault in the memory address = {1}
+5,5,five parameters{0}{1}{2}{3}{4}
+6,6,six parameters{0}{1}{2}{3}{4}{5}
+7,7,seven parameters {0}{1}{2}{3}{4}{5}{6}
+8,8,eight parameters  {0}{1}{2}{3}{4}{5}{6}{7}
+9,9,nine parameters  {0}{1}{2}{3}{4}{5}{6}{7}{8}
+10,10,ten parameters  {0}{1}{2}{3}{4}{5}{6}{7}{8}{9}
+11,1,message is null {0}
+12,1,Invalid request code {0}
+13,1,Invalid index {0}
+14,1,Invalid number of parameters for message code: {0}
+15,1,Error: {0} variable supplied either has invalid characters or does not contain a csv file extension
+16,2,Missing columns:{0} in file {1}
+17,2,There are {0} records in file {1}
+18,2,There are {0} records updated in file {1}
+19,1,File {0} does not exist
+20,1,Output File {0} already existed. Please rename or delete the file and rerun process.
+21,1,Ensure column header match to its data. Please check format of {0}.
+22,1,There is no records update in {0}
+23,0,Updates complete.
+50,1,The following {0} tables have been dropped from the database:
+51,0,Nothing to cleanup from database.
+99,1,Database loading error: {0}.
+100,1,File IO Error: {0}.
+101,1,Variable {0} is not set.
+102,1,Can not create table {0}.
+103,1,File: '{0}' already exists. 
+104,0,Please rename or delete the files before continuing.
+105,2,{0} file: '{1}' is missing the following mandatory columns:
+106,2,"File '{0}': Duplicates in column '{1}' for rows:"
+107,2,"File '{0}': Invalid date format in column '{1}' for rows:"
+108,2,"File '{0}': Null value for column '{1}' for rows:"
+109,1,"File '{0}': distance is not the same for station matrix pairs:"
+110,2,"File '{0}': Null or non-numeric value for column '{1}' for rows:"
+111,2,"File '{0}': Non-numeric values for column '{1}' for rows:"
+112,2,"Verifying {0} file: '{1}'..."
+113,0,OK!
+114,0,ERROR!
+115,2,"Loading {0} file: '{1}'..."
+116,2,Compressed detections exported to: {0} containing {1} records.
+117,2,Interval data exported to: {0} containing {1} records.
+118,0,Exporting data...
+119,1,"File '{0}' Number of data columns do not match the number of header column."
+120,1,"File '{0}' has a blank column header."
+121,1,"File '{0}' has a duplicate header name."
+200,1,Please provide the variable: '{0}'
+201,0,"Unable to detect encoding, please set input_encoding and rerun conversion."
+202,2,"Converting file '{0}' from encoding '{1}' to 'utf-8', please wait..."
+203,2,"File '{0}' has been successfully converted to utf-8 as '{1}'."
