@@ -1,0 +1,160 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar 31 14:16:28 2014
+
+@author: OTN -Jinyu
+"""
+
+import os
+import sys
+import csv
+import shutil
+import tempfile
+
+#Local Imports
+import library.verifications as verify
+from csf.Table import message as msgCSF
+
+def dis_mtx_merge(reqcode,distance_matrix_input,distance_real_input):
+    #Variables
+    file1_valid = False
+    file2_valid = False
+    encoding = None
+    delimiter = ','
+    file1=[]
+    file1_base_name = distance_matrix_input[:-4]
+    
+
+    #Check reqcode 
+    if(reqcode !='reqmerge'):
+        #return 'Error:Not valid reqcode'  #CSF
+        return msgCSF(requestCode='simple', index=12,numbOfParameters=1,param1=reqcode).format(reqcode)
+        
+    if not verify.Filename( distance_matrix_input ):
+        return msgCSF(requestCode='simple', index=15,numbOfParameters=1,param1=distance_matrix_input).format(distance_matrix_input)
+    if not verify.Filename( distance_real_input ):
+        return msgCSF(requestCode='simple', index=15,numbOfParameters=1,param1=distance_real_input).format(distance_real_input)
+    
+    #Assign file path
+    #parent_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    parent_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),os.pardir,os.pardir)
+    distance_matrix_input = os.path.join(parent_path,'data', distance_matrix_input)
+    distance_real_input = os.path.join(parent_path,'data', distance_real_input)
+    
+    #Check file exist
+    if not verify.FileExists( distance_matrix_input ):
+        return msgCSF(requestCode='simple', index=19,numbOfParameters=1,param1=distance_matrix_input).format(distance_matrix_input)
+    if not verify.FileExists( distance_real_input):
+        return msgCSF(requestCode='simple', index=19,numbOfParameters=1,param1=distance_real_input).format(distance_real_input)
+
+    #backup detection file 1 (in a temp file)
+    fd, file1_bckup_name = tempfile.mkstemp()
+    shutil.copy2(distance_matrix_input,file1_bckup_name)
+        
+    #open first file
+    file1_open = open(file1_bckup_name,'rb')
+    
+    #read first file
+    file1_list = csv.reader(file1_open, delimiter=',')
+    
+    #file1 header  purpose for remove header in file1
+    header1 = file1_list.next()
+    
+    #Store file1 content without header
+    for row in file1_list:
+        if(row):
+            file1.append(row)
+         
+    #open second file
+    file2_open=open(distance_real_input,'rb')
+    
+    #read second file
+    file2_list = csv.reader(file2_open, delimiter=',')
+    
+    #file2 header
+    header2 = file2_list.next()
+    
+    #real_distance column position in file2
+    position = verify.headerPosition(header2,'real_distance')
+    
+    #test first file for validaity
+    detection_headers_file1 = verify.FileHeaders(file1_bckup_name)
+    #mandatory columns for 1st file
+    mandatory_columns_file1 = ['stn1','stn2','distance_m','real_distance']
+    missing_columns_file1 = verify.MandatoryColumns(detection_headers_file1,mandatory_columns_file1)
+    if missing_columns_file1:
+        return msgCSF(requestCode='simple', index=16,numbOfParameters=2,param1=missing_columns_file1,param2=distance_matrix_input).format(missing_columns_file1,distance_matrix_input)
+    else:
+        file1_valid = True
+    #test second file for validaity
+    detection_headers_file2 = verify.FileHeaders(distance_real_input)
+    #mandatory columns for 2nd file
+    mandatory_columns_file2 = ['stn1','stn2','real_distance']    
+    missing_columns_file2 = verify.MandatoryColumns(detection_headers_file2,mandatory_columns_file2)
+    if missing_columns_file2:
+        return msgCSF(requestCode='simple', index=16,numbOfParameters=2,param1=missing_columns_file2,param2=distance_real_input).format(missing_columns_file2,distance_real_input)
+    else:
+        file2_valid = True
+    #check for exist output file
+    if(os.path.isfile(os.path.join(parent_path,'data', file1_base_name+'_merged.csv'))):
+        return msgCSF(requestCode='simple', index=20,numbOfParameters=1,param1=file1_base_name+'_merged.csv').format(file1_base_name+'_merged.csv')
+    #merge two files
+    if(file1_valid and file2_valid):
+        count_file1 = verify.FileCount(distance_matrix_input,header = True)
+        count_file2 = verify.FileCount(distance_real_input,header = True)
+        print msgCSF(requestCode='simple', index=17,numbOfParameters=2,param1=count_file1,param2=distance_matrix_input).format(count_file1,distance_matrix_input)
+        print msgCSF(requestCode='simple', index=17,numbOfParameters=2,param1=count_file2,param2=distance_real_input).format(count_file2,distance_real_input)
+        beforeUpdatedCount = verify.RealUpdateCount(file1_bckup_name)        
+        
+        #Check each row of file2         
+        for row in file2_list:
+            if(row):
+                if ((position+1)>len(row) or len(header2) != len(row)):
+                    return msgCSF(requestCode='simple', index=21,numbOfParameters=1,param1=distance_real_input).format(distance_real_input)
+                if (row[position]!=''):
+                    row_number = []
+                    updateReal = ""
+                    #Get station 1 and station 2 in file2
+                    stn1 = row[verify.headerPosition(header2,'stn1')]
+                    stn2 = row[verify.headerPosition(header2,'stn2')]
+                    #Find station row number in file 1
+                    row_number =  verify.stationMatch(file1_bckup_name,stn1,stn2)
+                    #store real_distance value
+                    updateReal = row[position]
+                
+                    #Update read_distance in file 1
+                    for number in row_number:
+                        update = []
+                        update = file1[number]
+                        update[verify.headerPosition(header1,'real_distance')]=updateReal #update real_distance
+                        line_to_override = {int(number)+1:update}
+                        #Get file1 content 
+                        merged_file1 = []
+                        a = open(file1_bckup_name, 'rb')
+                        merged = csv.reader(a)
+                        merged_file1.extend(merged)
+                        a.close()
+                        #Write to file1
+                        b = open(file1_bckup_name, 'wb')
+                        writer = csv.writer(b)
+                        for line, row in enumerate(merged_file1):
+                            data = line_to_override.get(line, row)
+                            writer.writerow(data)
+                        b.close()
+        #output messages # of records & # of updated records 
+        updatedCount = verify.RealUpdateCount(file1_bckup_name)
+        
+        file1_open.close()
+        file2_open.close()                    
+        #output the updated first file with 'merged' append to original file name
+        if(updatedCount-beforeUpdatedCount > 0 ):
+            print msgCSF(requestCode='simple', index=18,numbOfParameters=2,param1=updatedCount,param2=file1_base_name+'_merged.csv').format(updatedCount,file1_base_name+'_merged.csv')
+            os.rename(file1_bckup_name,''.join([parent_path,'/','data','/',file1_base_name,'_merged.csv']))
+        else:
+            print msgCSF(requestCode='simple', index=22,numbOfParameters=1,param1=distance_matrix_input).format(distance_matrix_input)
+            # remove bckup file
+            if (os.path.isfile(file1_bckup_name)):
+                os.remove(file1_bckup_name)
+     
+        return msgCSF(requestCode='simple', index=23,numbOfParameters=0)
+

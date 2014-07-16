@@ -1,0 +1,14 @@
+# OTN TOOLBOX
+
+## USAGE
+
+This package is meant to be installed on an Ubuntu system with the following software packages installed
+* PostgreSQL
+* PostGIS
+* R
+* RStudio
+* PHP-Postgresql-admin
+* RPython
+
+Additional requirements can be found in the packages.txt file included in the repo.
+Currently a .ova file is available for download at http://members.oceantrack.org/toolbox/OTN%20Sandbox/OTN-Sandbox.ova that provides all required packages.
