@@ -78,35 +78,20 @@ class MessageDB(object):
         fp.close()
 
 
-#message csf
-def message(index, params=None, input_string=None):
-        if params is None:
-            params = []
-        # initialize variables
-        mdb = MessageDB(csv_path)  # create table object from csv
-
-        if input_string is None:
-            result = mdb.get_message(index, params)
-        else:
-            result = '%s \n\n %s' % (input_string, mdb.get_message(index, params))
-
-        return result
-
-
 def main():
     #Create table & Test search function
-    mdb = MessageDB(csv_path)
-    print mdb.is_valid_code(1)
+    msgs = MessageDB(csv_path)
+    print msgs.is_valid_code(1)
     #Test insert function
-    print mdb.put_message(14, 1, 'Test {0}')
-    print mdb.get_message(14, ['test'])
+    print msgs.put_message(14, 1, 'Test {0}')
+    print msgs.get_message(14, ['test'])
     #Test simple request with not enough parameters - as per M.M., should insert ? for missing params
-    print mdb.get_message(index=10, params=['SystemIO'])
+    print msgs.get_message(index=10, params=['SystemIO'])
     #Test with too many parameters. - as per M.M., should truncate extras and go through without complaint.
-    print mdb.get_message(index=3, params=['1', '2', '3', '4', '5', '6'])
+    print msgs.get_message(index=3, params=['1', '2', '3', '4', '5', '6'])
     #Test concatenate request
-    print mdb.get_message(1, ['One'], 'Test Header:')
-    mdb.write_to_csv('test_output.csv')
+    print msgs.get_message(1, ['One'], 'Test Header:')
+    msgs.write_to_csv('test_output.csv')
     # compare the test_output to the input csv
     import difflib
     d = difflib.Differ()

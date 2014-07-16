@@ -5,8 +5,10 @@ SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
 CSF_PATH = os.path.join(SCRIPT_PATH,os.pardir,'csf')
 
 sys.path.append( CSF_PATH )
-from csf.MessageDB import message as msg
+import csf.MessageDB as mdb
 from csf.database_io import databaseIO
+
+msgs = mdb.MessageDB()
 
 def cleanup(reqcode):
     '''
@@ -20,5 +22,5 @@ def cleanup(reqcode):
         c.databaseIO('reqcleanup') # Clean
         c.databaseIO('reqdisconn') # Close
     else:
-        print msg('simple',12,1,param1=reqcode)
+        print msgs.get_message(12, [reqcode])
 

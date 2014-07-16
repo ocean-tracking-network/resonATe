@@ -7,7 +7,8 @@ import re
 SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
 
 sys.path.append( SCRIPT_PATH )
-from MessageDB import message as msg
+import MessageDB as mdb
+msgs = mdb.MessageDB()
 
 class table_maintenance():
     def __init__(self, reqcode='reqconn', tablename=None, filename=None):
@@ -23,7 +24,7 @@ class table_maintenance():
             self.table_maintenance(reqcode, tablename, filename)
         else:
             #Invalid request code: '{0}'
-            print msg('simple',12,1,param1=reqcode)
+            print msgs.get_message(12,params=[reqcode])
         
     def table_maintenance(self, reqcode, tablename=None, filename=None):
         '''
@@ -67,8 +68,7 @@ class table_maintenance():
             self.disconnect()
         else:
             # inform user that an invaild request code was given
-            print msg(requestCode='simple',index=12, 
-                      numbOfParameters=1, param1=reqcode)
+            print msgs.get_message(index=12, params=[reqcode])
 
     def create_table(self, tablename, filename):
         '''(table_maintenance, str) -> NoneType
@@ -98,7 +98,7 @@ class table_maintenance():
             query = query_file.read()
             query_file.close()
         else:
-            return msg(requestCode='simple',index=102, numbOfParameters=1, param1=tablename)
+            return msgs.get_message(index=102, params=[tablename])
         
         self.cur.execute(query)
         self.conn.commit()

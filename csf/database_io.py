@@ -7,7 +7,8 @@ SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
 CSF_PATH = os.path.join(SCRIPT_PATH,os.pardir,'csf')
 
 sys.path.append( CSF_PATH )
-from MessageDB import message as msg
+import MessageDB as mdb
+msgs = mdb.MessageDB()
 
 class databaseIO():
     def __init__(self, reqcode='reqconn', table=None, file=None):
@@ -21,7 +22,7 @@ class databaseIO():
             self.databaseIO(reqcode, table, file)
         else:
             #Invalid request code: '{0}'
-            print msg('simple',12,1,param1=reqcode)
+            print msgs.get_message(12,params=[reqcode])
 
     def databaseIO(self, reqcode, table=None, file=None):
         '''(databaseIO, str, str, str) -> NoneType
@@ -45,11 +46,11 @@ class databaseIO():
                 self.cleanup_tables(tables)
             else:
                 # Output 'Nothing to cleanup from database.'
-                print msg('simple',51,0)
+                print msgs.get_message(51)
                 
         else:
             # Output message for invalid reqcode
-            print msg('simple',12,1,param1=reqcode)
+            print msgs.get_message(12, params=[reqcode])
       
     def cleanup_tables(self, tables):
         '''(databaseIO, (list of str)) -> NoneType
@@ -72,7 +73,7 @@ class databaseIO():
         self.conn.set_isolation_level(old_isolation_level)
         
         # Print output messages
-        print msg('simple',50,1,param1=len(tables))
+        print msgs.get_message(50, params=[len(tables)])
         print '\n'.join(tables)
         
     def list_tables(self):
