@@ -3,16 +3,16 @@ import os
 
 # System paths
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
-CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir, 'csf')
+#CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir, 'csf')
 
 sys.path.append(CSF_PATH)
 
 # Import CSF/library scripts
-from Table import message as msg
-from file_io import fileIO
-from database_io import databaseIO
-from table_maintinance import table_maintinance
-from build_filename import build_filename
+from csf.MessageDB import message as msg
+from csf.file_io import fileIO
+#from csf.database_io import databaseIO
+from csf.table_maintenance import table_maintenance
+from csf.build_filename import build_filename
 
 # Library Modules
 from library import verify_columns
@@ -120,27 +120,27 @@ def intervalData(detection_filename, dist_matrix_filename, data_directory = '/ho
     ##### Loading Step #####
     
     # Open database connection
-    db =  table_maintinance('reqconn')
+    db =  table_maintenance('reqconn')
     
     # Drop the mv_anm_detections table if it exists.
-    anm_tbl_exists =  db.table_maintinance(reqcode='reqexist', tablename='mv_anm_detections')
+    anm_tbl_exists =  db.table_maintenance(reqcode='reqexist', tablename='mv_anm_detections')
     if anm_tbl_exists:
-        db.table_maintinance(reqcode='reqdropcscd', tablename='mv_anm_detections')
+        db.table_maintenance(reqcode='reqdropcscd', tablename='mv_anm_detections')
     
     # Drop the distance_matrix table if it exists.
-    dis_mtx_tbl_exits = db.table_maintinance(reqcode='reqexist', tablename='distance_matrix')
+    dis_mtx_tbl_exits = db.table_maintenance(reqcode='reqexist', tablename='distance_matrix')
     if dis_mtx_tbl_exits:
-        db.table_maintinance(reqcode='reqdropcscd', tablename='distance_matrix')
+        db.table_maintenance(reqcode='reqdropcscd', tablename='distance_matrix')
         
     # Create mv_anm_detections table
-    db.table_maintinance(reqcode='reqcreate', 
+    db.table_maintenance(reqcode='reqcreate',
                          tablename='mv_anm_detections', filename=detection_file_header)
     
     # Load mv_anm_detections csv
     # Loading detection file:
     print msg(requestCode='simple', index=115, 
                            numbOfParameters=2, param1='Detection', param2=detection_filename),
-    det_load_error = db.table_maintinance(reqcode='reqload', tablename='mv_anm_detections', filename=detection_filepath)
+    det_load_error = db.table_maintenance(reqcode='reqload', tablename='mv_anm_detections', filename=detection_filepath)
     if det_load_error:
         print msg(requestCode='simple', index=114,numbOfParameters=0)
         print msg(requestCode='simple', index=99, numbOfParameters=1, param1=det_load_error)
@@ -149,12 +149,12 @@ def intervalData(detection_filename, dist_matrix_filename, data_directory = '/ho
         
     
     # Create distance matrix table
-    db.table_maintinance(reqcode='reqcreate',tablename='distance_matrix', filename=dis_mtx_file_header)
+    db.table_maintenance(reqcode='reqcreate',tablename='distance_matrix', filename=dis_mtx_file_header)
     
     # Load distance matrix table
     print msg(requestCode='simple', index=115, 
                            numbOfParameters=2, param1='Distance Matrix', param2=dist_matrix_filename),
-    mtx_load_error = db.table_maintinance(reqcode='reqload', tablename='distance_matrix', filename=dis_mtx_filepath)
+    mtx_load_error = db.table_maintenance(reqcode='reqload', tablename='distance_matrix', filename=dis_mtx_filepath)
     if mtx_load_error:
         print msg(requestCode='simple', index=114, numbOfParameters=0)
         print msg(requestCode='simple', index=99, numbOfParameters=1, param1=mtx_load_error)

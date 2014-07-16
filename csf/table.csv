@@ -12,7 +12,7 @@
 11,1,message is null {0}
 12,1,Invalid request code {0}
 13,1,Invalid index {0}
-14,1,Invalid number of parameter {0}
+14,1,Invalid number of parameters for message code: {0}
 15,1,Error: {0} variable supplied either has invalid characters or does not contain a csv file extension
 16,2,Missing columns:{0} in file {1}
 17,2,There are {0} records in file {1}

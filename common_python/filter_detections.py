@@ -195,7 +195,7 @@ def filterDetections():
     print 'Detection file saved to: ({0})'.format(output_file_path)
     
     if DistanceMatrix:
-        # Remove existing Distance Matrix Table
+        # Remove existing Distance Matrix MessageDB
         if verify.TableExists( matrix_tbl ):
             load_to_pg.removeTable( matrix_tbl )
         

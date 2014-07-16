@@ -70,7 +70,7 @@ def loadDetections():
     # Send a message if using the table in the database
     if detection_tbl_exists and not ReloadInputFile:
         detection_tbl_count = verify.TableCount( detection_tbl )
-        print '''Table "{0}" already loaded with {1} records.'''.format( detection_tbl, detection_tbl_count )
+        print '''MessageDB "{0}" already loaded with {1} records.'''.format( detection_tbl, detection_tbl_count )
     
     #Does matrix file already exist on the file system?
     if DistanceMatrix and verify.FileExists(  matrix_filename ):

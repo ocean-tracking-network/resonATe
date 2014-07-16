@@ -19,18 +19,18 @@ def compress_detections():
     #Connect to the database
     db = table_maintinance('reqconn')
     
-    mv_anm_compressed_exists = db.table_maintinance(reqcode='reqexist', tablename='mv_anm_compressed')
+    mv_anm_compressed_exists = db.table_maintenance(reqcode='reqexist', tablename='mv_anm_compressed')
     if mv_anm_compressed_exists:
-        db.table_maintinance(reqcode='reqdrop', tablename='mv_anm_compressed')
+        db.table_maintenance(reqcode='reqdrop', tablename='mv_anm_compressed')
     
     #create table mv_anm_compressed.See Appendix A for SQL
-    db.table_maintinance(reqcode='reqcreate', tablename='mv_anm_compressed')
+    db.table_maintenance(reqcode='reqcreate', tablename='mv_anm_compressed')
     
     #create or replace function f_det_compressed(). See Appendix B for SQL
-    db.table_maintinance(reqcode='reqcreate', tablename='f_det_compressed')
+    db.table_maintenance(reqcode='reqcreate', tablename='f_det_compressed')
     
     #Close the table_maintinace module
-    db.table_maintinance('reqdisconn')
+    db.table_maintenance('reqdisconn')
     
     #Create new database connection for 
     conn, cur = pg.createConnection() 

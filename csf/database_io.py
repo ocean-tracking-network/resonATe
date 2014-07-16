@@ -7,7 +7,7 @@ SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
 CSF_PATH = os.path.join(SCRIPT_PATH,os.pardir,'csf')
 
 sys.path.append( CSF_PATH )
-from Table import message as msg
+from MessageDB import message as msg
 
 class databaseIO():
     def __init__(self, reqcode='reqconn', table=None, file=None):

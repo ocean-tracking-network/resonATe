@@ -1,6 +1,6 @@
 import os
 import re
-from Table import message as msgCSF
+from MessageDB import message as msgCSF
     
 def get_version( filename ):
     ''' (str) -> (list of (int, str))

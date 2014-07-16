@@ -7,25 +7,25 @@ import re
 SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
 
 sys.path.append( SCRIPT_PATH )
-from Table import message as msg
+from MessageDB import message as msg
 
-class table_maintinance():
+class table_maintenance():
     def __init__(self, reqcode='reqconn', tablename=None, filename=None):
         '''
-        Initialize the table_maintinance class
+        Initialize the table_maintenance class
         '''
         # Presistance connection variables
         self.conn = None
         self.cur = None
         
-        # table_maintinance must always be created first with the reqconn command
+        # table_maintenance must always be created first with the reqconn command
         if reqcode == 'reqconn':
-            self.table_maintinance(reqcode, tablename, filename)
+            self.table_maintenance(reqcode, tablename, filename)
         else:
             #Invalid request code: '{0}'
             print msg('simple',12,1,param1=reqcode)
         
-    def table_maintinance(self, reqcode, tablename=None, filename=None):
+    def table_maintenance(self, reqcode, tablename=None, filename=None):
         '''
         Main function used to process the reqcode
         '''
@@ -71,7 +71,7 @@ class table_maintinance():
                       numbOfParameters=1, param1=reqcode)
 
     def create_table(self, tablename, filename):
-        '''(table_maintinance, str) -> NoneType
+        '''(table_maintenance, str) -> NoneType
         Creates the table as specified by the tablename var
         '''
         query = ''
@@ -81,7 +81,7 @@ class table_maintinance():
             column_names = filename
             column_names = [re.sub(r'\W+', '', col.replace(' ','_')).lower().strip('_') for col in column_names]
             
-            # Construct Table auto-creation
+            # Construct MessageDB auto-creation
             query = '''
             CREATE TABLE public.{0} ({1})
             '''.format(tablename,
@@ -104,7 +104,7 @@ class table_maintinance():
         self.conn.commit()
         
     def drop_cascade(self, tablename):
-        ''' (table_maintinance, str) -> NoneType
+        ''' (table_maintenance, str) -> NoneType
         DROP CASCADE a table
         
         '''
@@ -113,7 +113,7 @@ class table_maintinance():
         self.conn.commit()
         
     def drop_table(self, tablename):
-        ''' (table_maintinance, str) -> NoneType
+        ''' (table_maintenance, str) -> NoneType
         DROP a table
         
         '''
@@ -138,7 +138,7 @@ class table_maintinance():
             return e
     
     def connect(self):
-        '''(table_maintinance) -> NoneType
+        '''(table_maintenance) -> NoneType
         Connect to the database
         
         '''
@@ -157,7 +157,7 @@ class table_maintinance():
         self.cur = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor) # Cursor 
 
     def disconnect(self):
-        '''(table_maintinance) -> NoneType
+        '''(table_maintenance) -> NoneType
         Disconnect from the database 
         '''
         self.cur.close()

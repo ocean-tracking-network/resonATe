@@ -5,8 +5,8 @@ SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
 CSF_PATH = os.path.join(SCRIPT_PATH,os.pardir,'csf')
 
 sys.path.append( CSF_PATH )
-from Table import message as msg 
-from database_io import databaseIO
+from csf.MessageDB import message as msg
+from csf.database_io import databaseIO
 
 def cleanup(reqcode):
     '''
