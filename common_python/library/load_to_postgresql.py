@@ -156,7 +156,8 @@ def createSuspect( detection_tbl, suspect_tbl, time_interval):
              check the case where the last detec is isolated
          or (suspect_detection is null and detecid3 is null and detecid1 not like
                '%release' ) --201407 flag single detections unless release
-        order by catalognumber, frst_detec        order by catalognumber, frst_detec        );
+        order by catalognumber, frst_detec
+        );
 '''.format(suspect_tbl,detection_tbl, time_interval))
     conn.commit()
     return True
