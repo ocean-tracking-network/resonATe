@@ -39,7 +39,7 @@ left join
 (select * from distance_matrix ) dmtx
 on ((dmtx.stn1 = from_station and dmtx.stn2 = to_station)
 or (dmtx.stn2 = from_station and dmtx.stn1 = to_station))
-) foo order by catalognumber, seq_num) foo order by catalognumber, seq_num
+) foo order by catalognumber, seq_num
 '''
     
     cur.execute(query)
