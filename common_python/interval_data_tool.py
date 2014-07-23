@@ -8,7 +8,7 @@ CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir, 'csf')
 sys.path.append(CSF_PATH)
 
 # Import CSF/library scripts
-import csf.MessageDB as mdb
+import MessageDB as mdb
 msgs = mdb.MessageDB()
 from csf.file_io import fileIO
 #from csf.database_io import databaseIO

@@ -7,7 +7,7 @@ SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir,os.pardir, 'csf')
 sys.path.append(CSF_PATH)
 
-import csv.MessageDB as mdb
+import MessageDB as mdb
 msgs = mdb.MessageDB()
 
 def verify_columns(reqcode, fileh, header_string):
