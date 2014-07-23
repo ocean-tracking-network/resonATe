@@ -3,7 +3,7 @@ import os
 
 # System paths
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
-#CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir, 'csf')
+CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir, 'csf')
 
 sys.path.append(CSF_PATH)
 

@@ -12,7 +12,11 @@ SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir, 'csf')
 sys.path.append(CSF_PATH)
 
-from Table import message as msg
+
+import csf.MessageDB as mdb
+msgs = mdb.MessageDB()
+
+
 
 def conversion(input_file=None, input_encoding=None, data_dir='/home/sandbox/RStudio/data/'):
     '''
@@ -20,14 +24,14 @@ def conversion(input_file=None, input_encoding=None, data_dir='/home/sandbox/RSt
     '''
     # Variable input_file exists?
     if not input_file:
-        print msg(requestCode='simple', index=200, numbOfParameters=1, param1='input_file')
+        print msgs.get_message(index=200, params=['input_file'])
         return ''
     
     input_file_path = os.path.join(data_dir,input_file)
     
     # Does the file at input_file_path exist?
     if not verify.FileExists(input_file_path):
-        print msg(requestCode='simple', index=19, numbOfParameters=1, param1=input_file)
+        print msgs.get_message(index=19, params=[input_file])
         return ''
     
     # Create output name
@@ -41,7 +45,7 @@ def conversion(input_file=None, input_encoding=None, data_dir='/home/sandbox/RSt
     
     #Output file exists
     if verify.FileExists(output_file_path):
-        print msg(requestCode='simple', index=20, numbOfParameters=1, param1=output_name)
+        print msgs.get_message(index=20, params=[output_name])
         return ''  
     
     if not input_encoding: 
@@ -64,13 +68,13 @@ def conversion(input_file=None, input_encoding=None, data_dir='/home/sandbox/RSt
             detected_encoding = 'ascii'
     
     if not input_encoding and not detected_encoding:
-        print msg(requestCode='simple', index=201, numbOfParameters=0)
+        print msgs.get_message(index=201)
         return ''
     elif not input_encoding and detected_encoding:
         input_encoding = detected_encoding
 
     # Convert the file
-    print msg(requestCode='simple', index=202, numbOfParameters=2,param1=input_file,param2=input_encoding),
+    print msgs.get_message(index=202, params=[input_file,input_encoding]),
     try:
         BLOCKSIZE = 1048576
         with codecs.open(input_file_path, "r", input_encoding) as sourceFile:
@@ -81,8 +85,8 @@ def conversion(input_file=None, input_encoding=None, data_dir='/home/sandbox/RSt
                         break
                     targetFile.write(contents)
                     
-        print msg(requestCode='simple', index=113,numbOfParameters=0)
-        print msg(requestCode='simple', index=203, numbOfParameters=2,param1=input_file,param2=output_name)
+        print msgs.get_message(index=113)
+        print msgs.get_message(index=203, params=[input_file,output_name])
         return ''
     except Exception as e:
         print e
