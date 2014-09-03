@@ -8,11 +8,12 @@ CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir, 'csf')
 sys.path.append(CSF_PATH)
 
 # Import CSF/library scripts
-from Table import message as msg
-from file_io import fileIO
-from database_io import databaseIO
-from table_maintinance import table_maintinance
-from build_filename import build_filename
+import MessageDB as mdb
+msgs = mdb.MessageDB()
+from csf.file_io import fileIO
+#from csf.database_io import databaseIO
+from csf.table_maintenance import table_maintenance
+from csf.build_filename import build_filename
 
 # Library Modules
 from library import verify_columns
@@ -53,53 +54,48 @@ def intervalData(detection_filename, dist_matrix_filename, data_directory = '/ho
     # Exit program if export files of the same name exist
     if compressed_exists or interval_data_exists:
         if compressed_exists:
-            print '{0}'.format(msg(requestCode='simple', index=103, 
-                             numbOfParameters=1, param1=compressed_filepath))
+            print '{0}'.format(msgs.get_message(index=103, params=[compressed_filepath]))
         if interval_data_exists:
-            print '{0}'.format(msg(requestCode='simple', index=103, 
-                             numbOfParameters=1, param1=interval_data_filepath))
-        print '{0}'.format(msg(requestCode='simple', index=104,numbOfParameters=0 ))
+            print '{0}'.format(msgs.get_message(index=103, params=[interval_data_filepath]))
+        print '{0}'.format(msgs.get_message(index=104))
         return ''
     
     # Load and verify detection file
     if fileIO().fileIO('reqexist', detection_filepath):
         # Verifying Detection file: 
-        print msg(requestCode='simple', index=112, 
-                               numbOfParameters=2, param1='Detection', param2=detection_filename),
+        print msgs.get_message(index=112, params=['Detection', detection_filename]),
         detection_fileh = fileIO('reqopen', detection_filepath )
         detection_file_header = detection_fileh.fileIO('reqread1',fromto=':list:')
         det_column_errors = verify_columns.verify_columns('reqdetect', detection_fileh, detection_file_header)
         if det_column_errors:
             # ERROR
-            print msg(requestCode='simple', index=114,numbOfParameters=0)
+            print msgs.get_message(index=114)
         else:
             # OK
-            print msg(requestCode='simple', index=113,numbOfParameters=0)
+            print msgs.get_message(index=113)
     else:
         missing_files.append(detection_filename)
     
     # Load and verify distance matrix file
     if fileIO().fileIO('reqexist', dis_mtx_filepath):
         # Verifying Distance Matrix file: 
-        print msg(requestCode='simple', index=112, 
-                               numbOfParameters=2, param1='Distance Matrix', param2=dist_matrix_filename),
+        print msgs.get_message(index=112, params=['Distance Matrix', dist_matrix_filename]),
         dis_mtx_fileh = fileIO('reqopen', dis_mtx_filepath )
         dis_mtx_file_header = dis_mtx_fileh.fileIO('reqread1', fromto=':list:')
         dis_mtx_column_errors = verify_columns.verify_columns('reqdistmtrx', dis_mtx_fileh, dis_mtx_file_header)
         if dis_mtx_column_errors:
             # ERROR
-            print msg(requestCode='simple', index=114,numbOfParameters=0)
+            print msgs.get_message(index=114)
         else:
             # OK
-            print msg(requestCode='simple', index=113,numbOfParameters=0)
+            print msgs.get_message(index=113)
     else:
         missing_files.append(dist_matrix_filename)
     
     # Return if any of the files are missing
     if missing_files:   
         for f in missing_files:
-            print msg('simple',19,
-                              1,param1=f)
+            print msgs.get_message(19, params=[f])
     
     # Return verification errors
     if det_column_errors or dis_mtx_column_errors:
@@ -120,46 +116,44 @@ def intervalData(detection_filename, dist_matrix_filename, data_directory = '/ho
     ##### Loading Step #####
     
     # Open database connection
-    db =  table_maintinance('reqconn')
+    db =  table_maintenance('reqconn')
     
     # Drop the mv_anm_detections table if it exists.
-    anm_tbl_exists =  db.table_maintinance(reqcode='reqexist', tablename='mv_anm_detections')
+    anm_tbl_exists =  db.table_maintenance(reqcode='reqexist', tablename='mv_anm_detections')
     if anm_tbl_exists:
-        db.table_maintinance(reqcode='reqdropcscd', tablename='mv_anm_detections')
+        db.table_maintenance(reqcode='reqdropcscd', tablename='mv_anm_detections')
     
     # Drop the distance_matrix table if it exists.
-    dis_mtx_tbl_exits = db.table_maintinance(reqcode='reqexist', tablename='distance_matrix')
+    dis_mtx_tbl_exits = db.table_maintenance(reqcode='reqexist', tablename='distance_matrix')
     if dis_mtx_tbl_exits:
-        db.table_maintinance(reqcode='reqdropcscd', tablename='distance_matrix')
+        db.table_maintenance(reqcode='reqdropcscd', tablename='distance_matrix')
         
     # Create mv_anm_detections table
-    db.table_maintinance(reqcode='reqcreate', 
+    db.table_maintenance(reqcode='reqcreate',
                          tablename='mv_anm_detections', filename=detection_file_header)
     
     # Load mv_anm_detections csv
     # Loading detection file:
-    print msg(requestCode='simple', index=115, 
-                           numbOfParameters=2, param1='Detection', param2=detection_filename),
-    det_load_error = db.table_maintinance(reqcode='reqload', tablename='mv_anm_detections', filename=detection_filepath)
+    print msgs.get_message(index=115, params=['Detection', detection_filename]),
+    det_load_error = db.table_maintenance(reqcode='reqload', tablename='mv_anm_detections', filename=detection_filepath)
     if det_load_error:
-        print msg(requestCode='simple', index=114,numbOfParameters=0)
-        print msg(requestCode='simple', index=99, numbOfParameters=1, param1=det_load_error)
+        print msgs.get_message(index=114)
+        print msgs.get_message(index=99, params=[det_load_error])
     else:
-        print msg(requestCode='simple', index=113,numbOfParameters=0)
+        print msgs.get_message(index=113)
         
     
     # Create distance matrix table
-    db.table_maintinance(reqcode='reqcreate',tablename='distance_matrix', filename=dis_mtx_file_header)
+    db.table_maintenance(reqcode='reqcreate',tablename='distance_matrix', filename=dis_mtx_file_header)
     
     # Load distance matrix table
-    print msg(requestCode='simple', index=115, 
-                           numbOfParameters=2, param1='Distance Matrix', param2=dist_matrix_filename),
-    mtx_load_error = db.table_maintinance(reqcode='reqload', tablename='distance_matrix', filename=dis_mtx_filepath)
+    print msgs.get_message(index=115, params=['Distance Matrix', dist_matrix_filename]),
+    mtx_load_error = db.table_maintenance(reqcode='reqload', tablename='distance_matrix', filename=dis_mtx_filepath)
     if mtx_load_error:
-        print msg(requestCode='simple', index=114, numbOfParameters=0)
-        print msg(requestCode='simple', index=99, numbOfParameters=1, param1=mtx_load_error)
+        print msgs.get_message(index=114)
+        print msgs.get_message(index=99, params=[mtx_load_error])
     else:
-        print msg(requestCode='simple', index=113, numbOfParameters=0)
+        print msgs.get_message(index=113)
     
     ##### Processing Step #####
     
@@ -170,20 +164,20 @@ def intervalData(detection_filename, dist_matrix_filename, data_directory = '/ho
     view_intvl.view_intvl()
     
     ##### File Output Step #####
-    print msg('simple',118,0),
+    print msgs.get_message(118)
     
     # Create local copies of tables 
     try:
         count_compressed = putfile.putFile('reqtabcsv', 'mv_anm_compressed', compressed_filepath)
         count_interval = putfile.putFile('reqtabcsv', 'vw_interval_data', interval_data_filepath)
-        print msg(requestCode='simple', index=113,numbOfParameters=0)
+        print msgs.get_message(index=113)
     except Exception, e:
-        print msg(requestCode='simple', index=114,numbOfParameters=0)
-        print msg(requestCode='simple', index=100,numbOfParameters=1,param1=e)
+        print msgs.get_message(index=114)
+        print msgs.get_message(index=100,params=[e])
         
     # Final export report messages 
-    print msg('simple',116,2,param1=compressed_filename,param2=count_compressed)
-    print msg('simple',117,2,param1=interval_data_filename, param2=count_interval)
+    print msgs.get_message(116, params=[compressed_filename, count_compressed])
+    print msgs.get_message(117, params=[interval_data_filename, count_interval])
     return '' # Program exit
     
 #if __name__ == '__main__':

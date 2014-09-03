@@ -28,8 +28,8 @@ def createMatrix( detection_tbl, matrix_tbl ):
     try:
         cur.execute('''INSERT INTO {1} (
             select *,
-            coalesce(round(ST_Distance_Spheroid(st_makepoint(avg_long1, avg_lat1)
-            ,st_makepoint(avg_long2, avg_lat2),'SPHEROID["WGS 84",6378137,298.257223563]')::numeric,0)::text)::numeric as distance_m
+            coalesce(round(ST_Distance_Spheroid(st_makepoint(avg_long1, avg_lat1,4326)
+            ,st_makepoint(avg_long2, avg_lat2,4326),'SPHEROID["WGS 84",6378137,298.257223563]')::numeric,0)::text)::numeric as distance_m
             ,NULL as real_distance from (
             select stn1,stn2, round(avg(lat1::numeric),5)::numeric as avg_lat1,round(avg(lat2::numeric),5)::numeric as avg_lat2 ,round(avg(long1::numeric),5)::numeric as avg_long1,round(avg(long2::numeric),5)::numeric as avg_long2  from (
             select  fst.station as stn1,snd.station as stn2,
@@ -135,12 +135,12 @@ def createSuspect( detection_tbl, suspect_tbl, time_interval):
         , trd.datecollected - snd.datecollected as next_interval,
         'GT '||{2}||' minutes'
          from (select row_number()over( order by catalognumber,datecollected) as row_num
-                 ,* from  public.{1} ) fst
-        -- a join here rather than left join eliminiates case where last detection is first detection
-        -- it will include all cases where there are at least two detections
-        -- it will eliminate cases where there is only the release record
-        join (select row_number()over( order by catalognumber,datecollected) as row_num
-                 ,* from  public.{1}) snd
+          ,* from  public.{1} ) fst
+         -- 201407 change from join to a left join to pick up single detections
+        -- 201407 single release records will be eliminated in the  at the end
+ left join (select row_number()over( order by catalognumber,datecollected) as
+            row_num  -- 201407 change to left join
+           ,* from  public.{1}) snd
           on fst.row_num = snd.row_num -1
           and fst.catalognumber = snd.catalognumber
         -- this is a left join as we want all cases where there are at lease two detections to show up. Three detections is not
@@ -150,11 +150,21 @@ def createSuspect( detection_tbl, suspect_tbl, time_interval):
           on fst.row_num = trd.row_num -2
           and fst.catalognumber = trd.catalognumber
         ) foo
-        where (prev_interval >  interval'{2} minute' and next_interval > interval'{2} minute' )
-        or (prev_interval > interval'{2} minute' and next_interval is null ) -- this check the case where the last detec is isolated
+         where (prev_interval >  interval'{2} minute' and next_interval >
+                  interval'{2} minute' )
+         or (prev_interval > interval'{2} minute' and next_interval is null ) -- case where the last detec is isolated
+         or (suspect_detection is null and detecid3 is null and detecid1 not like
+               '%release'
+         and  (catalognumber,frst_detec::text )
+         not in (
+              select catalognumber,max_date from (
+                  select catalognumber,max(datecollected)::text as max_date, count(*) as cnt
+                  from public.{1} group by 1)
+                  foo where cnt > 1)
+               ) --201407 flag single detections unless release
         order by catalognumber, frst_detec
         );
-        '''.format(suspect_tbl,detection_tbl, time_interval))
+'''.format(suspect_tbl,detection_tbl, time_interval))
     conn.commit()
     return True
 

@@ -8,8 +8,7 @@ CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir, os.pardir, 'csf')
 
 sys.path.append(CSF_PATH)
 
-from Table import message as msg
-from table_maintinance import table_maintinance
+from table_maintenance import table_maintenance
 
 def compress_detections():
     '''
@@ -17,20 +16,20 @@ def compress_detections():
     '''
     #test if table mv_anm_compressed exists and drop if it does. Use CSF
     #Connect to the database
-    db = table_maintinance('reqconn')
+    db = table_maintenance('reqconn')
     
-    mv_anm_compressed_exists = db.table_maintinance(reqcode='reqexist', tablename='mv_anm_compressed')
+    mv_anm_compressed_exists = db.table_maintenance(reqcode='reqexist', tablename='mv_anm_compressed')
     if mv_anm_compressed_exists:
-        db.table_maintinance(reqcode='reqdrop', tablename='mv_anm_compressed')
+        db.table_maintenance(reqcode='reqdrop', tablename='mv_anm_compressed')
     
     #create table mv_anm_compressed.See Appendix A for SQL
-    db.table_maintinance(reqcode='reqcreate', tablename='mv_anm_compressed')
+    db.table_maintenance(reqcode='reqcreate', tablename='mv_anm_compressed')
     
     #create or replace function f_det_compressed(). See Appendix B for SQL
-    db.table_maintinance(reqcode='reqcreate', tablename='f_det_compressed')
+    db.table_maintenance(reqcode='reqcreate', tablename='f_det_compressed')
     
     #Close the table_maintinace module
-    db.table_maintinance('reqdisconn')
+    db.table_maintenance('reqdisconn')
     
     #Create new database connection for 
     conn, cur = pg.createConnection() 

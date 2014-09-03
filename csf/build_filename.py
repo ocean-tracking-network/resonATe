@@ -1,6 +1,7 @@
 import os
 import re
-from Table import message as msgCSF
+import MessageDB as mdb
+msgs = mdb.MessageDB()
     
 def get_version( filename ):
     ''' (str) -> (list of (int, str))
@@ -57,8 +58,7 @@ def build_filename(reqcode, filename):
         return output_filename
     else:
         # Output message for an invalid request code
-        return msgCSF(requestCode='simple', index=12, 
-               numbOfParameters=1, param1=reqcode)
+        return msgs.get_message(index=12, params=[reqcode])
         
 
 if __name__ == '__main__':

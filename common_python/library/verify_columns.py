@@ -6,8 +6,9 @@ import time
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir,os.pardir, 'csf')
 sys.path.append(CSF_PATH)
-    
-from Table import message as msg
+
+import MessageDB as mdb
+msgs = mdb.MessageDB()
 
 def verify_columns(reqcode, fileh, header_string):
     ''' (str, fileIO, str) -> list of str
@@ -85,7 +86,7 @@ def verify_columns(reqcode, fileh, header_string):
             missing_columns.append('station')
              
         if missing_columns:
-            errors.append(msg('simple',105,2,param1='Detection', param2=os.path.basename(str(fileh))))
+            errors.append(msgs.get_message(105,params=['Detection', os.path.basename(str(fileh))]))
             for col in missing_columns:
                 errors.append(col)
         
@@ -115,21 +116,21 @@ def verify_columns(reqcode, fileh, header_string):
             missing_columns.append('real_distance')
              
         if missing_columns:
-            errors.append(msg('simple',105,2,param1='Distance matrix', param2=os.path.basename(str(fileh))))
+            errors.append(msgs.get_message(105, params=['Distance matrix', os.path.basename(str(fileh))]))
             for col in missing_columns:
                 errors.append(col)
         else:
             matrix_pair_tst = True
     else:
         #Invalid request code: '{reqcode}'
-        errors.append(msg('simple',12,1,param1=reqcode))
+        errors.append(msgs.get_message(12,params=[reqcode]))
     
     #Null in column headers
     if u'' in header_string:
-        errors.append(msg('simple',120,1,param1=os.path.basename(str(fileh))))
+        errors.append(msgs.get_message(120,params=[os.path.basename(str(fileh))]))
     
     if len(set(header_string)) < len(header_string):
-        errors.append(msg('simple',121,1,param1=os.path.basename(str(fileh))))
+        errors.append(msgs.get_message(121,params=[os.path.basename(str(fileh))]))
     
     #Return initial errors
     if errors:
@@ -231,59 +232,52 @@ def verify_columns(reqcode, fileh, header_string):
     
     #Build error messages
     if row_length_invalid:
-        errors.append(msg('simple',119,
-                          1,param1=os.path.basename(str(fileh))))
+        errors.append(msgs.get_message(119,
+                    params=[os.path.basename(str(fileh))]))
     if unqdetecids_dup:
-        errors.append(msg('simple',106,
-                          2,param1=os.path.basename(str(fileh)),
-                          param2='unqdetecids'))
+        errors.append(msgs.get_message(106,
+                    params=[os.path.basename(str(fileh)),'unqdetecids']))
+
         errors.append([x[1] for x in unqdetecids_dup])
     
     if invalid_dates:
-        errors.append(msg('simple',107,
-                          2,param1=os.path.basename(str(fileh)),
-                          param2='datecollected'))
+        errors.append(msgs.get_message(107,
+                    params=[os.path.basename(str(fileh)),'datecollected']))
         errors.append([x[1] for x in invalid_dates])
     
     if catalognumber_nulls:
-        errors.append(msg('simple',108,
-                          2,param1=os.path.basename(str(fileh)),
-                          param2='datecollected'))
+        errors.append(msgs.get_message(108,
+                    params=[os.path.basename(str(fileh)),'datecollected']))
         errors.append(catalognumber_nulls)
     
     if station_nulls:
-        errors.append(msg('simple',108,
-                          2,param1=os.path.basename(str(fileh)),
-                          param2='station'))
+        errors.append(msgs.get_message(108,
+                    params=[os.path.basename(str(fileh)),'station']))
         errors.append(station_nulls)
     
     if stn1_nulls:
-        errors.append(msg('simple',108,
-                          2,param1=os.path.basename(str(fileh)),
-                          param2='stn1'))
+        errors.append(msgs.get_message(108,
+                    params=[os.path.basename(str(fileh)),'stn1']))
         errors.append(stn1_nulls)
         
     if stn2_nulls:
-        errors.append(msg('simple',108,
-                          2,param1=os.path.basename(str(fileh)),
-                          param2='stn2'))
+        errors.append(msgs.get_message(108,
+                    params=[os.path.basename(str(fileh)),'stn2']))
         errors.append(stn1_nulls)
         
     if real_distance_invalid:
-        errors.append(msg('simple',111,
-                          2,param1=os.path.basename(str(fileh)),
-                          param2='real_distance'))
+        errors.append(msgs.get_message(111,
+                    params=[os.path.basename(str(fileh)),'real_distance']))
         errors.append(real_distance_invalid)
         
     if distance_m_invalid:
-        errors.append(msg('simple',110,
-                          2,param1=os.path.basename(str(fileh)),
-                          param2='distance_m'))
+        errors.append(msgs.get_message(110,
+                    params=[os.path.basename(str(fileh)),'distance_m']))
         errors.append(distance_m_invalid)
         
     if matrix_pairs_invalid:
-        errors.append(msg('simple',109,
-                          1,param1=os.path.basename(str(fileh))))
+        errors.append(msgs.get_message(109,
+                    params=[os.path.basename(str(fileh))]))
         station_pairs = ['stn:{0} rows:{1},{2}'.format(*x) for x in matrix_pairs_invalid]
         for pair in station_pairs:
             errors.append(pair)

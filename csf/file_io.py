@@ -11,7 +11,8 @@ SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
 CSF_PATH = os.path.join(SCRIPT_PATH,os.pardir,'csf')
 
 sys.path.append( CSF_PATH )
-from Table import message as msg
+import MessageDB as mdb
+msgs = mdb.MessageDB()
 
 class fileIO():
     def __init__(self, reqcode=None, filename=None, fromto=None):
@@ -61,7 +62,7 @@ class fileIO():
             self.close_file()
         else:
             # Output message for an invalid request code
-            return msg(requestCode='simple', index=12, numbOfParameters=1, param1=reqcode)
+            return msgs.get_message(index=12, params=[reqcode])
 
     def open_file(self, filename):
         '''(str) -> NoneType

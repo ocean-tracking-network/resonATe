@@ -13,7 +13,8 @@ import tempfile
 
 #Local Imports
 import library.verifications as verify
-from csf.Table import message as msgCSF
+import csf.MessageDB as mdb
+msgs = mdb.MessageDB()
 
 def dis_mtx_merge(reqcode,distance_matrix_input,distance_real_input):
     #Variables
@@ -28,12 +29,12 @@ def dis_mtx_merge(reqcode,distance_matrix_input,distance_real_input):
     #Check reqcode 
     if(reqcode !='reqmerge'):
         #return 'Error:Not valid reqcode'  #CSF
-        return msgCSF(requestCode='simple', index=12,numbOfParameters=1,param1=reqcode).format(reqcode)
+        return msgs.get_message(12,[reqcode])
         
     if not verify.Filename( distance_matrix_input ):
-        return msgCSF(requestCode='simple', index=15,numbOfParameters=1,param1=distance_matrix_input).format(distance_matrix_input)
+        return msgs.get_message(15,[distance_matrix_input])
     if not verify.Filename( distance_real_input ):
-        return msgCSF(requestCode='simple', index=15,numbOfParameters=1,param1=distance_real_input).format(distance_real_input)
+        return msgs.get_message(15,[distance_real_input])
     
     #Assign file path
     #parent_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -43,9 +44,9 @@ def dis_mtx_merge(reqcode,distance_matrix_input,distance_real_input):
     
     #Check file exist
     if not verify.FileExists( distance_matrix_input ):
-        return msgCSF(requestCode='simple', index=19,numbOfParameters=1,param1=distance_matrix_input).format(distance_matrix_input)
+        return msgs.get_message(index=19,params=[distance_matrix_input])
     if not verify.FileExists( distance_real_input):
-        return msgCSF(requestCode='simple', index=19,numbOfParameters=1,param1=distance_real_input).format(distance_real_input)
+        return msgs.get_message(index=19,params=[distance_real_input])
 
     #backup detection file 1 (in a temp file)
     fd, file1_bckup_name = tempfile.mkstemp()
@@ -83,7 +84,7 @@ def dis_mtx_merge(reqcode,distance_matrix_input,distance_real_input):
     mandatory_columns_file1 = ['stn1','stn2','distance_m','real_distance']
     missing_columns_file1 = verify.MandatoryColumns(detection_headers_file1,mandatory_columns_file1)
     if missing_columns_file1:
-        return msgCSF(requestCode='simple', index=16,numbOfParameters=2,param1=missing_columns_file1,param2=distance_matrix_input).format(missing_columns_file1,distance_matrix_input)
+        return msgs.get_message(index=16,params=[missing_columns_file1,distance_matrix_input])
     else:
         file1_valid = True
     #test second file for validaity
@@ -92,25 +93,25 @@ def dis_mtx_merge(reqcode,distance_matrix_input,distance_real_input):
     mandatory_columns_file2 = ['stn1','stn2','real_distance']    
     missing_columns_file2 = verify.MandatoryColumns(detection_headers_file2,mandatory_columns_file2)
     if missing_columns_file2:
-        return msgCSF(requestCode='simple', index=16,numbOfParameters=2,param1=missing_columns_file2,param2=distance_real_input).format(missing_columns_file2,distance_real_input)
+        return msgs.get_message(index=16,params=[missing_columns_file2,distance_real_input])
     else:
         file2_valid = True
     #check for exist output file
     if(os.path.isfile(os.path.join(parent_path,'data', file1_base_name+'_merged.csv'))):
-        return msgCSF(requestCode='simple', index=20,numbOfParameters=1,param1=file1_base_name+'_merged.csv').format(file1_base_name+'_merged.csv')
+        return msgs.get_message(index=20,params=[file1_base_name+'_merged.csv'])
     #merge two files
     if(file1_valid and file2_valid):
         count_file1 = verify.FileCount(distance_matrix_input,header = True)
         count_file2 = verify.FileCount(distance_real_input,header = True)
-        print msgCSF(requestCode='simple', index=17,numbOfParameters=2,param1=count_file1,param2=distance_matrix_input).format(count_file1,distance_matrix_input)
-        print msgCSF(requestCode='simple', index=17,numbOfParameters=2,param1=count_file2,param2=distance_real_input).format(count_file2,distance_real_input)
+        print msgs.get_message(index=17,params=[count_file1,distance_matrix_input])
+        print msgs.get_message(index=17,params=[count_file2,distance_real_input])
         beforeUpdatedCount = verify.RealUpdateCount(file1_bckup_name)        
         
         #Check each row of file2         
         for row in file2_list:
             if(row):
                 if ((position+1)>len(row) or len(header2) != len(row)):
-                    return msgCSF(requestCode='simple', index=21,numbOfParameters=1,param1=distance_real_input).format(distance_real_input)
+                    return msgs.get_message(index=21,params=distance_real_input)
                 if (row[position]!=''):
                     row_number = []
                     updateReal = ""
@@ -148,13 +149,13 @@ def dis_mtx_merge(reqcode,distance_matrix_input,distance_real_input):
         file2_open.close()                    
         #output the updated first file with 'merged' append to original file name
         if(updatedCount-beforeUpdatedCount > 0 ):
-            print msgCSF(requestCode='simple', index=18,numbOfParameters=2,param1=updatedCount,param2=file1_base_name+'_merged.csv').format(updatedCount,file1_base_name+'_merged.csv')
+            print msgs.get_message(index=18,params=[updatedCount,file1_base_name+'_merged.csv'])
             os.rename(file1_bckup_name,''.join([parent_path,'/','data','/',file1_base_name,'_merged.csv']))
         else:
-            print msgCSF(requestCode='simple', index=22,numbOfParameters=1,param1=distance_matrix_input).format(distance_matrix_input)
+            print msgs.get_message(index=22,params=[distance_matrix_input])
             # remove bckup file
             if (os.path.isfile(file1_bckup_name)):
                 os.remove(file1_bckup_name)
      
-        return msgCSF(requestCode='simple', index=23,numbOfParameters=0)
+        return msgs.get_message(index=23)
 
