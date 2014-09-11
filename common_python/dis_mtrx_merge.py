@@ -150,7 +150,7 @@ def dis_mtx_merge(reqcode,distance_matrix_input,distance_real_input):
         #output the updated first file with 'merged' append to original file name
         if(updatedCount-beforeUpdatedCount > 0 ):
             print msgs.get_message(index=18,params=[updatedCount,file1_base_name+'_merged.csv'])
-            os.rename(file1_bckup_name,''.join([parent_path,'/','data','/',file1_base_name,'_merged.csv']))
+            shutil.move(file1_bckup_name,''.join([parent_path,'/','data','/',file1_base_name,'_merged.csv']))
         else:
             print msgs.get_message(index=22,params=[distance_matrix_input])
             # remove bckup file
@@ -158,4 +158,3 @@ def dis_mtx_merge(reqcode,distance_matrix_input,distance_real_input):
                 os.remove(file1_bckup_name)
      
         return msgs.get_message(index=23)
-
