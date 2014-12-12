@@ -1,6 +1,7 @@
 import psycopg2
 import psycopg2.extras
 import sys
+import shapely
 
 from . import pg_connection as pg
 
@@ -168,7 +169,7 @@ def createSuspect( detection_tbl, suspect_tbl, time_interval):
     conn.commit()
     return True
 
-def loadToPostgre( table_name, filename ): 
+def loadToPostgre( table_name, filename):
     data_loaded = False
     
     # Create connection
@@ -203,6 +204,65 @@ def loadToPostgre( table_name, filename ):
     
     return data_loaded
 
+def createGeometryColumns(table_name):
+
+    conn, cur = pg.createConnection()
+    table_name = 'zsc_matched_detections_2013_v00'
+    cur.execute("select column_name from information_schema.columns \
+                    WHERE table_name = '%s' and data_type = 'character varying'" % (table_name))
+
+    text_cols = cur.fetchall()
+    geo_cols = []
+    srid = 4326 # this doesn't get included in wkb/wkt
+
+    for col_name in text_cols:
+        check_q = "select %s from %s" % (col_name[0], table_name)
+        cur.execute(check_q)
+        col_contents = cur.fetchall()
+        try: # try binary.
+            populated_column = False
+            for item in col_contents:
+                if item[0]:
+                    geom = shapely.wkb.loads(item[0], True)
+                    populated_column = True
+            if populated_column:
+                geo_cols.append([col_name[0], 'WKB', geom.geom_type])
+        except:
+            try: # try WKT
+                populated_column = False
+                for item in col_contents:
+                    if item[0]:
+                        geom = shapely.wkt.loads(item[0])
+                        populated_column = True
+                if populated_column:
+                    geo_cols.append([col_name[0], 'Text', geom.geom_type])
+            except:
+                continue
+            continue
+
+    for col in geo_cols:
+        # Update the geometry columns here.
+        geom_sql = "select AddGeometryColumn('public', '{0}', '{1}', {2}, '{3}', 2, false)\
+        ".format(table_name, 'geom_%s' % col[0], srid, col[2].upper())
+        gis_func_call = "ST_GeomFromE%s" % col[1]
+        if col[1] == 'WKB':
+            col_decode = "decode(%s, 'hex')" % col[0]
+        else:
+            col_decode = col[0]
+        geom_pop_sql = "update {0} set {1}={2}({3})".format(table_name,
+                                                            'geom_%s' % col[0],
+                                                            gis_func_call,
+                                                            col_decode)
+        print geom_sql
+        print geom_pop_sql
+
+    # Determine whether there is a latitude and longitude pair of columns from which to make a Geometry POINT object
+    if ['longitude'] in text_cols and ['latitude'] in text_cols:
+        createLatLonGeom = True
+        print 'creating a Point object from latitude/longitude'
+
+    conn.close()
+
 def createTable( table_name, csv_headers, drop=False ):
     #Create Database Connection
     conn, cur = pg.createConnection() 
@@ -217,7 +277,7 @@ def createTable( table_name, csv_headers, drop=False ):
     try:
         cur.execute(sql)
         conn.commit()
-        
+
         #Close postgresql connection
         cur.close()
         conn.close()

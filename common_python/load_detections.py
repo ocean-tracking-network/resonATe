@@ -19,7 +19,7 @@ data_directory = '/home/sandbox/RStudio/data/'
 #Switches
 SuspectDetections = None
 DistanceMatrix = None
-ReloadInputFile = None
+ReloadInputFile = False
 
 def loadDetections():
     #Is the supplied detection_file variable is valid
@@ -87,8 +87,10 @@ def loadDetections():
     #If the detection table doesn't exist or if realoadfile == True then create detection table
     if not detection_tbl_exists or ReloadInputFile:
         #Remove old table and reload data
-        if ReloadInputFile:
-            load_to_pg.removeTable( detection_tbl )
+        #if ReloadInputFile:
+            #load_to_pg.removeTable( detection_tbl ) # may not need this manual step, createTable takes a drop boolean
+            # Also bad form to drop the table here, there's still potential for the createTable to not run.
+            # eg what if the file doesn't have mandatory columns.
 
         #Extract headers
         detection_headers =  verify.FileHeaders( detection_filename )
@@ -115,14 +117,17 @@ def loadDetections():
                 errors.append('''Error: The required column(s) for creating the station distance matrix are missing:\nSet the DistanceMatrix to FALSE to continue processing with your current data file.'''.format(','.join(missing_columns)))
         else:
             #Create detections table
-            table_created = load_to_pg.createTable( detection_tbl, detection_headers)
+            table_created = load_to_pg.createTable( detection_tbl, detection_headers, ReloadInputFile) # final argument says whether to destroy an existing table.
             
             #Exit if table could not be created
             if not table_created:
                 return 'Exiting...'
-            
+
+            # Check file/table for lat/lon and Well Known Text/Binary and return a list of all newly created geometry columns.
+            geometry_columns = load_to_pg.createGeometryColumns(detection_tbl, detection_headers, detection_filename)
+
             #Load the table contents with csv file
-            detections_loaded = load_to_pg.loadToPostgre( detection_tbl, detection_filename)
+            detections_loaded = load_to_pg.loadToPostgre( detection_tbl, detection_filename, geometry_columns)
     
             if detections_loaded:       
                 #Remove blank lines from the newly created table
