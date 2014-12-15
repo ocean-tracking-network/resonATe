@@ -125,7 +125,7 @@ def loadDetections():
 
 
             #Load the table contents with csv file
-            detections_loaded = load_to_pg.loadToPostgre( detection_tbl, detection_filename, geometry_columns)
+            detections_loaded = load_to_pg.loadToPostgre( detection_tbl, detection_filename)
     
             if detections_loaded:       
                 #Remove blank lines from the newly created table
