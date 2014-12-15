@@ -268,6 +268,7 @@ def createGeometryColumns(table_name):
         print 'LatLon detected, creating a Point object from latitude/longitude'
 
     conn.close()
+    return geo_cols
 
 def createTable( table_name, csv_headers, drop=False ):
     #Create Database Connection
