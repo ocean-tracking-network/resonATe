@@ -256,11 +256,10 @@ def createGeometryColumns(table_name):
                                                             col_decode)
         #print geom_sql
         cur.execute(geom_sql)
-
+        conn.commit()
         #print geom_pop_sql
         cur.execute(geom_pop_sql)
-
-    conn.commit()
+        conn.commit()
 
     # Determine whether there is a latitude and longitude pair of columns from which to make a Geometry POINT object
     if ['longitude'] in text_cols and ['latitude'] in text_cols:
