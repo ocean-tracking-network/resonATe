@@ -207,13 +207,13 @@ def loadToPostgre( table_name, filename):
 def createGeometryColumns(table_name):
 
     conn, cur = pg.createConnection()
-    table_name = 'zsc_matched_detections_2013_v00'
     cur.execute("select column_name from information_schema.columns \
                     WHERE table_name = '%s' and data_type = 'character varying'" % (table_name))
 
     text_cols = cur.fetchall()
     geo_cols = []
-    srid = 4326 # this doesn't get included in wkb/wkt
+    srid = 4326 # this doesn't get included in wkb/wkt. No way to read it out of the geom usually.
+    # TODO: find the appropriate SRID given the geometry object.
 
     for col_name in text_cols:
         check_q = "select %s from %s" % (col_name[0], table_name)
@@ -242,24 +242,30 @@ def createGeometryColumns(table_name):
 
     for col in geo_cols:
         # Update the geometry columns here.
+        # Create a column with the same name as the source column with the prefix geom_
         geom_sql = "select AddGeometryColumn('public', '{0}', '{1}', {2}, '{3}', 2, false)\
-        ".format(table_name, 'geom_%s' % col[0], srid, col[2].upper())
+                    ".format(table_name, 'geom_%s' % col[0], srid, col[2].upper())
         gis_func_call = "ST_GeomFromE%s" % col[1]
         if col[1] == 'WKB':
-            col_decode = "decode(%s, 'hex')" % col[0]
+            col_decode = "decode(%s, 'hex')" % col[0] # Binary needs to be decoded from ASCII representing hex.
         else:
             col_decode = col[0]
         geom_pop_sql = "update {0} set {1}={2}({3})".format(table_name,
                                                             'geom_%s' % col[0],
                                                             gis_func_call,
                                                             col_decode)
-        print geom_sql
-        print geom_pop_sql
+        #print geom_sql
+        cur.execute(geom_sql)
+
+        #print geom_pop_sql
+        cur.execute(geom_pop_sql)
+
+    conn.commit()
 
     # Determine whether there is a latitude and longitude pair of columns from which to make a Geometry POINT object
     if ['longitude'] in text_cols and ['latitude'] in text_cols:
         createLatLonGeom = True
-        print 'creating a Point object from latitude/longitude'
+        print 'LatLon detected, creating a Point object from latitude/longitude'
 
     conn.close()
 
