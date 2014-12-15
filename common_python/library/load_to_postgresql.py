@@ -255,9 +255,11 @@ def createGeometryColumns(table_name):
                                                             gis_func_call,
                                                             col_decode)
         #print geom_sql
+        print 'Creating geometry column for %s, identified as %s' % (col[0], col[1])
         cur.execute(geom_sql)
         conn.commit()
         #print geom_pop_sql
+        print 'Populating geometry column with %s' % gis_func_call
         cur.execute(geom_pop_sql)
         conn.commit()
 
