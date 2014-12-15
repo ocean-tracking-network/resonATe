@@ -123,8 +123,6 @@ def loadDetections():
             if not table_created:
                 return 'Exiting...'
 
-            # Check file/table for lat/lon and Well Known Text/Binary and return a list of all newly created geometry columns.
-            geometry_columns = load_to_pg.createGeometryColumns(detection_tbl, detection_headers, detection_filename)
 
             #Load the table contents with csv file
             detections_loaded = load_to_pg.loadToPostgre( detection_tbl, detection_filename, geometry_columns)
@@ -132,7 +130,11 @@ def loadDetections():
             if detections_loaded:       
                 #Remove blank lines from the newly created table
                 load_to_pg.removeNullRows(detection_tbl, 'unqdetecid')
-                
+
+
+                # Check file/table for lat/lon and Well Known Text/Binary and return a list of all newly created geometry columns.
+                geometry_columns = load_to_pg.createGeometryColumns(detection_tbl)
+
                 #Check for duplicate unique ids
                 copy_from_pg.ReturnDuplicates( detection_tbl, 'unqdetecid')
                 duplicates = verify.TableCount( 'duplications' )
