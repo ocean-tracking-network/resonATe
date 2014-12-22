@@ -22,6 +22,8 @@ DistanceMatrix = None
 ReloadInputFile = False
 
 def loadDetections():
+
+    tables_created = {}
     #Is the supplied detection_file variable is valid
     if not verify.Filename( detection_file ):
         return 'Error: [detection_file] variable supplied either has invalid characters or does not contain a csv file extension'
@@ -122,6 +124,8 @@ def loadDetections():
             #Exit if table could not be created
             if not table_created:
                 return 'Exiting...'
+            else
+                tables_created['detections'] = table_created
 
 
             #Load the table contents with csv file
@@ -174,7 +178,8 @@ def loadDetections():
         suspect_count = verify.TableCount( suspect_tbl )
         #Export Suspect Detection Summary
         copy_from_pg.ExportTable( suspect_tbl, suspect_filename)
-        
+
+        tables_created['suspect'] = suspect_tbl
         #Print summary of actions to console
         print 'Detection summary exported to: {0}'.format(suspect_filename)
         print 'There are {0} suspect detections'.format(suspect_count)
@@ -196,14 +201,14 @@ def loadDetections():
             matrix_count = verify.TableCount( matrix_tbl )
             # Export Distance Matrix
             copy_from_pg.ExportTable( matrix_tbl, matrix_filename)
-            
+            tables_created['dist_matrix'] = matrix_tbl
             #Print summary of actions to console
             print 'Station distance matrix exported to: {0}'.format(matrix_filename)
             print 'There are {0} station matrix pairs'.format(matrix_count)
         else:
             #Program exit on error
             return 'Exiting...'
-    return 'Loading complete.'
+    return tables_created, 'Loading complete.'
 
 if __name__ == '__main__':
     ReloadInputFile = True
