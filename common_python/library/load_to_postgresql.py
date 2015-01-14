@@ -1,9 +1,15 @@
 import psycopg2
 import psycopg2.extras
 import sys
-import shapely
+import shapely.wkb as wkb
+import shapely.wkt as wkt
+import string
 
 from . import pg_connection as pg
+
+all_wkt_geom_types = ['Geometry', 'Point', 'LineString', 'Polygon', 'MultiPoint', 'MultiLineString', 'MultiPolygon',
+              'GeometryCollection', 'CircularString', 'CompoundCurve', 'CurvePolygon', 'MultiCurve', 'MultiSurface',
+              'Curve', 'Surface', 'PolyhedralSurface', 'TIN', 'Triangle']
 
 def createMatrix( detection_tbl, matrix_tbl ):
     #Create Database Connection
@@ -211,6 +217,7 @@ def createGeometryColumns(table_name):
                     WHERE table_name = '%s' and data_type = 'character varying'" % (table_name))
 
     text_cols = cur.fetchall()
+    print "%s text columns in table %s" % (text_cols, table_name)
     geo_cols = []
     srid = 4326 # this doesn't get included in wkb/wkt. No way to read it out of the geom usually.
     # TODO: find the appropriate SRID given the geometry object.
@@ -219,37 +226,36 @@ def createGeometryColumns(table_name):
         check_q = "select %s from %s" % (col_name[0], table_name)
         cur.execute(check_q)
         col_contents = cur.fetchall()
-        try: # try binary.
-            populated_column = False
-            for item in col_contents:
-                if item[0]:
-                    geom = shapely.wkb.loads(item[0], True)
+        populated_column = False
+        for item in col_contents:
+            try:
+                if item[0] is not None and len(item[0]) > 6 and any(s in item[0] for s in all_wkt_geom_types):
+                    geom = wkt.loads(item[0]) # try to parse it.
                     populated_column = True
-            if populated_column:
-                geo_cols.append([col_name[0], 'WKB', geom.geom_type])
-        except:
-            try: # try WKT
-                populated_column = False
-                for item in col_contents:
-                    if item[0]:
-                        geom = shapely.wkt.loads(item[0])
-                        populated_column = True
-                if populated_column:
-                    geo_cols.append([col_name[0], 'Text', geom.geom_type])
+                    pop_col_type="Text"
+                elif item[0] is not None and len(item[0]) > 10 and all(c in string.hexdigits for c in item[0]):
+                    geom = wkb.loads(item[0], hex=True)
+                    populated_column = True
+                    pop_col_type="WKB"
             except:
-                continue
-            continue
+                print item[0]
+                break
+        if populated_column:
+            geo_cols.append([col_name[0], pop_col_type, geom.geom_type])
 
+
+    #print "%s columns are geometry" % geo_cols
     for col in geo_cols:
         # Update the geometry columns here.
         # Create a column with the same name as the source column with the prefix geom_
         geom_sql = "select AddGeometryColumn('public', '{0}', '{1}', {2}, '{3}', 2, false)\
                     ".format(table_name, 'geom_%s' % col[0], srid, col[2].upper())
-        gis_func_call = "ST_GeomFromE%s" % col[1]
         if col[1] == 'WKB':
             col_decode = "decode(%s, 'hex')" % col[0] # Binary needs to be decoded from ASCII representing hex.
-        else:
+            gis_func_call = "ST_GeomFromEWKB"
+        else: # otherwise it's text.
             col_decode = col[0]
+            gis_func_call="ST_GeomFromText"
         geom_pop_sql = "update {0} set {1}={2}({3})".format(table_name,
                                                             'geom_%s' % col[0],
                                                             gis_func_call,
@@ -263,10 +269,25 @@ def createGeometryColumns(table_name):
         cur.execute(geom_pop_sql)
         conn.commit()
 
+    if not geo_cols: # if there was no geometry information explicitly defined by data in the file
     # Determine whether there is a latitude and longitude pair of columns from which to make a Geometry POINT object
-    if ['longitude'] in text_cols and ['latitude'] in text_cols:
-        createLatLonGeom = True
-        print 'LatLon detected, creating a Point object from latitude/longitude'
+    # Accept various lat and lon strings? Elsewhere we limit ourselves to latitude and longitude.
+        if ['longitude'] in text_cols and ['latitude'] in text_cols:
+            latcol_name = 'latitude'
+            loncol_name = 'longitude'
+            latlon_to_gis_func = 'ST_MakePoint' # Shouldn't need to abstract this, but let's keep it looking like above.
+            createLatLonGeom = True
+            print 'LatLon detected, creating a Point object from latitude / longitude'
+            latlon_geom_sql = "select AddGeometryColumn('public', '{0}', '{1}', '{2}', '{3}', 2, false)\
+                          ".format(table_name, 'latlon_geom', srid, 'POINT')
+            cur.execute(latlon_geom_sql)
+            # Populate the column
+            latlon_string = "%s,%s" % (latcol_name, loncol_name)
+            latlon_pop_sql = "update {0} set {1}=ST_SetSRID{2}({3}), {4})".format(table_name, 'latlon_geom',
+                                                                                latlon_to_gis_func, latlon_string, srid)
+            print latlon_pop_sql
+            cur.execute(latlon_pop_sql)
+            geo_cols.append(['latlon_geom', 'Geometry', 'Point'])
 
     conn.close()
     return geo_cols
