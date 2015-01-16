@@ -280,14 +280,15 @@ def createGeometryColumns(table_name):
             print 'LatLon detected, creating a Point object from latitude / longitude'
             latlon_geom_sql = "select AddGeometryColumn('public', '{0}', '{1}', '{2}', '{3}', 2, false)\
                           ".format(table_name, 'latlon_geom', srid, 'POINT')
-            print latlon_geom_sql
+            # print latlon_geom_sql
             cur.execute(latlon_geom_sql)
             conn.commit()
             # Populate the column
+            print "Populating geometry column."
             latlon_string = "%s::numeric,%s::numeric" % (loncol_name, latcol_name)
             latlon_pop_sql = "update {0} set {1}=ST_SetSRID({2}({3}), {4})".format(table_name, 'latlon_geom',
                                                                                 latlon_to_gis_func, latlon_string, srid)
-            print latlon_pop_sql
+            # print latlon_pop_sql
             cur.execute(latlon_pop_sql)
             geo_cols.append(['latlon_geom', 'Geometry', 'Point'])
             conn.commit()

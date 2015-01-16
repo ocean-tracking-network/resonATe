@@ -209,7 +209,7 @@ def loadDetections():
             #Program exit on error
             print 'Exiting...'
             return -1
-    print 'Loading complete.'
+    print 'Loading complete. Created/populated %s tables' % len(tables_created)
     return tables_created
 
 if __name__ == '__main__':
