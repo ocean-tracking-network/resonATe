@@ -19,12 +19,15 @@ data_directory = '/home/sandbox/RStudio/data/'
 #Switches
 SuspectDetections = None
 DistanceMatrix = None
-ReloadInputFile = None
+ReloadInputFile = False
 
 def loadDetections():
+
+    tables_created = {}
     #Is the supplied detection_file variable is valid
     if not verify.Filename( detection_file ):
-        return 'Error: [detection_file] variable supplied either has invalid characters or does not contain a csv file extension'
+        print 'Error: [detection_file] variable supplied either has invalid characters or does not contain a csv file extension'
+        return -1
         
     #version_id supplied in the filename?
     file_version_id = verify.FileVersionID( detection_file )
@@ -43,7 +46,8 @@ def loadDetections():
         input_version_id = '00'
     elif file_version_id and input_version_id:
         if file_version_id != input_version_id:
-            return 'version_id mismatch {} != {}'.format(file_version_id, input_version_id)
+            print 'version_id mismatch {} != {}'.format(file_version_id, input_version_id)
+            return -1
         
     #reformat both input_version_id and base_name
     input_version_id = input_version_id.rjust(2,'0') # Zero pad version ID
@@ -65,8 +69,8 @@ def loadDetections():
     # Return if detection_file does not exist 
     if not verify.FileExists( detection_filename ):
         print '''File "{0}" does not exist.'''.format( detection_filename )
-        return 'Please ensure that the file is in the data folder or check the detection_file variable.'
-    
+        print 'Please ensure that the file is in the data folder or check the detection_file variable.'
+        return -1
     # Send a message if using the table in the database
     if detection_tbl_exists and not ReloadInputFile:
         detection_tbl_count = verify.TableCount( detection_tbl )
@@ -76,20 +80,17 @@ def loadDetections():
     if DistanceMatrix and verify.FileExists(  matrix_filename ):
         matrixfile_count = verify.FileCount( matrix_filename, header=True )
         print """Station distance matrix output file already exists named "{0}" with {1} records.""".format( matrix_filename , matrixfile_count)
-        return "Please rename or delete output file or set \"DistanceMatrix = FALSE\" to proceed with current data."
-    
+        print "Please rename or delete output file or set \"DistanceMatrix = FALSE\" to proceed with current data."
+        return -1
     #Does suspect file exist on the file system?
     if SuspectDetections and verify.FileExists( suspect_filename ):
         suspectfile_count = verify.FileCount( suspect_filename, header=True )
         print """Suspect detection output file already exists named "{0}" with {1} records.""".format( suspect_filename , suspectfile_count)
-        return """Please rename or delete output file or set \"SuspectDetections = FALSE\" to proceed with current data."""
-    
+        print """Please rename or delete output file or set \"SuspectDetections = FALSE\" to proceed with current data."""
+        return -1
+
     #If the detection table doesn't exist or if realoadfile == True then create detection table
     if not detection_tbl_exists or ReloadInputFile:
-        #Remove old table and reload data
-        if ReloadInputFile:
-            load_to_pg.removeTable( detection_tbl )
-
         #Extract headers
         detection_headers =  verify.FileHeaders( detection_filename )
         
@@ -103,7 +104,8 @@ def loadDetections():
                              u'unqdetecid',
                              u'datecollected',
                              u'catalognumber']
-        if DistanceMatrix: mandatory_columns.extend([u'longitude',u'latitude'])
+        if DistanceMatrix:
+            mandatory_columns.extend([u'longitude',u'latitude'])
         
         missing_columns = verify.MandatoryColumns(detection_headers, mandatory_columns)
         errors = []
@@ -115,19 +117,27 @@ def loadDetections():
                 errors.append('''Error: The required column(s) for creating the station distance matrix are missing:\nSet the DistanceMatrix to FALSE to continue processing with your current data file.'''.format(','.join(missing_columns)))
         else:
             #Create detections table
-            table_created = load_to_pg.createTable( detection_tbl, detection_headers)
+            table_created = load_to_pg.createTable(detection_tbl, detection_headers, ReloadInputFile) # final argument says whether to destroy an existing table.
             
             #Exit if table could not be created
             if not table_created:
-                return 'Exiting...'
-            
+                print 'Exiting...'
+                return -1
+            else:
+                tables_created['detections'] = detection_tbl
+
+
             #Load the table contents with csv file
             detections_loaded = load_to_pg.loadToPostgre( detection_tbl, detection_filename)
     
             if detections_loaded:       
                 #Remove blank lines from the newly created table
                 load_to_pg.removeNullRows(detection_tbl, 'unqdetecid')
-                
+
+
+                # Check file/table for lat/lon and Well Known Text/Binary and return a list of all newly created geometry columns.
+                geometry_columns = load_to_pg.createGeometryColumns(detection_tbl)
+
                 #Check for duplicate unique ids
                 copy_from_pg.ReturnDuplicates( detection_tbl, 'unqdetecid')
                 duplicates = verify.TableCount( 'duplications' )
@@ -152,7 +162,8 @@ def loadDetections():
         if errors:
             for error in errors:
                 print error
-            return 'Exiting...'
+            print 'Exiting...'
+            return -1
         
     if SuspectDetections:
         #Has the suspect detections table been created?
@@ -167,7 +178,8 @@ def loadDetections():
         suspect_count = verify.TableCount( suspect_tbl )
         #Export Suspect Detection Summary
         copy_from_pg.ExportTable( suspect_tbl, suspect_filename)
-        
+
+        tables_created['suspect'] = suspect_tbl
         #Print summary of actions to console
         print 'Detection summary exported to: {0}'.format(suspect_filename)
         print 'There are {0} suspect detections'.format(suspect_count)
@@ -189,14 +201,16 @@ def loadDetections():
             matrix_count = verify.TableCount( matrix_tbl )
             # Export Distance Matrix
             copy_from_pg.ExportTable( matrix_tbl, matrix_filename)
-            
+            tables_created['dist_matrix'] = matrix_tbl
             #Print summary of actions to console
             print 'Station distance matrix exported to: {0}'.format(matrix_filename)
             print 'There are {0} station matrix pairs'.format(matrix_count)
         else:
             #Program exit on error
-            return 'Exiting...'
-    return 'Loading complete.'
+            print 'Exiting...'
+            return -1
+    print 'Loading complete. Created/populated %s tables' % len(tables_created)
+    return tables_created
 
 if __name__ == '__main__':
     ReloadInputFile = True

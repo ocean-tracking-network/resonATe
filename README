@@ -9,6 +9,10 @@ This package is meant to be installed on an Ubuntu system with the following sof
 * RStudio
 * PHP-Postgresql-admin
 * RPython
+* iPython
+* python packages Shapely, Kartograph, pyscopg2, bokeh
 
 Additional requirements can be found in the packages.txt file included in the repo.
-Currently a .ova file is available for download at http://members.oceantrack.org/toolbox/OTN%20Sandbox/OTN-Sandbox.ova that provides all required packages.
+There is a Vagrant box (oceantracking/sandbox) that will provide all of these requirements.
+Install Vagrant (vagrantup.com) and type:
+    vagrant init oceantracking/sandbox
