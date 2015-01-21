@@ -1,5 +1,17 @@
 from . import pg_connection as pg
 
+def copyTableStructure(source_table, dest_table, drop=False):
+    conn, cur = pg.createConnection()
+
+    if drop:
+        print 'Dropping existing table {0}'.format(dest_table)
+        cur.execute("DROP TABLE IF EXISTS {0}".format(dest_table))
+    cur.execute("CREATE TABLE {0} (LIKE {1})".format(dest_table, source_table))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return True
+
 def ExportTable( table_name, file_name ):
     #Create Database Connection
     conn, cur = pg.createConnection() 
