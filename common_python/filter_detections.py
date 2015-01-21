@@ -183,7 +183,7 @@ def filterDetections():
         return 'Exiting...'
     
     #Create final output file
-    load_to_pg.createTable( output_tbl, csv_headers_det, drop=True)
+    copy_from_pg.copyTableStructure(detection_tbl, output_tbl, drop=True)
     load_to_pg.removeSuspect( detection_tbl, 'suspects', output_tbl)
     count_removed_detection = verify.tableDifference( detection_tbl, output_tbl )
     count_output = verify.TableCount( output_tbl )
