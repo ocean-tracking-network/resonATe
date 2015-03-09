@@ -2,7 +2,7 @@ import os
 import sys
 import codecs
 import chardet
-import collections 
+import collections
 
 #Local Imports
 import library.verifications as verify
@@ -12,13 +12,12 @@ SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir, 'csf')
 sys.path.append(CSF_PATH)
 
-
-import csf.MessageDB as mdb
+#Import Message DB 
+import MessageDB as mdb
 msgs = mdb.MessageDB()
 
-
-
-def conversion(input_file=None, input_encoding=None, data_dir='/home/sandbox/RStudio/data/'):
+def conversion(input_file=None, input_encoding=None, 
+               data_dir='/home/sandbox/RStudio/data/'):
     '''
     Converts a file into utf-8 format
     '''
@@ -90,3 +89,13 @@ def conversion(input_file=None, input_encoding=None, data_dir='/home/sandbox/RSt
         return ''
     except Exception as e:
         print e
+        
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description="Change a csv file to UTF-8 encoding")
+    parser.add_argument('-input_file')
+    parser.add_argument('-encoding')
+    
+    args = parser.parse_args()
+    
+    conversion(input_file=args.input_file, input_encoding= args.encoding)

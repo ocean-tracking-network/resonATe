@@ -1,12 +1,15 @@
+setwd("/home/sandbox/RStudio/sandbox")
+
 cleanup <- function(){
-  # Load rPyton and set the working directory
   library(rPython,quietly=TRUE)
-  setwd("/home/sandbox/RStudio/sandbox")
   
+  # Load load_detections module
   python.exec("import sys, os")
-  python.exec("sys.path.append('/home/sandbox/RStudio/sandbox')")
+  python.exec(paste('sys.path.append(\'',getwd(),'\')',sep=''))
   python.exec("import common_python.cleanup")
+  python.exec("reload(common_python.cleanup)")
   
   # Run the cleanup script
-  main <- python.call("common_python.cleanup.cleanup","reqcleanup")
+  main <- python.call('common_python.cleanup.cleanup',
+                      'reqcleanup')
 }

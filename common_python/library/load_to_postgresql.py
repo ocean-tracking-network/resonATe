@@ -4,6 +4,7 @@ import sys
 import shapely.wkb as wkb
 import shapely.wkt as wkt
 import string # for hexdigits entity
+import codecs
 
 from . import pg_connection as pg
 
@@ -186,7 +187,7 @@ def loadToPostgre( table_name, filename):
         print "Loading records into {0}, Please wait...".format( table_name ) 
         cur.copy_expert("""set client_encoding= '{2}'; 
                                 COPY {3} FROM STDIN WITH DELIMITER \'{0}\' 
-                                CSV HEADER QUOTE \'{1}\'""".format(',','\"','utf-8',table_name ), open(filename,'rb'))
+                                CSV HEADER QUOTE \'{1}\'""".format(',','\"','utf-8',table_name ), codecs.open(filename,'r','utf-8'))
         conn.commit()
         data_loaded = True
     except Exception as e:
@@ -338,6 +339,7 @@ def removeTable( table_name ):
         return True
     except:
         return False
+
 
 def removeNullRows( table_name, unique_column ):
     '''

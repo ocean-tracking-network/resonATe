@@ -1,14 +1,15 @@
+setwd("/home/sandbox/RStudio/sandbox")
+
 convert_file <- function(input_file){
-  # Load rPyton and set the working directory
   library(rPython,quietly=TRUE)
-  setwd("/home/sandbox/RStudio/sandbox")
   
+  # Load conversion module
   python.exec("import sys, os")
-  python.exec("sys.path.append('/home/sandbox/RStudio/sandbox')")
+  python.exec(paste('sys.path.append(\'',getwd(),'\')',sep=''))
   python.exec("import common_python.conversion")
-  
-  if(!exists("input_encoding")){input_encoding <- NaN}
+  python.exec("reload(common_python.conversion)")
   
   # Run the conversion script
-  main <- python.call("common_python.conversion.conversion",input_file, input_encoding)
+  main <- python.call('common_python.conversion.conversion',
+                      input_file)
 }

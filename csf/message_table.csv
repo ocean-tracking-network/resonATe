@@ -24,6 +24,10 @@
 23,0,Updates complete.
 50,1,The following {0} tables have been dropped from the database:
 51,0,Nothing to cleanup from database.
+60,2,Cohort records successfully exported to: {0} with {1} records.
+70,1,Error: {0} variable supplied either has invalid characters or does not contain a csv file extension
+71,2,Using {0} table with {1} records for compression. Please Wait...
+72,2,Table {0} compressed in table mv_anm_compressed with {1} records.
 99,1,Database loading error: {0}.
 100,1,File IO Error: {0}.
 101,1,Variable {0} is not set.
