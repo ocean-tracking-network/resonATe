@@ -59,7 +59,7 @@ def CohortRecords(interval_time=60,
     conn.close()
 
     # Count the number of records in the file
-    file_count = FileCount(file_path)
+    file_count = FileCount(file_path, header=True)
 
     # Print final message to console
     print msgs.get_message(index=60,params=[file_name, file_count])
