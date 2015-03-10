@@ -63,4 +63,3 @@ def CohortRecords(interval_time=60,
 
     # Print final message to console
     print msgs.get_message(index=60,params=[file_name, file_count])
-
