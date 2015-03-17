@@ -198,7 +198,7 @@ def intervalData(detection_filename, dist_matrix_filename,
     
     # Create local copies of tables
     try:
-        count_compressed = putfile.putFile('reqtabcsv', 
+        count_compressed = putfile.putFile('reqtabcmprcsv', 
                                            'mv_anm_compressed', 
                                            compressed_filepath)
         count_interval = putfile.putFile('reqtabcsv', 
