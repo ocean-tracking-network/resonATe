@@ -12,4 +12,4 @@ distance_real_input <- 'distance_matrix_file2.csv' # second file is a set of dis
 # load two detections files
 # Merger real_distance in file 1 from file 2
 
-loadDistanceMerge()
+loadDistanceMerge(reqcode, distance_matrix_input, distance_real_input)

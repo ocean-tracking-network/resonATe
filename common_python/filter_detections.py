@@ -1,28 +1,17 @@
 import os
+import sys
 
 #Local Imports
 import library.verifications as verify
 import library.load_to_postgresql as load_to_pg
 import library.copy_from_postgresql as copy_from_pg
 
-#Variables
-delimiter = None
-detection_file = None
-time_interval = None
-version_id = None
-encoding = None
-quotechar = None
-
-#Switches
-SuspectFile = None
-DistanceMatrix = None
-OverrideSuspectDetectionFile = None
-ReloadInputFile = None
-
-def filterDetections():  
+def filterDetections(detection_file, version_id, SuspectFile, 
+                     OverrideSuspectDetectionFile, DistanceMatrix, 
+                     detection_radius, ReloadInputFile, 
+                     data_directory='/home/sandbox/RStudio/data/'):  
     '''
     Run the process for filtering the detection files using the supplied suspect detection file.
-    
     '''
     mandatory_columns = ['station',
                          'unqdetecid',
@@ -57,7 +46,7 @@ def filterDetections():
     input_version_id = input_version_id.rjust(2,'0')
     base_name = base_name.lower().replace(' ','_')
     
-    detection_file_path = os.path.join('..', 'data', detection_file )
+    detection_file_path = os.path.join(data_directory, detection_file )
     
     #Check to see if input file exists
     if not verify.FileExists( detection_file_path ):
@@ -70,7 +59,7 @@ def filterDetections():
         suspect_file = '{0}_suspect_v{1}.csv'.format(base_name, input_version_id.rjust(2,'0'))
     
     #Check if the file exists in either the export and import folders
-    suspect_file_path = os.path.join('..', 'data', suspect_file )
+    suspect_file_path = os.path.join(data_directory, suspect_file )
     
     #user the file in the input folder before the export
     if not verify.FileExists( suspect_file_path ):
@@ -82,16 +71,16 @@ def filterDetections():
     detection_tbl = '{0}_v{1}'.format( base_name, input_version_id )
     output_tbl = '{0}_v{1}'.format( base_name, str(int(input_version_id)+1).rjust(2,'0') )
     matrix_tbl = '{0}_distance_matrix_v{1}'.format(base_name,str(int(input_version_id)+1).rjust(2,'0'))
-    matrix_file_name = "../data/{0}.csv".format( matrix_tbl )
+    matrix_file_name = os.path.join(data_directory, matrix_tbl + ".csv").format(data_directory, matrix_tbl )
     output_file_name = '{0}_v{1}.csv'.format(base_name,str(int(input_version_id)+1).rjust(2,'0'))
-    output_file_path = os.path.join('..','data',output_file_name)
+    output_file_path = os.path.join(data_directory, output_file_name)
     
     #Does output file exist?
     if os.path.isfile( output_file_path ):
         outputfile_count = verify.FileCount( output_file_path, header=True )
         print """Filter Output file already exists named "{0}" with {1} records.""".format( output_file_path , outputfile_count)
         return "Please rename or delete output file."
-    
+
     #Does matrix file exist?
     if DistanceMatrix and os.path.isfile( matrix_file_name ):
         matrixfile_count = verify.FileCount( matrix_file_name, header=True )
@@ -145,7 +134,7 @@ def filterDetections():
             
                 #If duplicates are found, end execution of the loading script
                 if duplicates > 0:
-                    duplicate_filepath = './data/{0}_duplicates_v{1}.csv'.format( base_name, input_version_id.rjust(2,'0') )
+                    duplicate_filepath = '{0}{1}_duplicates_v{2}.csv'.format(data_directory, base_name, input_version_id.rjust(2,'0') )
                     copy_from_pg.ExportTable( 'duplications', duplicate_filepath )
                     error_lst.append('Error: All unqdetecid(s) are not unique.')
                     error_lst.append('unqdetecid duplicates exported to \'{0}\''.format( duplicate_filepath ))
@@ -200,18 +189,17 @@ def filterDetections():
             load_to_pg.removeTable( matrix_tbl )
         
         # Create distance matrix table
-        load_to_pg.createMatrix( output_tbl, matrix_tbl)
+        load_to_pg.createMatrix( output_tbl, matrix_tbl, detection_radius)
         
         # Get count and set filename
         matrix_count = verify.TableCount( matrix_tbl )
-        matrix_filename = "../data/{0}.csv".format( matrix_tbl )            
+        matrix_filename = "{0}{1}.csv".format( data_directory, matrix_tbl )            
         
         copy_from_pg.ExportTable( matrix_tbl, matrix_file_name)
         
         # Print summary of actions to console
         print 'Station distance matrix exported to: {0}'.format(matrix_file_name)
         print 'There are {0} station matrix pairs'.format(matrix_count)
-    
     
     #Calculate the script processing time 
     return 'Filtering complete.'

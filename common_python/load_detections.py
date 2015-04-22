@@ -5,23 +5,9 @@ import library.verifications as verify
 import library.load_to_postgresql as load_to_pg
 import library.copy_from_postgresql as copy_from_pg
 
-#Variables
-delimiter = None
-detection_file = None
-time_interval = None
-version_id = None
-encoding = None
-quotechar = None
-
-#Optional Variables
-data_directory = '/home/sandbox/RStudio/data/'
-
-#Switches
-SuspectDetections = None
-DistanceMatrix = None
-ReloadInputFile = False
-
-def loadDetections():
+def loadDetections(detection_file, version_id, DistanceMatrix, 
+                   ReloadInputFile, SuspectDetections, time_interval,
+                   detection_radius, data_directory='/home/sandbox/RStudio/data/'):
 
     tables_created = {}
     #Is the supplied detection_file variable is valid
@@ -194,7 +180,7 @@ def loadDetections():
         load_to_pg.createArraySort()
         
         # Load Distance Matrix
-        matrix_created = load_to_pg.createMatrix(detection_tbl, matrix_tbl)
+        matrix_created = load_to_pg.createMatrix(detection_tbl, matrix_tbl, detection_radius)
         
         if matrix_created:
             # Get count and create filename
@@ -213,10 +199,22 @@ def loadDetections():
     return tables_created
 
 if __name__ == '__main__':
-    ReloadInputFile = True
-    detection_file = 'tst_invalid_long_lat_numerics.csv'
-    DistanceMatrix = True
-    data_directory = 'W:\RStudio\data'
-    version_id = ''
-    loadDetections()
+    import argparse
+    parser = argparse.ArgumentParser(description="Load a csv file into the "\
+                                     "database.")
+    parser.add_argument('-detection_file')
+    parser.add_argument('-version_id')
+    parser.add_argument('-time_interval')
+    parser.add_argument('-SuspectDetections')
+    parser.add_argument('-DistanceMatrix')
+    parser.add_argument('-ReloadInputFile')
+    
+    args = parser.parse_args()
+    
+    loadDetections(detection_file= args.detection_file, 
+                   version_id= args.version_id,
+                   time_interval= args.time_interval,
+                   SuspectDetections= args.SuspectDetections,
+                   DistanceMatrix= args.DistanceMatrix,
+                   ReloadInputFile= args.ReloadInputFile)
     

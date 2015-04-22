@@ -1,7 +1,6 @@
 import re
 import os
 import csv
-import codecs
 
 from . import pg_connection as pg
 
@@ -176,41 +175,3 @@ def CheckDuplicateHeader( column_headers ):
     #Create list of duplications
     dup = set([i for i in headers if headers.count(i)>1])
     return list(dup)
-    
-def RealUpdateCount(filename):
-    #read first file
-    count=0
-    real_position=0
-    for row in csv.reader(open(filename,'rb'), delimiter=','):
-        if (row):
-		    for position,item in enumerate(row):
-			    if item=='real_distance':
-				    real_position=position  
-		    if (row[real_position]!=''and row[real_position]!='real_distance'):
-		        count+=1
-    return  count
-	
-def stationMatch(detection_file,stn1,stn2):
-    file_list = []
-    index = []
-    file1_open = open(detection_file,'rb')
-    file1_list = csv.reader(file1_open, delimiter=',')
-    header = file1_list.next()
-    stn1_pos = headerPosition(header,'stn1')
-    stn2_pos = headerPosition(header,'stn2')
-    #save csv file to a list
-    for row in file1_list:
-        if (row):
-            file_list.append(row)
-    #check for stn1/stn2    
-    for j in range(len(file_list)):
-        if ((file_list[j][stn1_pos] == stn1 and file_list[j][stn2_pos] == stn2)
-        or (file_list[j][stn2_pos] == stn1 and file_list[j][stn1_pos] == stn2)):
-            index.append(j)
-    file1_open.close()	
-    return index
-
-def headerPosition(header,target):
-    for j in range (len(header)):
-        if (header[j] == target ):
-            return j	

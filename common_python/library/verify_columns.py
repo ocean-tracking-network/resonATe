@@ -29,6 +29,8 @@ def verify_columns(reqcode, fileh, header_string):
     station_tst = False
     stn1_tst = False
     stn2_tst = False
+    detec_rad1_tst = False
+    detec_rad2_tst = False
     distance_m_tst = False
     real_distance_tst = False
     matrix_pair_tst = False
@@ -42,6 +44,8 @@ def verify_columns(reqcode, fileh, header_string):
     stn2_idx = -1
     distance_m_idx = -1
     real_distance_idx = -1
+    detec_rad1_idx = -1
+    detec_rad2_idx = -1
 
     index = 2 # Current Line number
     unqdetecids = {} # List of uniquiecids
@@ -91,6 +95,7 @@ def verify_columns(reqcode, fileh, header_string):
                 errors.append(col)
         
     elif(reqcode == 'reqdistmtrx'):
+        # Verify the column names exist
         if u'stn1' in header_string:
             stn1_tst = True
             stn1_idx = header_string.index(u'stn1')
@@ -103,6 +108,18 @@ def verify_columns(reqcode, fileh, header_string):
         else:
             missing_columns.append('stn2')
             
+        if u'detec_radius1' in header_string:
+            detec_rad1_tst = True
+            detec_rad1_idx = header_string.index(u'detec_radius1')
+        else:
+            missing_columns.append('detec_radius1')
+        
+        if u'detec_radius2' in header_string:
+            detec_rad2_tst = True
+            detec_rad2_idx = header_string.index(u'detec_radius2')
+        else:
+            missing_columns.append('detec_radius1')
+               
         if u'distance_m' in header_string:
             distance_m_tst = True
             distance_m_idx = header_string.index(u'distance_m')
@@ -179,7 +196,7 @@ def verify_columns(reqcode, fileh, header_string):
                 if row[station_idx] == '':
                     station_nulls.append(index)
             except:
-                missing_data_.append(index)
+                missing_data.append(index)
         
         # stn1 (NOT NULL)
         if stn1_tst:
@@ -299,28 +316,3 @@ def is_number(s):
         return True
     except (TypeError, ValueError):
         pass
-
-# if __name__ == '__main__':
-#     from file_io import fileIO
-# 
-#     data_directory = 'W:\\RStudio\\data\\'
-#     detection_filename = 'sample_missing header.csv'
-#     detection_filepath = os.path.join(data_directory, detection_filename) # (str) Set absolute path for detection file
-#     detection_fileh = fileIO('reqopen', detection_filepath )
-#     detection_file_header = detection_fileh.fileIO('reqread1',fromto=':list:')
-#     print detection_file_header
-#     # possible values ('reqdetect' or 'reqdistmtrx')
-#      
-#     errors = verify_columns(reqcode='reqdetect',fileh=detection_fileh, header_string=detection_file_header)
-#     
-# #     data_directory = 'W:\\RStudio\\data\\'
-# #     detection_filename = 'nsbs_matched_detections_2013_distance_matrix_v00.csv'
-# #     detection_filepath = os.path.join(data_directory, detection_filename) # (str) Set absolute path for detection file
-# #     detection_fileh = fileIO('reqopen', detection_filepath )
-# #     detection_file_header = detection_fileh.fileIO('reqread1',fromto=':list:')
-# #     
-# #     errors = verify_columns(reqcode='reqdistmtrx',file=detection_fileh, header_string=detection_file_header)
-#     
-#     for error in errors:
-#         print error
-    
