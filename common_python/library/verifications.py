@@ -162,7 +162,11 @@ def FileHeaders( filename ):
         reader = csv.reader(csvfile, dialect)
         
         try:
-            return reader.next()
+            row = reader.next()
+            # Remove BOM character
+            if row[0].startswith(codecs.BOM_UTF8):
+                row[0] = row[0].replace(codecs.BOM_UTF8,'')
+            return row
         except:
             return ''
 

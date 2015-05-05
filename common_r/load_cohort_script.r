@@ -1,6 +1,6 @@
 setwd("/home/sandbox/RStudio/sandbox")
 
-cohort_records <- function(time_interval){
+cohort_records <- function(time_interval, compressed_file){
   # Load rPython module
   library(rPython,quietly=TRUE)
   
@@ -12,5 +12,5 @@ cohort_records <- function(time_interval){
   
   # Run the cohort creation script
   main <- python.call('common_python.cohorts.CohortRecords',
-                      time_interval)
+                      time_interval, compressed_file)
 }
