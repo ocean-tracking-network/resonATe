@@ -3,7 +3,6 @@ source("/home/sandbox/RStudio/sandbox/common_r/load_compression_script.r") # Loa
 
 ################ User Input ################
 detection_file <- 'detections.csv'
-reload_detections <- FALSE
 
 ################ Create compression file ################
-compress_detections( detection_file, reload_detections)
+compress_detections( detection_file)

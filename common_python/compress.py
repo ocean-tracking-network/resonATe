@@ -21,7 +21,6 @@ msgs = mdb.MessageDB()
 import table_maintenance as tm
 
 def CompressDetections(detection_file,
-                       reload_detections=False,
                        data_directory='/home/sandbox/RStudio/data/'):
     '''
     Creates mv_anm_compressed table from detection file
@@ -66,23 +65,20 @@ def CompressDetections(detection_file,
     # Determine if table already exists in the database
     table_exists = TableExists( detection_tbl )
     
+    # Using loadDetections module to load the table
+    detections_loaded = load_detections.loadDetections(detection_file=detection_file,
+                                   version_id=version_id,
+                                   DistanceMatrix=False,
+                                   ReloadInputFile=True,
+                                   SuspectDetections=False,
+                                   time_interval=60,
+                                   data_directory= data_directory)
 
-    # If reload is specified, replace table with new csv file
-    if (table_exists and reload_detections) or not table_exists:
-        # Using loadDetections module
-        detections_loaded = load_detections.loadDetections(detection_file=detection_file,
-                                       version_id=version_id,
-                                       DistanceMatrix=False,
-                                       ReloadInputFile=True,
-                                       SuspectDetections=False,
-                                       time_interval=60,
-                                       detection_radius=0,
-                                       data_directory= data_directory)
-        if detections_loaded == -1:
-            return -1
+    if detections_loaded == -1:
+        return -1
 
     # Table row count
-    table_row_count = TableCount(  detection_tbl )
+    table_row_count = TableCount( detection_tbl )
 
     # Using {detection_tbl} table with {table_row_count} records for compression. Please Wait...
     print msgs.get_message(index=71, params=[detection_tbl, table_row_count])
@@ -110,7 +106,7 @@ def CompressDetections(detection_file,
                                tablename=['mv_anm_detections', detection_tbl])
     
     # Export the compressed detections to a file
-    ExportTable(detection_tbl, os.path.join(data_directory, export_compr_file))
+    ExportTable('mv_anm_compressed', os.path.join(data_directory, export_compr_file))
 
     # Output messages
     # Table {detection_tbl} compressed in table mv_anm_compressed with {compressed_count} records.
@@ -120,4 +116,3 @@ def CompressDetections(detection_file,
     
     # Close connections
     database.table_maintenance(reqcode='reqdisconn')
-    

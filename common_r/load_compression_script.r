@@ -1,6 +1,6 @@
 setwd("/home/sandbox/RStudio/sandbox")
 
-compress_detections <- function(detection_file, reload_detections=FALSE){
+compress_detections <- function(detection_file){
   # Load rPython module
   library(rPython,quietly=TRUE)
   
@@ -12,5 +12,5 @@ compress_detections <- function(detection_file, reload_detections=FALSE){
   
   # Run the compression script
   main <- python.call('common_python.compress.CompressDetections',
-                      detection_file, reload_detections)
+                      detection_file)
 }
