@@ -3,28 +3,33 @@ import psycopg2.extras
 import sys
 import os
 import re
+import ConfigParser
 
 SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
 
 sys.path.append( SCRIPT_PATH )
+
+#Import CSF modules
 import MessageDB as mdb
-msgs = mdb.MessageDB()
 
 class table_maintenance():
     def __init__(self, reqcode='reqconn', tablename=None, filename=None):
         '''
         Initialize the table_maintenance class
         '''
-        # Presistance connection variables
+        # connection variables
         self.conn = None
         self.cur = None
+
+        # message module
+        self.msgs = mdb.MessageDB()
         
         # table_maintenance must always be created first with the reqconn command
         if reqcode == 'reqconn':
             self.table_maintenance(reqcode, tablename, filename)
         else:
             #Invalid request code: '{0}'
-            print msgs.get_message(12,params=[reqcode])
+            print self.msgs.get_message(12,params=[reqcode])
         
     def table_maintenance(self, reqcode, tablename=None, filename=None):
         '''
@@ -62,13 +67,22 @@ class table_maintenance():
         elif reqcode == 'reqload':
             # Load a table from a csv file
             self.load_data(tablename, filename)
+
         elif reqcode == 'reqconn':
             self.connect()
+
+        elif reqcode == 'reqtruncate':
+            self.truncate_table(tablename)
+
         elif reqcode == 'reqdisconn':
             self.disconnect()
+
+        elif reqcode == 'reqrename':
+            self.rename_table(tablename)
+
         else:
             # inform user that an invaild request code was given
-            print msgs.get_message(index=12, params=[reqcode])
+            print self.msgs.get_message(index=12, params=[reqcode])
 
     def create_table(self, tablename, filename):
         '''(table_maintenance, str) -> NoneType
@@ -98,11 +112,40 @@ class table_maintenance():
             query = query_file.read()
             query_file.close()
         else:
-            return msgs.get_message(index=102, params=[tablename])
+            return self.msgs.get_message(index=102, params=[tablename])
         
         self.cur.execute(query)
         self.conn.commit()
-        
+
+    def rename_table(self, tablename):
+        '''
+        Renames a table
+        :param tablename: [from, to] table to rename and new name
+        :return:
+        '''
+
+        query = """ALTER TABLE public.{0}
+                      RENAME TO {1};
+                    """.format( *tablename )
+
+        #Execute SQL Script
+        self.cur.execute(query)
+        self.conn.commit()
+
+    def truncate_table(self, tablename):
+        '''
+        TRUNCATE a table in the public schema
+        :param table_name: table to truncate
+        :return: True if operation is sucessfull, False on error
+        '''
+        # Truncate a database table
+        query = "TRUNCATE TABLE public.{0};".format( tablename )
+
+        #Execute SQL Script
+        self.cur.execute(query)
+        self.conn.commit()
+
+
     def drop_cascade(self, tablename):
         ''' (table_maintenance, str) -> NoneType
         DROP CASCADE a table
@@ -142,14 +185,15 @@ class table_maintenance():
         Connect to the database
         
         '''
-        if os.name == 'nt':
-            host = '192.168.56.101'
-        else:
-            host = '127.0.0.1'
-        port = 5432
-        dbname = 'postgres'
-        user = 'postgres'
-        password = 'otn123' 
+        config = ConfigParser.RawConfigParser()
+        config.read(os.path.join(SCRIPT_PATH, 'db.cfg'))
+
+
+        host = config.get('Database','host')
+        port = config.getint('Database','port')
+        dbname = config.get('Database','dbname')
+        user = config.get('Database','user')
+        password = config.get('Database','password')
         
         self.conn = psycopg2.connect(host=host, port=port, 
                                 dbname=dbname,user=user, 
