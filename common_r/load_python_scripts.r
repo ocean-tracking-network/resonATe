@@ -16,11 +16,13 @@ loadDetections <- function(){
   if(!exists("SuspectDetections")){SuspectDetections <<- FALSE}
   if(!exists("DistanceMatrix")){DistanceMatrix <<- FALSE}
   if(!exists("ReloadInputFile")){ReloadInputFile <<- FALSE}
+  if(!exists("detection_radius")){detection_radius <<- ''}
   
   # Run the loading script
   main <- python.call('common_python.load_detections.loadDetections',
                       detection_file,input_version_id, DistanceMatrix,
-                      ReloadInputFile, SuspectDetections, time_interval)
+                      ReloadInputFile, SuspectDetections, time_interval,
+                      detection_radius)
 }
 
 filterDetections <- function(){
@@ -39,9 +41,10 @@ filterDetections <- function(){
   if(!exists( "OverrideSuspectDetectionFile" )){OverrideSuspectDetectionFile <<- FALSE}
   if(!exists( "DistanceMatrix" )){DistanceMatrix <<- FALSE}
   if(!exists( "ReloadInputFile" )){ReloadInputFile <<- FALSE}
+  if(!exists("detection_radius")){detection_radius <<- ''}
   
   main <- python.call('common_python.filter_detections.filterDetections',
                       detection_file,input_version_id, SuspectFile,
-                      OverrideSuspectDetectionFile, DistanceMatrix, 
-                      ReloadInputFile)
+                      OverrideSuspectDetectionFile, DistanceMatrix,
+                      detection_radius, ReloadInputFile)
 }

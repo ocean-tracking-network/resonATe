@@ -6,8 +6,8 @@ import library.load_to_postgresql as load_to_pg
 import library.copy_from_postgresql as copy_from_pg
 
 def loadDetections(detection_file, version_id, DistanceMatrix, 
-                   ReloadInputFile, SuspectDetections, time_interval, 
-                   data_directory='/home/sandbox/RStudio/data/'):
+                   ReloadInputFile, SuspectDetections, time_interval,
+                   detection_radius, data_directory='/home/sandbox/RStudio/data/'):
 
     tables_created = {}
     #Is the supplied detection_file variable is valid
@@ -180,7 +180,7 @@ def loadDetections(detection_file, version_id, DistanceMatrix,
         load_to_pg.createArraySort()
         
         # Load Distance Matrix
-        matrix_created = load_to_pg.createMatrix(detection_tbl, matrix_tbl)
+        matrix_created = load_to_pg.createMatrix(detection_tbl, matrix_tbl, detection_radius)
         
         if matrix_created:
             # Get count and create filename

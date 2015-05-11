@@ -12,7 +12,7 @@ all_wkt_geom_types = ['Geometry', 'Point', 'LineString', 'Polygon', 'MultiPoint'
               'GeometryCollection', 'CircularString', 'CompoundCurve', 'CurvePolygon', 'MultiCurve', 'MultiSurface',
               'Curve', 'Surface', 'PolyhedralSurface', 'TIN', 'Triangle']
 
-def createMatrix( detection_tbl, matrix_tbl ):
+def createMatrix( detection_tbl, matrix_tbl, detection_radius ):
     #Create Database Connection
     conn, cur = pg.createConnection() 
     
@@ -27,18 +27,25 @@ def createMatrix( detection_tbl, matrix_tbl ):
         avg_long1 numeric,
         avg_long2 numeric,
         distance_m numeric,
-        real_distance numeric
+        real_distance numeric,
+        detec_radius1 numeric,
+        detec_radius2 numeric
         );
         '''.format( matrix_tbl ))
     conn.commit()
      
     #SQL to populate the station matrix file
     try:
+        if detection_radius == '':
+            detection_radius = 'NULL'
         cur.execute('''INSERT INTO {1} (
             select *,
             coalesce(round(ST_Distance_Spheroid(st_makepoint(avg_long1, avg_lat1,4326)
             ,st_makepoint(avg_long2, avg_lat2,4326),'SPHEROID["WGS 84",6378137,298.257223563]')::numeric,0)::text)::numeric as distance_m
-            ,NULL as real_distance from (
+            ,NULL as real_distance 
+            ,{2} as detec_radius1
+            ,{2} as detec_radius2
+            from (
             select stn1,stn2, round(avg(lat1::numeric),5)::numeric as avg_lat1,round(avg(lat2::numeric),5)::numeric as avg_lat2 ,round(avg(long1::numeric),5)::numeric as avg_long1,round(avg(long2::numeric),5)::numeric as avg_long2  from (
             select  fst.station as stn1,snd.station as stn2,
             fst.latitude as lat1, snd.latitude as lat2,
@@ -53,7 +60,7 @@ def createMatrix( detection_tbl, matrix_tbl ):
             ) foo group by 1,2
             )calc
             order by 1,2);
-            '''.format(detection_tbl, matrix_tbl))
+            '''.format(detection_tbl, matrix_tbl, detection_radius))
         conn.commit()
     except Exception as e:
         if hasattr(e, 'pgcode'):
@@ -68,17 +75,23 @@ def createMatrix( detection_tbl, matrix_tbl ):
     
     sql = '''
         DELETE FROM public.{0}
-        
+         
         WHERE ( stn1,stn2 ) not IN
        (
             SELECT
               stn1
             , stn2
-        
+         
             FROM 
             (
                 SELECT
-                  DISTINCT ON ( array_to_string ( f_ARRAY_SORT ( ARRAY[stn1,stn2]),',' ) ) stn1
+                  --Combine the two station columns into an array and sort them alphabetically.
+                  --Only select distinct station pairs. The station records not in the order of this select statement
+                  --are removed, thus removing the duplicate station pairs.
+                  --eg. records P1, P2 and P2, P1 would return one row which is distinct on the sorted pair of stations
+                  --first matching pair will be kept 
+                  DISTINCT ON ( array_to_string ( f_ARRAY_SORT ( ARRAY[stn1,stn2]),',' ) ) 
+                  stn1
                 , stn2
                 , avg_lat1
                 , avg_lat2
@@ -86,7 +99,7 @@ def createMatrix( detection_tbl, matrix_tbl ):
                 , avg_long2
                 , distance_m
                 , real_distance
-        
+         
                 FROM public.{0}
             )
             foo
@@ -96,7 +109,7 @@ def createMatrix( detection_tbl, matrix_tbl ):
         #Execute SQL Script
         cur.execute(sql)
         conn.commit()
-        
+         
         #Close postgresql connection
         cur.close()
         conn.close()

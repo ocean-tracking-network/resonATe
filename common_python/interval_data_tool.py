@@ -16,7 +16,7 @@ from csf.table_maintenance import table_maintenance
 from csf.build_filename import build_filename
 
 # Library Modules
-from library import verify_columns
+from common_python.library import verify_columns
 from library import compress_detections
 from library import view_intvl
 from library import putfile

@@ -8,7 +8,8 @@ import library.copy_from_postgresql as copy_from_pg
 
 def filterDetections(detection_file, version_id, SuspectFile, 
                      OverrideSuspectDetectionFile, DistanceMatrix, 
-                     ReloadInputFile, data_directory='/home/sandbox/RStudio/data/'):  
+                     detection_radius, ReloadInputFile, 
+                     data_directory='/home/sandbox/RStudio/data/'):  
     '''
     Run the process for filtering the detection files using the supplied suspect detection file.
     '''
@@ -188,7 +189,7 @@ def filterDetections(detection_file, version_id, SuspectFile,
             load_to_pg.removeTable( matrix_tbl )
         
         # Create distance matrix table
-        load_to_pg.createMatrix( output_tbl, matrix_tbl)
+        load_to_pg.createMatrix( output_tbl, matrix_tbl, detection_radius)
         
         # Get count and set filename
         matrix_count = verify.TableCount( matrix_tbl )

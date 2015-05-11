@@ -1,5 +1,15 @@
 from . import pg_connection as pg
-from bokeh.transforms.ar_downsample import Count
+import os, sys
+SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
+CSF_PATH =  os.path.abspath(os.path.join(SCRIPT_PATH,
+                                         os.pardir,
+                                         os.pardir,
+                                         'csf'))
+
+sys.path.append(CSF_PATH)
+
+import MessageDB as mdb
+msgs = mdb.MessageDB()
 
 def putFile(reqcode, objfrom, objto):
     '''(str, str, str) -> int
@@ -56,5 +66,5 @@ def putFile(reqcode, objfrom, objto):
     
     else:
         # Output message: Invalid reqcode
-        print msg('simple',12,1,param1=reqcode)
+        print msgs.get_message(12, params=[reqcode])
         return -1
