@@ -72,6 +72,7 @@ def CompressDetections(detection_file,
                                    ReloadInputFile=True,
                                    SuspectDetections=False,
                                    time_interval=60,
+                                   detection_radius='',
                                    data_directory= data_directory)
 
     if detections_loaded == -1:

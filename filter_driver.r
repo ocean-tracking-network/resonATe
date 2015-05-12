@@ -23,8 +23,10 @@ detection_file   <- 'detections.csv' #Detection file input name
 input_version_id <- '00'             #Version ID number [0 for initial(first) load]
 time_interval    <- '60'             #Time interval used to evaluate suspect detections (in minutes)
 
-detection_radius <- ''              #Distance from the recevier, in meters, tags can be detected
-#Validation for this parameter: Value must be >= to 999
+detection_radius <- ''               # Average Distance from receviers, in meters, tags can be detected
+# There will be an opportunity later to change values for individual stations
+# If entered: Value must be between 0 and 999 
+
 
 ################ Detection Processing Functions ################
 

@@ -75,6 +75,15 @@ def loadDetections(detection_file, version_id, DistanceMatrix,
         print """Please rename or delete output file or set \"SuspectDetections = FALSE\" to proceed with current data."""
         return -1
 
+    #Check the detection_radius variable for a correct value, if entered: 0 to 999
+    if not detection_radius == '':
+        try:
+            if int(detection_radius) not in range(1000):
+                raise
+        except:
+            print """Value for detection_radius is not correct, must be between 0 and 999"""
+            return -1
+    
     #If the detection table doesn't exist or if realoadfile == True then create detection table
     if not detection_tbl_exists or ReloadInputFile:
         #Extract headers
