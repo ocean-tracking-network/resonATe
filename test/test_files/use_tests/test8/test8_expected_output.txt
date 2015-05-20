@@ -1,0 +1,8 @@
+Verifying Detection file: 'test8_detections.csv'... OK!
+Verifying Distance Matrix file: 'test8_distance_matrix.csv'... OK!
+Loading Detection file: 'test8_detections.csv'... OK!
+Loading Distance Matrix file: 'test8_distance_matrix.csv'... OK!
+Exporting data...
+OK!
+Compressed detections exported to: test8_detections_compressed_detections_v00.csv containing 33 records.
+Interval data exported to: test8_detections_interval_data_v00.csv containing 33 records.

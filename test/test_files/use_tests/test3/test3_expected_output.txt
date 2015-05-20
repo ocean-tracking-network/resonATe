@@ -1,0 +1,2 @@
+There are 9 records updated in file test3_distance_matrix_input1_merged.csv
+Updates complete.

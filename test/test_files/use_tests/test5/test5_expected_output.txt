@@ -1,0 +1,8 @@
+Loading records into test5_detections_v00, Please wait...
+LatLon detected, creating a Point object from latitude / longitude
+Populating geometry column.
+File loaded successfully! Detection Count: 66
+Loading complete. Created/populated 1 tables
+Using test5_detections_v00 table with 66 records for compression. Please Wait...
+Table test5_detections_v00 compressed in table mv_anm_compressed with 33 records.
+Compressed detection file exported to: test5_detections_compressed_detections_v00.csv.
