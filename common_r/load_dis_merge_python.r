@@ -9,9 +9,6 @@ loadDistanceMerge <- function(reqcode, distance_matrix_input, distance_real_inpu
   python.exec("import common_python.dis_mtrx_merge")
   python.exec("reload(common_python.dis_mtrx_merge)")
   
-  setwd("/home/sandbox/RStudio/sandbox")
-  system2('python',paste('./common_python/dis_mtrx_merge.py', sep=' '), stdout=TRUE, stderr=TRUE);
-  
   # Run the merge script
   main <- python.call('common_python.dis_mtrx_merge.dis_mtx_merge',
                       reqcode,distance_matrix_input, distance_real_input)
