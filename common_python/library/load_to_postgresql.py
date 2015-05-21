@@ -253,7 +253,7 @@ FROM   -- this is a special case where the first detection is compared to the se
 )
 foo
 WHERE det_interval>interval '{2} minute'
-order by catalognumber, frst_detec);
+) order by catalognumber, scnd_detect ;
 '''.format(suspect_tbl,detection_tbl, time_interval)
 
     cur.execute(insert_sql)
