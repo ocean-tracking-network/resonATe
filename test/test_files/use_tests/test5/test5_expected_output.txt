@@ -1,3 +1,4 @@
+Verifying detection file: 'test5_detections.csv'... OK!
 Loading records into test5_detections_v00, Please wait...
 LatLon detected, creating a Point object from latitude / longitude
 Populating geometry column.

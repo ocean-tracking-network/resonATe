@@ -53,6 +53,8 @@
 120,1,"File '{0}' has a blank column header."
 121,1,"File '{0}' has a duplicate header name."
 122,1,"Creating file '{0}'..."
+123,0,"Error: The required column(s) for creating the station distance matrix are missing:\nSet the DistanceMatrix to FALSE to continue processing with your current data file."
+124,1,"Duplicate header names: '{0}', please rename the duplicate header(s) and rerun."
 200,1,Please provide the variable: '{0}'
 201,0,"Unable to detect encoding, please set input_encoding and rerun conversion."
 202,2,"Converting file '{0}' from encoding '{1}' to 'utf-8', please wait..."

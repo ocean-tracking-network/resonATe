@@ -1,4 +1,5 @@
 row_num,catalognumber,detecid1,suspect_detection,detecid3,stn1,stn2,stn3,frst_detec,scnd_detect,thrd_detect,prev_interval,next_interval,input_interval
 25,A11,22,36,,P3,P5,,2015-05-19 15:14:26,2015-05-19 16:16:17,,01:01:51,,GT 60 minutes
+31,A18,,23,37,,P3,P5,,2015-05-19 13:38:14,2015-05-19 15:06:43,,01:28:29,GT 60 minutes
 37,A2,58,,,P8,,,2015-05-19 14:19:24,,,,,GT 60 minutes
 66,A9,30,,,P4,,,2015-05-19 13:31:13,,,,,GT 60 minutes

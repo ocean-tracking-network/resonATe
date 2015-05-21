@@ -3,6 +3,8 @@ import sys
 import re
 import time 
 
+from collections import Counter
+
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir,os.pardir, 'csf')
 sys.path.append(CSF_PATH)
@@ -57,6 +59,8 @@ def verify_columns(reqcode, fileh, header_string):
     stn1_nulls = [] # Null values for stn1 column
     stn2_nulls = [] # Null values for sta2 column
     distance_m_invalid = [] # Invalid Date format
+    detect_rad1_invalid = [] # Invalid detec_radius1
+    detect_rad2_invalid = [] # Invalid detec_radius2
     real_distance_invalid = [] # Invalid numeric values for real distance
     matrix_pairs = {} # Matrix pairs
     matrix_pairs_invalid = [] # Invalid matrix pairs
@@ -93,7 +97,49 @@ def verify_columns(reqcode, fileh, header_string):
             errors.append(msgs.get_message(105,params=['Detection', os.path.basename(str(fileh))]))
             for col in missing_columns:
                 errors.append(col)
+                
+    # Test Detection file with distance matrix creation enabled
+    elif (reqcode == 'reqdetect_w_distmtrx'):
+        if u'unqdetecid' in header_string:
+            unqdetecid_tst = True
+            unqdetecid_idx = header_string.index(u'unqdetecid')
+        else:
+            missing_columns.append('unqdetecid')
+            
+        if u'datecollected' in header_string:
+            datecollected_tst = True
+            datecollected_idx = header_string.index(u'datecollected')
+        else:
+            missing_columns.append('datecollected')
+            
+        if u'catalognumber' in header_string:
+            catalognumber_tst = True
+            catalognumber_idx = header_string.index(u'catalognumber')
+        else:
+            missing_columns.append('catalognumber')
+            
+        if u'station' in header_string:
+            station_tst = True
+            station_idx = header_string.index(u'station')
+        else:
+            missing_columns.append('station')
         
+        if u'longitude' not in header_string:
+            missing_columns.append('longitude')
+            
+        if u'latitude' not in header_string:
+            missing_columns.append('latitude')
+            
+        if missing_columns:
+            errors.append(msgs.get_message(105,params=['Detection', os.path.basename(str(fileh))]))
+            # Add the column names to the error list
+            errors.append(','.join(missing_columns))
+            
+            if all([x=='longitude' or x=='latitude' for x in missing_columns]):
+                errors.append(msgs.get_message(123,params=[]))
+                
+    
+    # Checks to run for distance matrix files 
     elif(reqcode == 'reqdistmtrx'):
         # Verify the column names exist
         if u'stn1' in header_string:
@@ -118,7 +164,7 @@ def verify_columns(reqcode, fileh, header_string):
             detec_rad2_tst = True
             detec_rad2_idx = header_string.index(u'detec_radius2')
         else:
-            missing_columns.append('detec_radius1')
+            missing_columns.append('detec_radius2')
                
         if u'distance_m' in header_string:
             distance_m_tst = True
@@ -138,6 +184,46 @@ def verify_columns(reqcode, fileh, header_string):
                 errors.append(col)
         else:
             matrix_pair_tst = True
+            
+    # Checks to run for distance matrix files 
+    elif(reqcode == 'reqrealdistmtrx'):
+        # Verify the column names exist
+        if u'stn1' in header_string:
+            stn1_tst = True
+            stn1_idx = header_string.index(u'stn1')
+        else:
+            missing_columns.append('stn1')
+            
+        if u'stn2' in header_string:
+            stn2_tst = True
+            stn2_idx = header_string.index(u'stn2')
+        else:
+            missing_columns.append('stn2')
+            
+        if u'detec_radius1' in header_string:
+            detec_rad1_tst = True
+            detec_rad1_idx = header_string.index(u'detec_radius1')
+        else:
+            missing_columns.append('detec_radius1')
+        
+        if u'detec_radius2' in header_string:
+            detec_rad2_tst = True
+            detec_rad2_idx = header_string.index(u'detec_radius2')
+        else:
+            missing_columns.append('detec_radius2')
+            
+        if u'real_distance' in header_string:
+            real_distance_tst = True
+            real_distance_idx = header_string.index(u'real_distance')
+        else:
+            missing_columns.append('real_distance')
+             
+        if missing_columns:
+            errors.append(msgs.get_message(105, params=['Distance real', os.path.basename(str(fileh))]))
+            for col in missing_columns:
+                errors.append(col)
+        else:
+            matrix_pair_tst = True
     else:
         #Invalid request code: '{reqcode}'
         errors.append(msgs.get_message(12,params=[reqcode]))
@@ -146,10 +232,12 @@ def verify_columns(reqcode, fileh, header_string):
     if u'' in header_string:
         errors.append(msgs.get_message(120,params=[os.path.basename(str(fileh))]))
     
-    if len(set(header_string)) < len(header_string):
-        errors.append(msgs.get_message(121,params=[os.path.basename(str(fileh))]))
+    # Duplicate in column headers
+    duplicate_headers = [k for k,v in Counter(header_string).items() if v > 1 ]
+    if duplicate_headers:
+        errors.append(msgs.get_message(124,params=[','.join(duplicate_headers)]))
     
-    #Return initial errors
+    # Return initial errors
     if errors:
         return errors
     
@@ -222,6 +310,22 @@ def verify_columns(reqcode, fileh, header_string):
             except:
                 missing_data.append(index)
         
+        # detec_radius1 (number)
+        if detec_rad1_tst:
+            try:
+                if (not row[detec_rad1_idx] == '') & (not is_number(row[detec_rad1_idx])):
+                    detect_rad1_invalid.append(index)
+            except:
+                missing_data.append(index)
+                
+        # detec_radius2 (number)
+        if detec_rad2_tst:
+            try:
+                if (not row[detec_rad2_idx] == '') & (not is_number(row[detec_rad2_idx])):
+                    detect_rad2_invalid.append(index)
+            except:
+                missing_data.append(index)
+                
         # real_distance (NULL or number)
         if real_distance_tst:  
             try:
@@ -280,7 +384,7 @@ def verify_columns(reqcode, fileh, header_string):
     if stn2_nulls:
         errors.append(msgs.get_message(108,
                     params=[os.path.basename(str(fileh)),'stn2']))
-        errors.append(stn1_nulls)
+        errors.append(stn2_nulls)
         
     if real_distance_invalid:
         errors.append(msgs.get_message(111,
@@ -291,6 +395,16 @@ def verify_columns(reqcode, fileh, header_string):
         errors.append(msgs.get_message(110,
                     params=[os.path.basename(str(fileh)),'distance_m']))
         errors.append(distance_m_invalid)
+    
+    if detect_rad1_invalid:
+        errors.append(msgs.get_message(110,
+                    params=[os.path.basename(str(fileh)),'detec_radius1']))
+        errors.append(detect_rad1_invalid)
+        
+    if detect_rad2_invalid:
+        errors.append(msgs.get_message(110,
+                    params=[os.path.basename(str(fileh)),'detec_radius2']))
+        errors.append(detect_rad2_invalid)
         
     if matrix_pairs_invalid:
         errors.append(msgs.get_message(109,

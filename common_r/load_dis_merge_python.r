@@ -15,5 +15,5 @@ loadDistanceMerge <- function(reqcode, distance_matrix_input, distance_real_inpu
   # Run the merge script
   main <- python.call('common_python.dis_mtrx_merge.dis_mtx_merge',
                       reqcode,distance_matrix_input, distance_real_input)
-                      
+                  
 }

@@ -203,7 +203,7 @@ class TestSandbox(unittest.TestCase):
                 
         
         # Run the load_detections function on the test file
-        print dis_mtrx_merge.dis_mtx_merge(reqcode='reqmerge',
+        dis_mtrx_merge.dis_mtx_merge(reqcode='reqmerge',
                                     distance_matrix_input= matrix_1_file,
                                     distance_real_input= matrix_2_file,
                                     data_directory=DATA_PATH)
@@ -431,9 +431,9 @@ class TestSandbox(unittest.TestCase):
         # Execute the load_detection function to get expected failure
         load_detections.loadDetections(detection_file=input_detect_file,
                                        version_id='00', 
-                                       DistanceMatrix=True, 
+                                       DistanceMatrix=False, 
                                        ReloadInputFile=True, 
-                                       SuspectDetections=True, 
+                                       SuspectDetections=False, 
                                        time_interval='60',
                                        detection_radius='',
                                        data_directory=DATA_PATH)
@@ -445,9 +445,9 @@ class TestSandbox(unittest.TestCase):
         # expected to pass
         load_detections.loadDetections(detection_file=output_converted_file,
                                        version_id='00', 
-                                       DistanceMatrix=True, 
+                                       DistanceMatrix=False, 
                                        ReloadInputFile=True, 
-                                       SuspectDetections=True, 
+                                       SuspectDetections=False, 
                                        time_interval='60',
                                        detection_radius='',
                                        data_directory=DATA_PATH)

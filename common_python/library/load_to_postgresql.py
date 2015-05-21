@@ -146,8 +146,9 @@ def createSuspect( detection_tbl, suspect_tbl, time_interval):
     print 'Processing detection summary on table {0} using the time interval: {1} minute(s)'.format(detection_tbl, time_interval)
      
     #Write to the detection summary table
-    cur.execute('''
-        INSERT INTO public.{0} (select * from (
+    insert_sql = '''
+INSERT INTO public.{0}(
+select * from (
         select fst.row_num,fst.catalognumber,fst.unqdetecid as detecid1 ,snd.unqdetecid as suspect_detection
         ,trd.unqdetecid as detecid3
         ,fst.station as stn1,snd.station as stn2,trd.station as stn3
@@ -183,9 +184,79 @@ def createSuspect( detection_tbl, suspect_tbl, time_interval):
                   from public.{1} group by 1)
                   foo where cnt > 1)
                ) --201407 flag single detections unless release
-        order by catalognumber, frst_detec
-        );
-'''.format(suspect_tbl,detection_tbl, time_interval))
+        
+UNION ALL
+SELECT
+  row_num
+, catalognumber
+, null as detecid1
+, suspect_detection
+, detecid3
+, null as stn1
+, stn2
+, stn3
+, null as frst_detec
+, scnd_detect
+, thrd_detect
+, null as prev_interval
+, det_interval as next_interval
+, 'GT '||'{2}'||' minutes'
+FROM   -- this is a special case where the first detection is compared to the second only to determine if the first detection is suspect
+(
+    SELECT
+      fst.row_num
+    , fst.catalognumber
+    , fst.unqdetecid as suspect_detection
+    , snd.unqdetecid as detecid3
+    , fst.station as stn2
+    , snd.station as stn3
+    , fst.datecollected as scnd_detect
+    , snd.datecollected as thrd_detect
+    , snd.datecollected-fst.datecollected as det_interval
+    FROM
+    (
+        SELECT
+          row_number ( ) over ( order by catalognumber,datecollected ) AS row_num
+        , *
+        FROM public.{1}
+    )
+    fst --  join used to eliminate single detections as they are caught in the other secton of code
+    JOIN
+    (
+        SELECT
+          row_number ( ) over ( order by catalognumber,datecollected ) AS row_num
+        , *
+        FROM public.{1}
+    )
+    snd
+     ON fst.row_num=snd.row_num-1
+    AND fst.catalognumber=snd.catalognumber
+    WHERE fst.unqdetecid not like '%release' -- release records are never suspect
+    AND ( fst.catalognumber,fst.datecollected ) IN 
+    (
+        SELECT
+          catalognumber
+        , datecollected
+        FROM
+        (
+            SELECT
+              catalognumber
+            , min ( datecollected ) as datecollected
+            , count (*) as cnt
+            FROM public.{1}
+            GROUP BY 1
+        )
+        foo
+        WHERE cnt>2
+    )
+    -- two detections only are dealth with in other section of code
+)
+foo
+WHERE det_interval>interval '{2} minute'
+order by catalognumber, frst_detec);
+'''.format(suspect_tbl,detection_tbl, time_interval)
+
+    cur.execute(insert_sql)
     conn.commit()
     return True
 
@@ -236,7 +307,7 @@ def createGeometryColumns(table_name):
     # TODO: find the appropriate SRID given the geometry object.
 
     for col_name in text_cols:
-        check_q = "select %s from %s" % (col_name[0], table_name)
+        check_q = "select \"%s\" from %s" % (col_name[0], table_name)
         cur.execute(check_q)
         col_contents = cur.fetchall()
         populated_column = False

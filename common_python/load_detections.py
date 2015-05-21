@@ -1,21 +1,34 @@
 import os
+import sys
 
 #Local Imports
 import library.verifications as verify
 import library.load_to_postgresql as load_to_pg
 import library.copy_from_postgresql as copy_from_pg
+import library.verify_columns as verify_columns
+
+# Append the CSF path 
+SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
+CSF_PATH = os.path.join(SCRIPT_PATH,os.pardir,'csf')
+sys.path.append( CSF_PATH )
+
+#Load message module
+import MessageDB as mdb
+msgs = mdb.MessageDB()
+from csf.file_io import fileIO
 
 def loadDetections(detection_file, version_id, DistanceMatrix, 
                    ReloadInputFile, SuspectDetections, time_interval,
                    detection_radius, data_directory='/home/sandbox/RStudio/data/'):
 
     tables_created = {}
-    #Is the supplied detection_file variable is valid
+    #Is the supplied detection_file variable is valid, quit if not
     if not verify.Filename( detection_file ):
-        print 'Error: [detection_file] variable supplied either has invalid characters or does not contain a csv file extension'
+        #'Error: [detection_file] variable supplied either has invalid characters or does not contain a csv file extension'
+        msgs.get_message(15,[detection_file])
         return -1
         
-    #version_id supplied in the filename?
+    # extract the version_id, if supplied by the filename?
     file_version_id = verify.FileVersionID( detection_file )
     if file_version_id:
         #remove the version_id & extension from the filename
@@ -24,7 +37,7 @@ def loadDetections(detection_file, version_id, DistanceMatrix,
         #remove the extension from the filename
         base_name = detection_file[:-4]
     
-    #Check all version_id combinations and apply to input_version_id
+    # Check all version_id combinations and apply to input_version_id
     input_version_id = verify.VersionID( version_id )
     if file_version_id and not input_version_id:
         input_version_id = file_version_id
@@ -35,21 +48,20 @@ def loadDetections(detection_file, version_id, DistanceMatrix,
             print 'version_id mismatch {} != {}'.format(file_version_id, input_version_id)
             return -1
         
-    #reformat both input_version_id and base_name
+    # Reformat both input_version_id and the file base_name
     input_version_id = input_version_id.rjust(2,'0') # Zero pad version ID
     base_name = base_name.lower().replace(' ','_')   # Replace spaces with underscores
     
-    #Assign table names
+    # Assign table names
     detection_tbl = '{0}_v{1}'.format( base_name, input_version_id )
     matrix_tbl    = '{0}_distance_matrix_v{1}'.format( base_name, input_version_id )
     suspect_tbl   = '{0}_suspect_v{1}'.format( base_name, input_version_id )
     
-    #Assign file names
+    # Assign file names
     detection_filename = os.path.join(data_directory,detection_file)
     suspect_filename = os.path.join(data_directory,suspect_tbl+'.csv' )
     matrix_filename = os.path.join(data_directory,matrix_tbl+'.csv' )
     
-    #Has the detections table been already loaded?
     detection_tbl_exists =  verify.TableExists( detection_tbl )
     
     # Return if detection_file does not exist 
@@ -84,33 +96,25 @@ def loadDetections(detection_file, version_id, DistanceMatrix,
             print """Value for detection_radius is not correct, must be between 0 and 999"""
             return -1
     
-    #If the detection table doesn't exist or if realoadfile == True then create detection table
+    #If the detection table doesn't exist or if ReloadInputFile == True, create detection table
     if not detection_tbl_exists or ReloadInputFile:
-        #Extract headers
-        detection_headers =  verify.FileHeaders( detection_filename )
+        #CSV File validation 
+        detection_fileh = fileIO('reqopen', detection_filename )
         
-        #Report duplicate headers
-        duplicate_headers = verify.CheckDuplicateHeader( detection_headers )
-        if duplicate_headers:
-            print 'Duplicate header names: \"{0}\", please rename the duplicate header(s) and rerun.'.format(','.join(duplicate_headers))
+        # Read first line into header
+        detection_headers = detection_fileh.fileIO('reqread1', fromto=':list:')
+        print msgs.get_message(112,['detection',detection_file]),
         
-        #Verify mandatory columns exist
-        mandatory_columns = [u'station',
-                             u'unqdetecid',
-                             u'datecollected',
-                             u'catalognumber']
-        if DistanceMatrix:
-            mandatory_columns.extend([u'longitude',u'latitude'])
+        errors = verify_columns.verify_columns(('reqdetect_w_distmtrx' if 
+                                             DistanceMatrix else 'reqdetect'),
+                                            detection_fileh, detection_headers)
+
+        detection_fileh.close_file()
         
-        missing_columns = verify.MandatoryColumns(detection_headers, mandatory_columns)
-        errors = []
-        
-        if missing_columns:
-            errors.append('Error: Mandatory column(s) missing ({})'.format(','.join(missing_columns)))
-            #IF the matrix option are defined and one or more of the required columns are missing
-            if len(missing_columns) <= 2 and ('latitude' in missing_columns or 'longitude' in missing_columns):
-                errors.append('''Error: The required column(s) for creating the station distance matrix are missing:\nSet the DistanceMatrix to FALSE to continue processing with your current data file.'''.format(','.join(missing_columns)))
-        else:
+        if not errors:
+            # OK!
+            print msgs.get_message(113,[])
+            
             #Create detections table
             table_created = load_to_pg.createTable(detection_tbl, detection_headers, ReloadInputFile) # final argument says whether to destroy an existing table.
             
@@ -121,7 +125,6 @@ def loadDetections(detection_file, version_id, DistanceMatrix,
             else:
                 tables_created['detections'] = detection_tbl
 
-
             #Load the table contents with csv file
             detections_loaded = load_to_pg.loadToPostgre( detection_tbl, detection_filename)
     
@@ -129,32 +132,21 @@ def loadDetections(detection_file, version_id, DistanceMatrix,
                 #Remove blank lines from the newly created table
                 load_to_pg.removeNullRows(detection_tbl, 'unqdetecid')
 
-
                 # Check file/table for lat/lon and Well Known Text/Binary and return a list of all newly created geometry columns.
                 geometry_columns = load_to_pg.createGeometryColumns(detection_tbl)
-
-                #Check for duplicate unique ids
-                copy_from_pg.ReturnDuplicates( detection_tbl, 'unqdetecid')
-                duplicates = verify.TableCount( 'duplications' )
                 
                 #If duplicates are found, end execution of the loading script
-                if duplicates > 0:
-                    duplicate_filepath = os.path.join(data_directory,'{0}_duplicates_v{1}.csv'.format( base_name, input_version_id ))
-                    copy_from_pg.ExportTable( 'duplications', duplicate_filepath )
-                    errors.append('Error: All unqdetecid(s) are not unique.')
-                    errors.append('unqdetecid duplicates exported to \'{0}\''.format( duplicate_filepath ))
-                    #Remove Database Tables
-                    load_to_pg.removeTable( 'duplications' )
-                    load_to_pg.removeTable( detection_tbl )
-                else:
-                    detection_count = verify.TableCount( detection_tbl )
-                    print 'File loaded successfully! Detection Count: {}'.format(detection_count)
+                detection_count = verify.TableCount( detection_tbl )
+                print 'File loaded successfully! Detection Count: {}'.format(detection_count)
+                
             else:
                 errors.append('Error loading detections.')
                 load_to_pg.removeTable( detection_tbl )
             
         #Print all csv file validation errors and then exit
         if errors:
+            # ERROR!
+            print msgs.get_message(114,[])
             for error in errors:
                 print error
             print 'Exiting...'

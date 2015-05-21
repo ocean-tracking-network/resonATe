@@ -17,8 +17,11 @@ sys.path.append( CSF_PATH )
 
 #Local Imports
 import library.verifications as verify
+import library.verify_columns as verify_columns
+
 import MessageDB as mdb
 msgs = mdb.MessageDB()
+from csf.file_io import fileIO
 
 def dis_mtx_merge(reqcode, distance_matrix_input, distance_real_input, 
                   data_directory='/home/sandbox/RStudio/data/'):
@@ -32,20 +35,23 @@ def dis_mtx_merge(reqcode, distance_matrix_input, distance_real_input,
     # Check if reqcode is valid 
     if(reqcode !='reqmerge'):
         # return 'Error:Not valid reqcode'  #CSF
-        return msgs.get_message(12,[reqcode])
+        print msgs.get_message(12,[reqcode])
+        return -1
     
     # Check for valid filenamesl
     if not verify.Filename( distance_matrix_input ):
         # return 'Error: {distance_matrix_input} variable supplied either 
         #             has invalid characters or does not contain a csv 
         #             file extension'
-        return msgs.get_message(15,[distance_matrix_input])
+        print msgs.get_message(15,[distance_matrix_input])
+        return -1
     
     if not verify.Filename( distance_real_input ):
         # return 'Error: {distance_real_input} variable supplied either 
         #             has invalid characters or does not contain a csv 
         #             file extension'
-        return msgs.get_message(15,[distance_real_input])
+        print msgs.get_message(15,[distance_real_input])
+        return -1
     
     # Create output file name & full path
     output_file = os.path.splitext(distance_matrix_input)[0]+'_merged.csv'
@@ -60,49 +66,64 @@ def dis_mtx_merge(reqcode, distance_matrix_input, distance_real_input,
     # Check if both files exist
     if not verify.FileExists( distance_matrix_input_path ):
         # return: 'File {distance_matrix_input_path} does not exist'
-        return msgs.get_message(index=19,params=[distance_matrix_input_path])
+        print msgs.get_message(index=19,params=[distance_matrix_input_path])
+        return -1
     
     if not verify.FileExists( distance_real_input_path):
         # return: 'File {distance_real_input_path} does not exist'
-        return msgs.get_message(index=19,params=[distance_real_input_path])
+        print msgs.get_message(index=19,params=[distance_real_input_path])
+        return -1
+    
+    
+    # Verify both matrix input files 
+    print msgs.get_message(112,['distance matrix',distance_matrix_input]),
+    
+    #CSV File validation 
+    matrix_fileh = fileIO('reqopen', distance_matrix_input_path )
+    
+    # Read first line into header
+    matrix_headers = matrix_fileh.fileIO('reqread1', fromto=':list:')
+    
+    matrix_errors = verify_columns.verify_columns('reqdistmtrx', 
+                                            matrix_fileh, matrix_headers)
+    matrix_fileh.close_file()
+    
+    #Print all csv file validation errors and then exit
+    if matrix_errors:
+        # ERROR!
+        print msgs.get_message(114,[])
+        for error in matrix_errors:
+            print error
+        print 'Exiting...'
+        return -1
+    
+    # OK!
+    print msgs.get_message(113,[])
+        
+    print msgs.get_message(112,['distance real',distance_real_input]),
+    
+    real_fileh = fileIO('reqopen', distance_real_input_path )
+    real_headers = real_fileh.fileIO('reqread1', fromto=':list:')
+    
+    real_errors = verify_columns.verify_columns('reqrealdistmtrx', 
+                                            real_fileh, real_headers)
+    
+    real_fileh.close_file()
+    
+    if real_errors:
+        # ERROR!
+        print msgs.get_message(114,[])
+        for error in real_errors:
+            print error
+        print 'Exiting...'
+        return -1
+    
+    # OK!
+    print msgs.get_message(113,[])
     
     # Open the two files as pandas DataFrames
     matrix_df = pd.read_csv(distance_matrix_input_path, dtype='object')
     real_df = pd.read_csv(distance_real_input_path, dtype='object')
-    
-    # Mandatory columns for 1st matrix input file
-    mandatory_columns_matrix = ['stn1','stn2','distance_m',
-                                'real_distance','detec_radius1',
-                                'detec_radius2']
-    
-    # Get column headers in each input file
-    matrix_headers = list(matrix_df.columns)
-    real_headers = list(real_df.columns)
-    
-    # Retrieve list of missing columns (based on column name matching)
-    matrix_missing_columns = verify.MandatoryColumns(matrix_headers, 
-                                                     mandatory_columns_matrix)
-    
-    # Return error message if missing any mandatory columns from the 
-    # matrix input file
-    if matrix_missing_columns:
-        # return: 'Missing columns:{matrix_missing_columsn} in 
-        #          file {distance_matrix_input}'
-        return msgs.get_message(index=16,params=[matrix_missing_columns, 
-                                                 distance_matrix_input_path])
-        
-    # Mandatory columns for the real distance input file
-    mandatory_columns_real = ['stn1','stn2','real_distance',
-                               'detec_radius1','detec_radius2'] 
-       
-    real_missing_columns = verify.MandatoryColumns(real_headers,
-                                                   mandatory_columns_real)
-    
-    # Return error message if missing any mandatory columns from the 
-    # real input file
-    if real_missing_columns:
-        return msgs.get_message(index=16,params=[real_missing_columns, 
-                                                 distance_real_input_path])
     
     updates = 0 
     # Field update function (DRY)
@@ -117,7 +138,7 @@ def dis_mtx_merge(reqcode, distance_matrix_input, distance_real_input,
                                ((df1['stn2'] == row['stn1']) &
                                 (df1['stn1'] == row['stn2']))]
             
-            # continue only if station pare could be matched
+            # continue only if station pair could be matched
             if not df_index.empty:
                 if df1.loc[df_index.axes[0], field].item() != row[field]:
                     df1.loc[df_index.axes[0], field] = row[field]
@@ -143,7 +164,8 @@ def dis_mtx_merge(reqcode, distance_matrix_input, distance_real_input,
         print msgs.get_message(index=22, params=[distance_matrix_input])
         
     # return: Updates complete 
-    return msgs.get_message(index=23)
+    print msgs.get_message(index=23)
+    return 1
 
 if __name__ == '__main__':
     print dis_mtx_merge('reqmerge', 'matrix.csv','matrix_update.csv')
