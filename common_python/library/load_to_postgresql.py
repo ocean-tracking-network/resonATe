@@ -5,6 +5,7 @@ import shapely.wkb as wkb
 import shapely.wkt as wkt
 import string # for hexdigits entity
 import codecs
+import datetime
 
 from . import pg_connection as pg
 
@@ -327,24 +328,29 @@ def createGeometryColumns(table_name):
                 break
         if populated_column:
             geo_cols.append([col_name[0], pop_col_type, geom.geom_type])
-
-
+    
     #print "%s columns are geometry" % geo_cols
     for col in geo_cols:
         # Update the geometry columns here.
-        # Create a column with the same name as the source column with the prefix geom_
+        # Create a column with the same name as the source column with the prefix geom_ymdthhmmss_ms_
+        now = datetime.datetime.now()
+        temp_col_name = "geom_{0}_{1}".format(now.strftime("%Y%m%d%H%M%S_%f_"), col[0])
+        
         geom_sql = "select AddGeometryColumn('public', '{0}', '{1}', {2}, '{3}', 2, false)\
-                    ".format(table_name, 'geom_%s' % col[0], srid, col[2].upper())
+                    ".format(table_name, temp_col_name, srid, col[2].upper())
+                    
         if col[1] == 'WKB':
             col_decode = "decode(%s, 'hex')" % col[0] # Binary needs to be decoded from ASCII representing hex.
             gis_func_call = "ST_GeomFromEWKB"
         else: # otherwise it's text.
             col_decode = col[0]
             gis_func_call="ST_GeomFromText"
+            
         geom_pop_sql = "update {0} set {1}={2}({3})".format(table_name,
-                                                            'geom_%s' % col[0],
+                                                            temp_col_name,
                                                             gis_func_call,
                                                             col_decode)
+
         #print geom_sql
         print 'Creating geometry column for %s, identified as %s' % (col[0], col[1])
         cur.execute(geom_sql)
@@ -353,11 +359,22 @@ def createGeometryColumns(table_name):
         print 'Populating geometry column with %s' % gis_func_call
         cur.execute(geom_pop_sql)
         conn.commit()
+        
+        #Drop the source column
+        cur.execute('ALTER TABLE public.{0}\
+                                 DROP COLUMN {1};'.format(table_name, col[0]))
+        
+        # Rename the geom column back to the source column
+        cur.execute('ALTER TABLE public.{0}\
+                        RENAME {1} to {2};'.format(table_name, 
+                                                   temp_col_name,
+                                                   col[0]))
+        conn.commit()
 
     if not geo_cols: # if there was no geometry information explicitly defined by data in the file
     # Determine whether there is a latitude and longitude pair of columns from which to make a Geometry POINT object
     # Accept various lat and lon strings? Elsewhere we limit ourselves to latitude and longitude.
-        if ['longitude'] in text_cols and ['latitude'] in text_cols:
+        if ['longitude'] in text_cols and ['latitude'] in text_cols and ['latlon_geom'] not in text_cols:
             latcol_name = 'latitude'
             loncol_name = 'longitude'
             latlon_to_gis_func = 'ST_MakePoint' # Shouldn't need to abstract this, but let's keep it looking like above.
