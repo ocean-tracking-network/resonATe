@@ -7,7 +7,7 @@ import sys
 
 from library.verifications import FileVersionID, TableExists, Filename, TableCount, FileExists
 from library import compress_detections
-from library.copy_from_postgresql import ExportTable 
+from library import putfile
 
 import load_detections
 
@@ -107,7 +107,8 @@ def CompressDetections(detection_file,
                                tablename=['mv_anm_detections', detection_tbl])
     
     # Export the compressed detections to a file
-    ExportTable('mv_anm_compressed', os.path.join(data_directory, export_compr_file))
+    putfile.putFile('reqtabcmprcsv','mv_anm_compressed', 
+                    os.path.join(data_directory, export_compr_file))
 
     # Output messages
     # Table {detection_tbl} compressed in table mv_anm_compressed with {compressed_count} records.
