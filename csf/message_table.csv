@@ -60,3 +60,5 @@
 202,2,"Converting file '{0}' from encoding '{1}' to 'utf-8', please wait..."
 203,2,"File '{0}' has been successfully converted to utf-8 as '{1}'."
 210,1,"Column '{0}' already exists, Please use another file."
+211,1,additional [{0}] invalid columns present in the input file
+212,2,"File {0} is missing mandatory data for the columns ({1}) on rows:"

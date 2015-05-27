@@ -10,6 +10,7 @@ import library.verifications as verify
 #import FileCount, FileVersionID, TableExists, Filename, TableCount, FileExists, FileHeaders
 # MandatoryColumns
 import library.load_to_postgresql as load_to_pg
+import library.verify_columns as verify_columns
 
 SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
 CSF_PATH = os.path.join(SCRIPT_PATH,os.pardir,'csf')
@@ -17,6 +18,7 @@ sys.path.append( CSF_PATH )
 
 import MessageDB as mdb
 msgs = mdb.MessageDB()
+from csf.file_io import fileIO
 
 import table_maintenance as tm
 
@@ -42,26 +44,40 @@ def CohortRecords(interval_time=60, compressed_file='',
         # File {compressed_file} does not exist
         print msgs.get_message(index=19, params=[compressed_file])
         return False 
-    
-    # Get headers
-    csv_headers = verify.FileHeaders(compressed_file_path)
-    
-    # Check if mandatory columns exist
-    mandatory_columns = ['catalognumber', 'seq_num', 'station', 
-                         'startdate', 'enddate', 'startunqdetecid',
-                         'endunqdetecid', 'total_count']
 
-    missing_columns = verify.MandatoryColumns(csv_headers, mandatory_columns)
-    
-    if missing_columns:
-        print msgs.get_message(index=16,params=[missing_columns,compressed_file_path])
-        return False
-        
+    # missing_columns = ['catalognumber',]
+    # if missing_columns:
+    #     print msgs.get_message(index=16,params=[missing_columns,compressed_file_path])
+
+    print msgs.get_message(112,['compressed detections', compressed_file]),
+
+    #CSV File validation
+    compressed_fileh = fileIO('reqopen', compressed_file_path )
+
+    # Read first line into header
+    compressed_headers = compressed_fileh.fileIO('reqread1', fromto=':list:')
+
+    errors = verify_columns.verify_columns('reqcompressed', compressed_fileh, compressed_headers)
+
+    if errors:
+            # ERROR!
+            print msgs.get_message(114,[])
+            for error in errors:
+                print error
+            print 'Exiting...'
+            return -1
+    else:
+            # OK!
+            print msgs.get_message(113,[])
+
+    compressed_fileh.close_file()
+
     # Create Table
-    load_to_pg.createTable('compressed_data_temp', csv_headers, drop=True)
+    load_to_pg.createTable('compressed_data_temp', compressed_headers, drop=True)
+
     # Load the data into the table
-    load_to_pg.loadToPostgre('compressed_data_temp', compressed_file_path)
-    
+    is_loaded = load_to_pg.loadToPostgre('compressed_data_temp', compressed_file_path)
+
     # Create cursor object
     conn, cur = createConnection()
     
@@ -86,7 +102,7 @@ def CohortRecords(interval_time=60, compressed_file='',
     """.format(interval_time)
 
     # Path name & File handler creation
-    file_name = '{0}_cohort_{1}min.csv'.format(compressed_file.replace('.csv',''), interval_time)
+    file_name = '{0}_cohort_{1}min.csv'.format(compressed_file.replace('.csv', ''), interval_time)
     file_path = os.path.join(data_directory, file_name)
     fh = open(file_path, 'wb')
 
