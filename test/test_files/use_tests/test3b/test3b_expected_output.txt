@@ -1,0 +1,8 @@
+Verifying distance matrix file: 'matched_detections_2013_distance_matrix.csv'... OK!
+Verifying distance real file: 'sample_missing_cols_dm_all.csv'... ERROR!
+Distance real file: 'sample_missing_cols_dm_all.csv' is missing the following mandatory columns:
+stn2
+detec_radius1
+detec_radius2
+real_distance
+Exiting...

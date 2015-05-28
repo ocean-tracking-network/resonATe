@@ -1,0 +1,5 @@
+Verifying distance matrix file: 'matched_detections_2013_distance_matrix.csv'... OK!
+Verifying distance real file: 'override_dist_mtrx_notnum_rad2.csv'... ERROR!
+File 'override_dist_mtrx_notnum_rad2.csv': Non-numeric values for column 'detec_radius2' for rows:
+3
+Exiting...

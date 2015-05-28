@@ -1,0 +1,3 @@
+Verifying detection file: 'sample_missing_header.csv'... ERROR!
+File 'sample_missing_header.csv' has a blank column header.
+Exiting...

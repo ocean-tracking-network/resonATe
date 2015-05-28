@@ -1,0 +1,4 @@
+Verifying distance matrix file: 'matched_detections_2013_distance_matrix.csv'... OK!
+Verifying distance real file: 'override_dist_mtrx_null_rad2.csv'... OK!
+There are 15 records updated in file matched_detections_2013_distance_matrix_merged.csv
+Updates complete.

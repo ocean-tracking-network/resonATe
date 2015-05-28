@@ -1,0 +1,7 @@
+Verifying detection file: 'sample_missing_cols.csv'... ERROR!
+Detection file: 'sample_missing_cols.csv' is missing the following mandatory columns:
+unqdetecid
+datecollected
+catalognumber
+station
+Exiting...

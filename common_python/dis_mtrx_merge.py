@@ -73,8 +73,7 @@ def dis_mtx_merge(reqcode, distance_matrix_input, distance_real_input,
         # return: 'File {distance_real_input_path} does not exist'
         print msgs.get_message(index=19,params=[distance_real_input_path])
         return -1
-    
-    
+
     # Verify both matrix input files 
     print msgs.get_message(112,['distance matrix',distance_matrix_input]),
     
@@ -94,11 +93,9 @@ def dis_mtx_merge(reqcode, distance_matrix_input, distance_real_input,
         print msgs.get_message(114,[])
         for error in matrix_errors:
             print error
-        print 'Exiting...'
-        return -1
-    
-    # OK!
-    print msgs.get_message(113,[])
+    else:
+        # OK!
+        print msgs.get_message(113,[])
         
     print msgs.get_message(112,['distance real',distance_real_input]),
     
@@ -115,17 +112,20 @@ def dis_mtx_merge(reqcode, distance_matrix_input, distance_real_input,
         print msgs.get_message(114,[])
         for error in real_errors:
             print error
+    else:
+        # OK!
+        print msgs.get_message(113,[])
+
+    if real_errors or matrix_errors:
         print 'Exiting...'
         return -1
-    
-    # OK!
-    print msgs.get_message(113,[])
-    
+
     # Open the two files as pandas DataFrames
     matrix_df = pd.read_csv(distance_matrix_input_path, dtype='object')
     real_df = pd.read_csv(distance_real_input_path, dtype='object')
     
-    updates = 0 
+    updates = 0
+
     # Field update function (DRY)
     def field_update(df1, df2, field):
         '''
@@ -140,10 +140,11 @@ def dis_mtx_merge(reqcode, distance_matrix_input, distance_real_input,
             
             # continue only if station pair could be matched
             if not df_index.empty:
-                if df1.loc[df_index.axes[0], field].item() != row[field]:
-                    df1.loc[df_index.axes[0], field] = row[field]
-                    updates += 1
-            
+                for i, r in df_index.iterrows():
+                    if df1.loc[i, field] != row[field]:
+                        df1.loc[i, field] = row[field]
+                        updates += 1
+
         return updates
     
     # Update real_distance
