@@ -1319,6 +1319,35 @@ class TestSandbox(unittest.TestCase):
                                   open(path.join(TESTFILE_PATH, fldr,
                                                  output_cohort_file)).read())
 
+    def test_06a_cohorts(self):
+        #
+        #    TEST 6a - cohort: missing input file
+        #
+        from common_python import cohorts
+
+        fldr = 'test6a'  # Test folder name
+
+        # File Names
+        compressed_file = 'missing_compressed_file.csv'
+        expected_output_file = 'test6a_expected_output.txt'
+
+        stdout = CaptureStdout() # Capture console output to compare to what is expected
+
+        # Execute the cohort function with 60 minute interval time
+        cohorts.CohortRecords(interval_time=60,
+                              compressed_file=compressed_file,
+                              data_directory=DATA_PATH)
+
+        # Release console output
+        output = stdout.release_output()  # Release output
+
+        # Read expected output into a string
+        expect_output = open(path.join(TESTFILE_PATH, fldr,
+                                       expected_output_file)).read()
+
+        # Console output assertions
+        self.assertMultiLineEqual(output, expect_output)
+
     def test_07_conversion(self):
         #
         #    TEST 7 - Test using an ANSI windows-1252 format. Loading steps fails 
