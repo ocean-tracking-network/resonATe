@@ -33,7 +33,7 @@ BEGIN
 for rows in (
 	    select  *
 	    from mv_anm_detections
-	    order by catalognumber,datecollected
+	    order by catalognumber,datecollected, station
 	) --end for
 
 	LOOP

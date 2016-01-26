@@ -51,9 +51,9 @@ def createMatrix( detection_tbl, matrix_tbl, detection_radius ):
             select  fst.station as stn1,snd.station as stn2,
             fst.latitude as lat1, snd.latitude as lat2,
             fst.longitude as long1, snd.longitude as long2
-             from (select row_number()over( order by catalognumber, datecollected) as row_num
+             from (select row_number()over( order by catalognumber, datecollected, station) as row_num
                      ,* from  {0}) fst
-            join (select row_number()over( order by catalognumber, datecollected) as row_num
+            join (select row_number()over( order by catalognumber, datecollected, station) as row_num
                      ,* from  {0}) snd
               on fst.row_num = snd.row_num -1
               and fst.catalognumber = snd.catalognumber
