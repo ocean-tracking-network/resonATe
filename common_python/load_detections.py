@@ -19,7 +19,7 @@ from csf.file_io import fileIO
 
 def loadDetections(detection_file, version_id, DistanceMatrix, 
                    ReloadInputFile, SuspectDetections, time_interval,
-                   detection_radius, data_directory='/home/sandbox/RStudio/data/'):
+                   detection_radius, data_directory=DATADIRECTORY):
 
     tables_created = {}
     #Is the supplied detection_file variable is valid, quit if not

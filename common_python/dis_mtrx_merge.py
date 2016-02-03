@@ -24,7 +24,7 @@ msgs = mdb.MessageDB()
 from csf.file_io import fileIO
 
 def dis_mtx_merge(reqcode, distance_matrix_input, distance_real_input, 
-                  data_directory='/home/sandbox/RStudio/data/'):
+                  data_directory=DATADIRECTORY):
     
     # Variable Assignments
     reqcode = reqcode

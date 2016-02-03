@@ -1,1 +1,2 @@
 
+DATADIRECTORY='/home/vagrant/data/'

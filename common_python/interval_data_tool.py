@@ -22,7 +22,7 @@ from library import view_intvl
 from library import putfile
 
 def intervalData(detection_filename, dist_matrix_filename, 
-                 data_directory= '/home/sandbox/RStudio/data/'):
+                 data_directory= DATADIRECTORY):
     '''
     Interval data tool, given distance_matrix and detection file, 
     export compressed detection and interval data files

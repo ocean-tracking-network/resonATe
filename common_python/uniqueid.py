@@ -17,7 +17,7 @@ import MessageDB as mdb
 msgs = mdb.MessageDB()
 
 def add_column_unqdetecid(input_file,
-                          data_directory='/home/sandbox/RStudio/data/'):
+                          data_directory=DATADIRECTORY):
     
     infile_path = os.path.join(data_directory, input_file)
     

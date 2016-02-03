@@ -21,7 +21,7 @@ msgs = mdb.MessageDB()
 import table_maintenance as tm
 
 def CompressDetections(detection_file,
-                       data_directory='/home/sandbox/RStudio/data/'):
+                       data_directory=DATADIRECTORY):
     '''
     Creates mv_anm_compressed table from detection file
     :param detection_file: detection file

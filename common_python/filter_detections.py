@@ -9,7 +9,7 @@ import library.copy_from_postgresql as copy_from_pg
 def filterDetections(detection_file, version_id, SuspectFile, 
                      OverrideSuspectDetectionFile, DistanceMatrix, 
                      detection_radius, ReloadInputFile, 
-                     data_directory='/home/sandbox/RStudio/data/'):  
+                     data_directory=DATADIRECTORY):  
     '''
     Run the process for filtering the detection files using the supplied suspect detection file.
     '''

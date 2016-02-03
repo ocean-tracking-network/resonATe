@@ -17,7 +17,7 @@ import MessageDB as mdb
 msgs = mdb.MessageDB()
 
 def conversion(input_file=None, input_encoding=None, 
-               data_dir='/home/sandbox/RStudio/data/'):
+               data_dir=DATADIRECTORY):
     '''
     Converts a file into utf-8 format
     '''
