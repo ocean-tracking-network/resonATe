@@ -1,6 +1,6 @@
 ################ Libraries ###################
 #set current working directory
-setwd("/home/sandbox/RStudio/sandbox")
+
 source("common_r/load_python_scripts.r")
 
 ############### Switches ################
@@ -25,7 +25,7 @@ time_interval    <- '60'             #Time interval used to evaluate suspect det
 
 detection_radius <- ''               # Average Distance from receviers, in meters, tags can be detected
 # There will be an opportunity later to change values for individual stations
-# If entered: Value must be between 0 and 999 
+# If entered: Value must be between 0 and 999
 
 
 ################ Detection Processing Functions ################

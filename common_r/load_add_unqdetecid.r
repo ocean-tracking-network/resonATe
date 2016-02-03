@@ -1,4 +1,4 @@
-setwd("/home/sandbox/RStudio/sandbox")
+
 
 add_column_unqdetecid <- function(input_file){
   library(rPython,quietly=TRUE)

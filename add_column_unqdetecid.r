@@ -1,6 +1,6 @@
 ################ Libraries ###################
 #set current working directory
-setwd("/home/sandbox/RStudio/sandbox")
+
 source("common_r/load_add_unqdetecid.r")
 
 ################ User Input ################

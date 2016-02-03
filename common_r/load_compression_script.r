@@ -1,4 +1,4 @@
-setwd("/home/sandbox/RStudio/sandbox")
+
 
 compress_detections <- function(detection_file){
   # Load rPython module

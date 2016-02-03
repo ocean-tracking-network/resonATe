@@ -1,4 +1,4 @@
-setwd("/home/sandbox/RStudio/sandbox")
+
 
 loadDetections <- function(){
   library(rPython,quietly=TRUE)

@@ -1,4 +1,4 @@
-setwd("/home/sandbox/RStudio/sandbox")
+
 
 intervalData <- function(){
   # Load rPyton and set the working directory

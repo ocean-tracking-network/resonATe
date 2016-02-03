@@ -1,4 +1,4 @@
-setwd("/home/sandbox/RStudio/sandbox")
+
 
 convert_file <- function(input_file){
   library(rPython,quietly=TRUE)

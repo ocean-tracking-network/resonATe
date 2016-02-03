@@ -1,4 +1,4 @@
-setwd("/home/sandbox/RStudio/sandbox")
+
 
 cohort_records <- function(time_interval, compressed_file){
   # Load rPython module
