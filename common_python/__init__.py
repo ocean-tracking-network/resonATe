@@ -1,2 +1,0 @@
-
-DATADIRECTORY='/home/vagrant/data/'

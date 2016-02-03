@@ -16,6 +16,8 @@ SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
 CSF_PATH = os.path.join(SCRIPT_PATH,os.pardir,'csf')
 sys.path.append( CSF_PATH )
 
+DATADIRECTORY = open('datadirectory', 'r')
+
 import MessageDB as mdb
 msgs = mdb.MessageDB()
 from csf.file_io import fileIO
