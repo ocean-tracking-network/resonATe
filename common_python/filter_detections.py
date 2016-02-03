@@ -6,7 +6,9 @@ import library.verifications as verify
 import library.load_to_postgresql as load_to_pg
 import library.copy_from_postgresql as copy_from_pg
 
-DATADIRECTORY = open('datadirectory', 'r')
+d = open('common_python/datadirectory.txt', 'r')
+d = d.readline().splitlines()
+DATADIRECTORY = d[0]
 
 def filterDetections(detection_file, version_id, SuspectFile,
 					 OverrideSuspectDetectionFile, DistanceMatrix,

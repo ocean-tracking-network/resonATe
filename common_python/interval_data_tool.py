@@ -8,7 +8,9 @@ SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir, 'csf')
 sys.path.append(CSF_PATH)
 
-DATADIRECTORY = open('datadirectory', 'r')
+d = open('common_python/datadirectory.txt', 'r')
+d = d.readline().splitlines()
+DATADIRECTORY = d[0]
 
 # Import CSF/library scripts
 import MessageDB as mdb
