@@ -1,5 +1,11 @@
 import pandas as pd
 from datetime import datetime
+import common_python.compress as cp
+from library import pg_connection as pg
+
+d = open('common_python/datadirectory.txt', 'r')
+d = d.readline().splitlines()
+DATADIRECTORY = d[0]
 
 '''
 total_days_diff()
@@ -51,10 +57,103 @@ def total_days_count(detections):
 
 
 '''
+aggregate_total_with_overlap()
+----------------------------------------
+
+'''
+
+
+def aggregate_total_with_overlap(detections):
+    total = pd.Timedelta(0)
+    detections['startdate'] = detections['startdate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
+    detections['enddate'] = detections['enddate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
+    detections['timedelta'] = detections['enddate'] - detections['startdate']
+
+    for index, row in detections.iterrows():
+        if row['timedelta'] > pd.Timedelta(0):
+            diff = row['timedelta']
+        else:
+            diff = pd.Timedelta('1 second')
+        total += diff
+    return total.total_seconds()/86400.0
+
+
+'''
+aggregate_total_no_overlap()
+--------------------------------------
+
+'''
+
+
+def aggregate_total_no_overlap(detections):
+    total = pd.Timedelta(0)
+    detections = detections.sort(['startdate'], ascending=False).reset_index(drop=True)
+    detections['startdate'] = detections['startdate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
+    detections['enddate'] = detections['enddate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
+
+    detection_stack = detections.T.to_dict().values()
+
+
+
+    while len(detection_stack) > 0:
+
+        current_time_block = detection_stack.pop()
+
+        if current_time_block:
+            if len(detection_stack) > 0:
+                next_time_block = detection_stack.pop()
+            else:
+                next_time_block = False
+
+            if not next_time_block or next_time_block['startdate'] > current_time_block['enddate']:
+                diff = pd.Timedelta(0)
+                diff += current_time_block['enddate'] - current_time_block['startdate']
+                if diff == pd.Timedelta(0):
+                    diff = pd.Timedelta('1 second')
+                total += diff
+                detection_stack.append(next_time_block)
+            else:
+                current_time_block['enddate'] = max([current_time_block['enddate'], next_time_block['enddate']])
+                detection_stack.append(current_time_block)
+
+    return total.total_seconds()/86400.0
+
+
+'''
+'''
+
+
+def get_days(dets, calculation_method='kessel'):
+    days = 0
+
+    if calculation_method == 'aggregate_with_overlap':
+        days = aggregate_total_with_overlap(dets)
+    elif calculation_method == 'aggregate_no_overlap':
+        days = aggregate_total_no_overlap(dets)
+    elif calculation_method == 'timedelta':
+        days = total_days_diff(dets)
+    else:
+        days = total_days_count(dets)
+
+    return days
+
+
+'''
+'''
+def get_station_location(station, table):
+    db = pg.get_engine()
+    location = pd.read_sql("SELECT * FROM "+table+" WHERE station = %(station)s LIMIT 1", db, params={"station": station})
+    location = location[['station', 'longitude', 'latitude']]
+    location[['longitude', 'latitude']] = location[['longitude', 'latitude']].astype(float)
+    location[['station']] = location[['station']].astype(str)
+    return location.loc[0].to_dict()
+
+
+'''
 residency_index()
 -----------------
 
-This function takes in a commpressed detections CSV and determ,ines the residency
+This function takes in a commpressed detections CSV and determines the residency
 index for reach station.
 
 Residence Index (RI) was calculated as the number of days an individual fish was
@@ -65,37 +164,49 @@ detected anywhere on the acoustic array. - Kessel et al.
 '''
 
 
-def residency_index(detections):
-
+def residency_index(detections, calculation_method='kessel'):
     # Create a DataFrame from the CSV
+    detections = "%s%s" %(DATADIRECTORY, detections)
     dets = pd.read_csv(detections)
 
+    if not (set(['startdate', 'enddate', 'station']).issubset(dets.columns)):
+        cp.CompressDetections(detections)
+        detections = detections.lower().replace('.csv', '_compressed_detections_v00.csv')
+        dets = pd.read_csv(detections)
+
+
     # Remove any release locations
-    dets = dets[~dets['startunqdetecid'].str.contains("release")]
+    dets = dets[~dets['startunqdetecid'].astype(str).str.contains("release")]
+
+    # Drop ALS-68 for Kessels ALS data ONLY!!!!!!!!!!!!!!!!!
+    dets = dets[~dets['catalognumber'].isin(['ALS-68'])]
 
     # Determine the total days from a copy of the DataFrame
-    total_days = total_days_count(dets.copy())
+    total_days = get_days(dets.copy(), calculation_method)
 
+    dets_table = detections.lower().replace('compressed_detections_v00.csv', 'v00').replace(DATADIRECTORY, '')
     # Init the stations list
     station_list = []
 
     # For each unique station determine the total number of days there were detections at the station
     for station in dets['station'].unique():
         st_dets = pd.DataFrame(dets[dets['station'] == station])
-        total = total_days_count(st_dets.copy())
+        total = get_days(st_dets.copy(), calculation_method)
 
+        location = get_station_location(station, dets_table)
         # Determine the RI and add the station to the list
-        station_dict = {'station':station, 'days_detected':total, 'residency_index':(total/(float(total_days)))}
+        station_dict = {'station': station, 'days_detected': total, 'residency_index': (total/(float(total_days))), 'longitude': location['longitude'], 'latitude': location['latitude']}
         station_list.append(station_dict)
 
     # convert the station list to a Dataframe
     all_stations = pd.DataFrame(station_list)
 
     # sort and reset the index for the station DataFrame
-    all_stations = all_stations.sort_values(['days_detected'], ascending=False).reset_index(drop=True)
+    all_stations = all_stations.sort(['days_detected'], ascending=False).reset_index(drop=True)
 
     # Write a new CSV file for the RI
-    new_ri_detections = detections.replace('_v00.csv', '_ri_v00.csv')
+    new_ri_detections = detections.replace('v00.csv', calculation_method+'_ri_v00.csv')
+    print "Writing CSV to "+new_ri_detections+" ..."
     all_stations.to_csv(new_ri_detections)
 
     # Return the stations RI DataFrame

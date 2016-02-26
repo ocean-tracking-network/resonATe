@@ -37,3 +37,23 @@ def createConnection():
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     return conn, cur
+
+
+def get_engine():
+    from sqlalchemy import create_engine
+
+    config = ConfigParser.RawConfigParser()
+    config.read(os.path.join(CSF_PATH, 'db.cfg'))
+    host = config.get('Database', 'host')
+    port = str(config.getint('Database', 'port'))
+    dbname = config.get('Database', 'dbname')
+    user = config.get('Database', 'user')
+    password = config.get('Database', 'password')
+
+    db_engine_name = "postgresql://%s:%s@%s:%s/%s" %(user, password, host, port, dbname)
+
+    engine = create_engine(db_engine_name)
+    return engine
+
+
+get_engine()
