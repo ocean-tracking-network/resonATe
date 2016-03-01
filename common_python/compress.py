@@ -122,3 +122,5 @@ def CompressDetections(detection_file,
 
 	# Close connections
 	database.table_maintenance(reqcode='reqdisconn')
+
+	return "%s%s" % (DATADIRECTORY, export_compr_file)

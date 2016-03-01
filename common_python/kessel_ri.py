@@ -60,6 +60,11 @@ def total_days_count(detections):
 aggregate_total_with_overlap()
 ----------------------------------------
 
+The function below aggregates timedelta of startdate and enddate of each detection into
+a final timedelta then returns a float of the number of days. If the startdate and enddate
+are the same, a timedelta of one second is assumed.
+
+@var Detections - Pandas DataFrame pulled from the compressed detections CSV
 '''
 
 
@@ -82,6 +87,12 @@ def aggregate_total_with_overlap(detections):
 aggregate_total_no_overlap()
 --------------------------------------
 
+The function below aggregates timedelta of startdate and enddate, excluding overlap between
+detections. Any overlap between two detections is converted to a new detection using the earlier
+startdate and the latest enddate. If the startdate and enddate are the same, a timedelta of one
+second is assumed.
+
+@var Detections - Pandas DataFrame pulled from the compressed detections CSV
 '''
 
 
@@ -120,6 +131,15 @@ def aggregate_total_no_overlap(detections):
 
 
 '''
+get_days()
+----------
+
+Determines which calculation method to use for the residency index.
+
+Wrapper method for the calulation methods above.
+
+@var dets - Pandas DataFrame pulled from the compressed detections CSV
+@var calculation_method - determines which method above will be used to count total time and station time
 '''
 
 
@@ -139,7 +159,17 @@ def get_days(dets, calculation_method='kessel'):
 
 
 '''
+get_station_location()
+----------------------
+
+Returns the longitude and latitude of a station/receiver given the station
+and the table name.
+
+@var station - String that contains the station name
+@var table - the table name in which to find the station
 '''
+
+
 def get_station_location(station, table):
     db = pg.get_engine()
     location = pd.read_sql("SELECT * FROM "+table+" WHERE station = %(station)s LIMIT 1", db, params={"station": station})
@@ -164,27 +194,24 @@ detected anywhere on the acoustic array. - Kessel et al.
 '''
 
 
-def residency_index(detections, calculation_method='kessel'):
+def residency_index(detections, calculation_method='kessel', dets_table=''):
     # Create a DataFrame from the CSV
-    detections = "%s%s" %(DATADIRECTORY, detections)
-    dets = pd.read_csv(detections)
+    full_path_detections = "%s%s" % (DATADIRECTORY, detections)
+    dets = pd.read_csv(full_path_detections)
 
     if not (set(['startdate', 'enddate', 'station']).issubset(dets.columns)):
-        cp.CompressDetections(detections)
-        detections = detections.lower().replace('.csv', '_compressed_detections_v00.csv')
-        dets = pd.read_csv(detections)
-
+        full_path_detections = cp.CompressDetections(detections)
+        dets = pd.read_csv(full_path_detections)
 
     # Remove any release locations
     dets = dets[~dets['startunqdetecid'].astype(str).str.contains("release")]
 
-    # Drop ALS-68 for Kessels ALS data ONLY!!!!!!!!!!!!!!!!!
-    dets = dets[~dets['catalognumber'].isin(['ALS-68'])]
-
     # Determine the total days from a copy of the DataFrame
     total_days = get_days(dets.copy(), calculation_method)
 
-    dets_table = detections.lower().replace('compressed_detections_v00.csv', 'v00').replace(DATADIRECTORY, '')
+    if dets_table == '':
+        dets_table = full_path_detections.lower().replace('_compressed_detections', '').replace(DATADIRECTORY, '').replace('.csv', '')
+
     # Init the stations list
     station_list = []
 
@@ -205,7 +232,7 @@ def residency_index(detections, calculation_method='kessel'):
     all_stations = all_stations.sort(['days_detected'], ascending=False).reset_index(drop=True)
 
     # Write a new CSV file for the RI
-    new_ri_detections = detections.replace('v00.csv', calculation_method+'_ri_v00.csv')
+    new_ri_detections = full_path_detections.replace('v00.csv', calculation_method+'_ri_v00.csv')
     print "Writing CSV to "+new_ri_detections+" ..."
     all_stations.to_csv(new_ri_detections)
 
