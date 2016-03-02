@@ -98,35 +98,48 @@ second is assumed.
 
 def aggregate_total_no_overlap(detections):
     total = pd.Timedelta(0)
+
+    # sort and convert datetimes
     detections = detections.sort(['startdate'], ascending=False).reset_index(drop=True)
     detections['startdate'] = detections['startdate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
     detections['enddate'] = detections['enddate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
 
+    # A stack is used as an easy way to organize and maintain the detections
     detection_stack = detections.T.to_dict().values()
 
-
-
+    # Run the loop while the stack is not empty
     while len(detection_stack) > 0:
 
         current_time_block = detection_stack.pop()
 
+        # Make sure the current element is not empty
         if current_time_block:
+
+            # Pop the next item if the stack is not empty
             if len(detection_stack) > 0:
                 next_time_block = detection_stack.pop()
             else:
                 next_time_block = False
 
+            # Check to see if we are down to the last item in the stack or there is no overlap
             if not next_time_block or next_time_block['startdate'] > current_time_block['enddate']:
+
+                # Create the timedelta and add it to the total, assuming 1 second if the timedelta equals 0
                 diff = pd.Timedelta(0)
                 diff += current_time_block['enddate'] - current_time_block['startdate']
                 if diff == pd.Timedelta(0):
                     diff = pd.Timedelta('1 second')
                 total += diff
+
+                # Add the next block back into the stack so that it can be used in the next iteration
                 detection_stack.append(next_time_block)
             else:
+
+                # If there is overlap take a new endate, eliminating the overlap, and add it back into the stack for the next iteration
                 current_time_block['enddate'] = max([current_time_block['enddate'], next_time_block['enddate']])
                 detection_stack.append(current_time_block)
 
+    # Return the value as a float in days
     return total.total_seconds()/86400.0
 
 
