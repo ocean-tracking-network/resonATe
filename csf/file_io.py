@@ -53,10 +53,10 @@ class fileIO():
             return self.read_one(filename, fromto)
         
         elif reqcode == 'reqread':
-            # TODO: Not utilised
+            # TODO: Not utilized
             pass
         elif reqcode == 'reqput':
-            # TODO: Not utilised
+            # TODO: Not utilized
             pass
         elif reqcode == 'reqclose':
             self.close_file()
@@ -97,13 +97,10 @@ class fileIO():
         if not raw:
             return None
         
-        # Read the line's encoding
-        encoding = 'utf-8'
-        
-        # If BOM is detected, load the file using utf-8-sig encoding
-        if encoding == 'utf-8' and raw.startswith(codecs.BOM_UTF8):
-            encoding = 'utf-8-sig'
-        
+        # If BOM is detected, remove it from line
+        raw = raw.decode('utf-8-sig', 'ignore')
+        raw = raw.encode('utf-8')
+
         # Return row as a string 
         if fromto == ':string:':
             ''' Return string value of the first row in a file'''
