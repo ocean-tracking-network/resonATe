@@ -2,8 +2,11 @@ import pandas as pd
 from datetime import datetime
 import common_python.compress as cp
 from library import pg_connection as pg
+import os
 
-d = open('common_python/datadirectory.txt', 'r')
+SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
+
+d = open(SCRIPT_PATH+'/datadirectory.txt', 'r')
 d = d.readline().splitlines()
 DATADIRECTORY = d[0]
 
