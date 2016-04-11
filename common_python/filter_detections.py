@@ -6,7 +6,9 @@ import library.verifications as verify
 import library.load_to_postgresql as load_to_pg
 import library.copy_from_postgresql as copy_from_pg
 
-d = open('common_python/datadirectory.txt', 'r')
+SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
+
+d = open(SCRIPT_PATH+'/datadirectory.txt', 'r')
 d = d.readline().splitlines()
 DATADIRECTORY = d[0]
 

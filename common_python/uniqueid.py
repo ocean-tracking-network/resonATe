@@ -12,7 +12,7 @@ SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir, 'csf')
 sys.path.append(CSF_PATH)
 
-d = open('common_python/datadirectory.txt', 'r')
+d = open(SCRIPT_PATH+'/datadirectory.txt', 'r')
 d = d.readline().splitlines()
 DATADIRECTORY = d[0]
 
