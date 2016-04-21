@@ -1,11 +1,14 @@
 import pandas as pd
+import os
 import datetime
 import simplejson as json
 import common_python.compress as cp
 from library import pg_connection as pg
 
 
-d = open('datadirectory.txt', 'r')
+SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
+
+d = open(SCRIPT_PATH+'/datadirectory.txt', 'r')
 d = d.readline().splitlines()
 DATADIRECTORY = d[0]
 
@@ -100,6 +103,3 @@ def create_geojson(detections, dets_table='', inc=5000):
 
     return detection_geojson
 
-def create_html():
-
-    return html
