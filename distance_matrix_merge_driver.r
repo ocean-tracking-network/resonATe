@@ -1,6 +1,6 @@
 ################ Libraries ###################
 #set current working directory
-setwd("/home/sandbox/RStudio/sandbox")
+
 source("common_r/load_dis_merge_python.r")
 
 ################ User Input ################

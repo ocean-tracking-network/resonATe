@@ -1,4 +1,4 @@
-setwd("/home/sandbox/RStudio/sandbox")
+
 
 loadDistanceMerge <- function(reqcode, distance_matrix_input, distance_real_input){
   library(rPython,quietly=TRUE)

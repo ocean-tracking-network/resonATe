@@ -1,4 +1,4 @@
-setwd("/home/sandbox/RStudio/sandbox")
+
 
 cleanup <- function(){
   library(rPython,quietly=TRUE)
