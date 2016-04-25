@@ -32,7 +32,7 @@
 			});
 
 			var map = L.map('map', {
-				center: [44.21325 , -63.27482],
+				center: [{{ center_y }} , {{ center_x }}],
 				zoom: {{ zoom }}
 			});
 
@@ -42,7 +42,7 @@
 				formatOutput: function(date) {
 					return new Date(date).toString();
 				},
-				steps: 100000,
+				steps: {{ steps }},
 				waitToUpdateMap: true,
 			});
 

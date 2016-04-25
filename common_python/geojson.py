@@ -36,7 +36,14 @@ def get_station_locations(station, table):
 
     return location
 
+'''
+create_geojson()
+----------------
 
+@var detections - a compressed or uncompressed csv detections file
+@var dets_table -
+@inc inc - the number of detections to include in each subection of the json
+'''
 def create_geojson(detections, dets_table='', inc=5000):
     # Create a DataFrame from the CSV
     full_path_detections = "%s%s" % (DATADIRECTORY, detections)
@@ -71,10 +78,13 @@ def create_geojson(detections, dets_table='', inc=5000):
     animals = animals.T.to_dict()
 
     detection_geojson = []
+    center_y = data.latitude.median()
+    center_x = data.longitude.median()
     start = 1
     end = inc
+    cap = 100000
 
-    while start < data.index.size:
+    while start < data.index.size and start <= cap:
         geojson ={
             "type": "FeatureCollection",
             "features": [
@@ -95,11 +105,16 @@ def create_geojson(detections, dets_table='', inc=5000):
         start = end+1
         end = end + inc
 
+    if start > cap:
+        print "Only first "+str(cap)+" detections used, please subset your data to see more."
 
-    json_name = full_path_detections.lower().replace('.csv', '')
+    json_name = full_path_detections.lower().replace('.csv', '').replace('data/', 'data/html/')
+    print "Writing JSON file to " +json_name+".json"
     output = open(json_name+".json", 'w')
     json.dump(detection_geojson, output)
     output.close()
 
-    return detection_geojson
+    filename = json_name.replace(DATADIRECTORY+"html/", '')+".json"
+
+    return {'json': detection_geojson, 'filename': filename, 'center_x': center_x, 'center_y': center_y}
 
