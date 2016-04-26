@@ -37,8 +37,8 @@ def create_leafelet_timeline(title, json, center_y=0, center_x=0, zoom=8, steps=
     return "HTML file written to "+DATADIRECTORY+"html/"+title+".html"
 
 
-def render_map(det_file, title, width=900, height=450, zoom=8):
-    json = gj.create_geojson(det_file)
+def render_map(det_file, title, dets_table='', width=900, height=450, zoom=8):
+    json = gj.create_geojson(det_file, dets_table=dets_table)
 
     create_leafelet_timeline(json=json['filename'], title=title, center_y=json['center_y'], center_x=json['center_x'], zoom=zoom)
 

@@ -1,5 +1,5 @@
 import pandas as pd
-import os
+import os, sys
 import datetime
 import simplejson as json
 import common_python.compress as cp
@@ -32,16 +32,22 @@ and the table name.
 
 def get_station_locations(station, table):
     db = pg.get_engine()
-    location = pd.read_sql("SELECT DISTINCT station, latitude, longitude FROM %s WHERE station IN ('%s')" % (table, '\',\''.join(station)), db)
 
+    if db.has_table(table):
+        location = pd.read_sql("SELECT DISTINCT station, latitude, longitude FROM %s WHERE station IN ('%s')" % (table, '\',\''.join(station)), db)
+    else:
+        print "The table '%s' does not exist. Please enter table through the dets_table argument." % table
+        sys.exit(1)
     return location
 
 '''
 create_geojson()
 ----------------
+This function maps a compressed file and converts the necessary fields
+into a GeoJSON file that can be easily read by Leaflet
 
 @var detections - a compressed or uncompressed csv detections file
-@var dets_table -
+@var dets_table - An override variable if the table does not match the name file name
 @inc inc - the number of detections to include in each subection of the json
 '''
 def create_geojson(detections, dets_table='', inc=5000):
