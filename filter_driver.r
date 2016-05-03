@@ -19,7 +19,7 @@ ReloadInputFile <- FALSE    # used by function loadDetections()
 
 
 ################ User Input ################
-detection_file   <- 'detections.csv' #Detection file input name
+detection_file   <- 'acs_matched_detections_2012.csv' #Detection file input name
 input_version_id <- '00'             #Version ID number [0 for initial(first) load]
 time_interval    <- '60'             #Time interval used to evaluate suspect detections (in minutes)
 

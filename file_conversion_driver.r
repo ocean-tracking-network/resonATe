@@ -1,5 +1,6 @@
 ################ Libraries ###################
-source("/home/sandbox/RStudio/sandbox/common_r/load_conversion_script.r") # Load conversion function
+setwd("~/otn-toolbox")
+source("./common_r/load_conversion_script.r")  # Load conversion function
 
 ################ User Input ################
 input_file <- 'detections.csv' # used by convert_file() function

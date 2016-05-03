@@ -1,2 +1,0 @@
-Verifying input_file file: 'test4_detections.csv'... OK!
-Creating file 'test4_detections_unqid.csv'... OK!

@@ -1,9 +1,0 @@
-Verifying distance matrix file: 'sample_missing_header_dm.csv'... ERROR!
-Distance matrix file: 'sample_missing_header_dm.csv' is missing the following mandatory columns:
-detec_radius1
-detec_radius2
-Verifying distance real file: 'sample_matched_detections_2013_distance_matrix.csv'... ERROR!
-Distance real file: 'sample_matched_detections_2013_distance_matrix.csv' is missing the following mandatory columns:
-detec_radius1
-detec_radius2
-Exiting...

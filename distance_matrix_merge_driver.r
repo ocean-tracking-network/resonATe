@@ -1,12 +1,12 @@
 ################ Libraries ###################
 #set current working directory
-
-source("common_r/load_dis_merge_python.r")
+setwd("~/otn-toolbox")
+source("./common_r/load_dis_merge_python.r")
 
 ################ User Input ################
 reqcode <- 'reqmerge' #request code for merge two station matrix files
-distance_matrix_input <-   'matrix.csv' # first file will be the full file
-distance_real_input <- 'matrix_update.csv' # second file is a set of distances which are to be used to override the distances on the first file
+distance_matrix_input <-   'acs_matched_detections_2012_distance_matrix_v00.csv' # first file will be the full file
+distance_real_input <- 'acs_matched_detections_2012_distance_matrix_v01.csv' # second file is a set of distances which are to be used to override the distances on the first file
 
 ################ Function Merge Real_distance for Station Matrix ################
 # load two detections files

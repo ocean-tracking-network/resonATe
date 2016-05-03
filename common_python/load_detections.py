@@ -1,25 +1,25 @@
 import os
 import sys
 
+# Append the CSF path
+SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
+CSF_PATH = os.path.join(SCRIPT_PATH,os.pardir,'csf')
+sys.path.insert(0, CSF_PATH )
+
+#Load message module
+import MessageDB as mdb
+msgs = mdb.MessageDB()
+from file_io import fileIO
+
 #Local Imports
 import library.verifications as verify
 import library.load_to_postgresql as load_to_pg
 import library.copy_from_postgresql as copy_from_pg
 import library.verify_columns as verify_columns
 
-# Append the CSF path
-SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
-CSF_PATH = os.path.join(SCRIPT_PATH,os.pardir,'csf')
-sys.path.append( CSF_PATH )
-
 d = open(SCRIPT_PATH+'/datadirectory.txt', 'r')
 d = d.readline().splitlines()
 DATADIRECTORY = d[0]
-
-#Load message module
-import MessageDB as mdb
-msgs = mdb.MessageDB()
-from csf.file_io import fileIO
 
 def loadDetections(detection_file, version_id, DistanceMatrix,
 				   ReloadInputFile, SuspectDetections, time_interval,

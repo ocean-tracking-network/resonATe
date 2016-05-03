@@ -15,12 +15,12 @@ DATADIRECTORY = d[0]
 # Import CSF/library scripts
 import MessageDB as mdb
 msgs = mdb.MessageDB()
-from csf.file_io import fileIO
-from csf.table_maintenance import table_maintenance
-from csf.build_filename import build_filename
+from file_io import fileIO
+from table_maintenance import table_maintenance
+from build_filename import build_filename
 
 # Library Modules
-from common_python.library import verify_columns
+from library import verify_columns
 from library import compress_detections
 from library import view_intvl
 from library import putfile

@@ -1,6 +1,0 @@
-Verifying detection file: 'test1f_detections.csv'... OK!
-Loading records into test1f_detections_v00, Please wait...
-LatLon detected, creating a Point object from latitude / longitude
-Populating geometry column.
-File loaded successfully! Detection Count: 66
-Loading complete. Created/populated 1 tables

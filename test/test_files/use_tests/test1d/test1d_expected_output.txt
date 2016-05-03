@@ -1,5 +1,0 @@
-Verifying detection file: 'sample_not_unique.csv'... ERROR!
-File 'sample_not_unique.csv': Duplicates in column 'unqdetecids' for rows:
-4:'ZZZ-A69-1303-99967-92253',5:'ZZZ-A69-1303-99967-92253',6:'ZZZ-A69-1303-99967-92253',7:'ZZZ-A69-1303-99967-92253',8:'ZZZ-A69-1303-99967-92253',
-9:'ZZZ-A69-1303-99967-92253',10:'ZZZ-A69-1303-99967-92253',11:'ZZZ-A69-1303-99967-92253',12:'ZZZ-A69-1303-99967-92253',13:'ZZZ-A69-1303-99967-92253'
-Exiting...

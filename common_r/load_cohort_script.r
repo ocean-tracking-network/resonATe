@@ -1,15 +1,4 @@
-
-
 cohort_records <- function(time_interval, compressed_file){
-  # Load rPython module
-  library(rPython,quietly=TRUE)
-  
-  # Load load_detections module
-  python.exec("import sys, os")
-  python.exec(paste('sys.path.append(\'', getwd(), '\')',sep=''))
-  python.exec("import common_python.cohorts")
-  python.exec("reload(common_python.cohorts)")
-  
   # Check for int values
   check.integer <- function(N){
     !length(grep("[^[:digit:]]", as.character(N)))
@@ -21,10 +10,17 @@ cohort_records <- function(time_interval, compressed_file){
     time_interval <- as.integer(time_interval)
     
     # Run the cohort creation script
-    main <- python.call('common_python.cohorts.CohortRecords',
-                        time_interval, compressed_file)
+    out = system2("/opt/anaconda/bin/python", 
+                  stdout = TRUE, stderr = TRUE, 
+                  args=list("/home/vagrant/otn-toolbox/common_r/cpr.py","cohorts","CohortRecords",
+                            paste("'",time_interval,"'",sep=''),
+                            paste("'",compressed_file,"'",sep='')))
+    for (line in out){
+      print(line)
+    }
   }
   else{
     return("Please enter an integer value for time_interval.")
   }
 }
+

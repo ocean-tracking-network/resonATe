@@ -1,3 +1,0 @@
-Verifying detection file: 'sample_extra_header.csv'... ERROR!
-File 'sample_extra_header.csv' Number of data columns do not match the number of header column.
-Exiting...
