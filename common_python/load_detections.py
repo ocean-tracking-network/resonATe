@@ -29,7 +29,7 @@ def loadDetections(detection_file, version_id, DistanceMatrix,
 	#Is the supplied detection_file variable is valid, quit if not
 	if not verify.Filename( detection_file ):
 		#'Error: [detection_file] variable supplied either has invalid characters or does not contain a csv file extension'
-		msgs.get_message(15,[detection_file])
+		print msgs.get_message(15,[detection_file])
 		return -1
 
 	# extract the version_id, if supplied by the filename?
