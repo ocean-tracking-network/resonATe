@@ -1,7 +1,7 @@
 ################ Libraries ###################
 #set current working directory
-
-source("common_r/load_dis_merge_python.r")
+setwd("~/otn-toolbox")
+source("./common_r/load_dis_merge_python.r")
 
 ################ User Input ################
 reqcode <- 'reqmerge' #request code for merge two station matrix files

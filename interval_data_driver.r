@@ -1,5 +1,6 @@
 ################ Libraries ###################
-source("/home/sandbox/RStudio/sandbox/common_r/load_interval_python.r")
+setwd("~/otn-toolbox")
+source("./common_r/load_interval_python.r")
 
 ################ User Input ################
 detection_file <- 'detections.csv' #Detection file input name

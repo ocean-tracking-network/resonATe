@@ -22,7 +22,7 @@ DATADIRECTORY = d[0]
 
 import MessageDB as mdb
 msgs = mdb.MessageDB()
-from csf.file_io import fileIO
+from file_io import fileIO
 
 import table_maintenance as tm
 

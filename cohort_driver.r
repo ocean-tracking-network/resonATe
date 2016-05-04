@@ -1,5 +1,6 @@
 ################ Libraries ###################
-source("/home/sandbox/RStudio/sandbox/common_r/load_cohort_script.r") # Load conversion function
+setwd("~/otn-toolbox")
+source("./common_r/load_cohort_script.r") # Load conversion function
 
 ################ User Input ################
 time_interval <- 60

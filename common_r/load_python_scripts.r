@@ -1,14 +1,4 @@
-
-
 loadDetections <- function(){
-  library(rPython,quietly=TRUE)
-
-  # Load load_detections module
-  python.exec("import sys, os")
-  python.exec(paste('sys.path.append(\'',getwd(),'\')',sep=''))
-  python.exec("import common_python.load_detections")
-  python.exec("reload(common_python.load_detections)")
-  
   # Check for global variables/set defaults
   if(!exists("detection_file")){detection_file <<- ''}
   if(!exists("input_version_id")){input_version_id <<- ''}
@@ -18,22 +8,22 @@ loadDetections <- function(){
   if(!exists("ReloadInputFile")){ReloadInputFile <<- FALSE}
   if(!exists("detection_radius")){detection_radius <<- ''}
   
-  # Run the loading script
-  main <- python.call('common_python.load_detections.loadDetections',
-                      detection_file,input_version_id, DistanceMatrix,
-                      ReloadInputFile, SuspectDetections, time_interval,
-                      detection_radius)
+  out = system2("/opt/anaconda/bin/python", 
+                stdout = TRUE, stderr = TRUE, 
+                args=list("/home/vagrant/otn-toolbox/common_r/cpr.py","load_detections","loadDetections",
+                          paste("'",detection_file,"'",sep=''),
+                          paste("'",input_version_id,"'",sep=''), 
+                          paste("'",DistanceMatrix,"'",sep=''),
+                          paste("'",ReloadInputFile,"'",sep=''), 
+                          paste("'",SuspectDetections,"'",sep=''), 
+                          paste("'",time_interval,"'",sep=''),
+                          paste("'",detection_radius,"'",sep='')))
+  for (line in out){
+    print(line)
+  }
 }
 
 filterDetections <- function(){
-  library(rPython,quietly=TRUE)
-  
-  # Load filter_detections module
-  python.exec("import sys, os")
-  python.exec(paste('sys.path.append(\'',getwd(),'\')',sep=''))
-  python.exec("import common_python.filter_detections")
-  python.exec("reload(common_python.filter_detections)")
-  
   # Check for global variables/set defaults
   if(!exists( "input_version_id" )){input_version_id <<- ''}
   if(!exists( "detection_file" )){detection_file <<- ''}
@@ -43,8 +33,17 @@ filterDetections <- function(){
   if(!exists( "ReloadInputFile" )){ReloadInputFile <<- FALSE}
   if(!exists("detection_radius")){detection_radius <<- ''}
   
-  main <- python.call('common_python.filter_detections.filterDetections',
-                      detection_file,input_version_id, SuspectFile,
-                      OverrideSuspectDetectionFile, DistanceMatrix,
-                      detection_radius, ReloadInputFile)
+  out = system2("/opt/anaconda/bin/python", 
+                stdout = TRUE, stderr = TRUE, 
+                args=list("/home/vagrant/otn-toolbox/common_r/cpr.py","filter_detections","filterDetections",
+                          paste("'",detection_file,"'",sep=''),
+                          paste("'",input_version_id,"'",sep=''), 
+                          paste("'",SuspectFile,"'",sep=''),
+                          paste("'",OverrideSuspectDetectionFile,"'",sep=''), 
+                          paste("'",DistanceMatrix,"'",sep=''), 
+                          paste("'",detection_radius,"'",sep=''),
+                          paste("'",ReloadInputFile,"'",sep='')))
+  for (line in out){
+    print(line)
+  }
 }

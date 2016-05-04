@@ -1,16 +1,15 @@
-
-
 loadDistanceMerge <- function(reqcode, distance_matrix_input, distance_real_input){
-  library(rPython,quietly=TRUE)
-  
-  # Load dis_matrix_merge module
-  python.exec("import sys, os")
-  python.exec(paste('sys.path.append(\'',getwd(),'\')',sep=''))
-  python.exec("import common_python.dis_mtrx_merge")
-  python.exec("reload(common_python.dis_mtrx_merge)")
-  
   # Run the merge script
-  main <- python.call('common_python.dis_mtrx_merge.dis_mtx_merge',
-                      reqcode,distance_matrix_input, distance_real_input)
                   
+  out = system2("/opt/anaconda/bin/python", 
+                stdout = TRUE, stderr = TRUE, 
+                args=list("/home/vagrant/otn-toolbox/common_r/cpr.py","dis_mtrx_merge","dis_mtx_merge",
+                          paste("'",reqcode,"'",sep=''),
+                          paste("'",distance_matrix_input,"'",sep=''),
+                          paste("'",distance_real_input,"'",sep='')))
+  for (line in out){
+    print(line)
+  }
 }
+
+

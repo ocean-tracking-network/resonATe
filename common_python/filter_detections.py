@@ -12,6 +12,7 @@ d = open(SCRIPT_PATH+'/datadirectory.txt', 'r')
 d = d.readline().splitlines()
 DATADIRECTORY = d[0]
 
+
 def filterDetections(detection_file, version_id, SuspectFile,
 					 OverrideSuspectDetectionFile, DistanceMatrix,
 					 detection_radius, ReloadInputFile,
@@ -56,12 +57,15 @@ def filterDetections(detection_file, version_id, SuspectFile,
 
 	#Check to see if input file exists
 	if not verify.FileExists( detection_file_path ):
-		return 'File \'{0}\' does not exist.'.format(detection_file)
+		print 'File \'{0}\' does not exist.'.format(detection_file)
+		return -1
 
 	#Set the suspect detection filename
 	if SuspectFile and OverrideSuspectDetectionFile:
+		print 'using Suspect',OverrideSuspectDetectionFile,SuspectFile
 		suspect_file = SuspectFile
 	else:
+		print 'using default'
 		suspect_file = '{0}_suspect_v{1}.csv'.format(base_name, input_version_id.rjust(2,'0'))
 
 	#Check if the file exists in either the export and import folders
@@ -69,7 +73,8 @@ def filterDetections(detection_file, version_id, SuspectFile,
 
 	#user the file in the input folder before the export
 	if not verify.FileExists( suspect_file_path ):
-		return 'File {0} does not exist.'.format(suspect_file)
+		print 'File {0} does not exist.'.format(suspect_file)
+		return -1
 
 	print 'Using suspect detection file: {0}'.format(suspect_file_path)
 
@@ -156,6 +161,7 @@ def filterDetections(detection_file, version_id, SuspectFile,
 
 		if susp_duplicate_headers:
 			print 'Duplicate header names: \"{0}\" in input_file \"{1}\", please rename the duplicate header(s) and rerun.'.format(','.join(susp_duplicate_headers),suspect_file)
+			return -1
 
 		if detections_loaded:
 			#Load suspect detections
@@ -163,7 +169,8 @@ def filterDetections(detection_file, version_id, SuspectFile,
 
 			#Exit if table could not be created
 			if not susp_table_created:
-					return 'Exiting...'
+					print 'Exiting...'
+					return -1
 
 			suspect_loaded = load_to_pg.loadToPostgre( 'suspects', suspect_file_path )
 			#If suspect table could not be loaded append error
@@ -175,7 +182,8 @@ def filterDetections(detection_file, version_id, SuspectFile,
 	if error_lst:
 		for error in error_lst:
 			print error
-		return 'Exiting...'
+		print 'Exiting...'
+		return -1
 
 	#Create final output file
 	copy_from_pg.copyTableStructure(detection_tbl, output_tbl, drop=True)

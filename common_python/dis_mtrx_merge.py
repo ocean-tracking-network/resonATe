@@ -25,7 +25,7 @@ import library.verify_columns as verify_columns
 
 import MessageDB as mdb
 msgs = mdb.MessageDB()
-from csf.file_io import fileIO
+from file_io import fileIO
 
 def dis_mtx_merge(reqcode, distance_matrix_input, distance_real_input,
 				  data_directory=DATADIRECTORY):
