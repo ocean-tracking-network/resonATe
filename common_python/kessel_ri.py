@@ -3,6 +3,7 @@ from datetime import datetime
 import common_python.compress as cp
 from library import pg_connection as pg
 import os
+import re
 
 SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
 
@@ -248,8 +249,9 @@ def residency_index(detections, calculation_method='kessel', dets_table=''):
     all_stations = all_stations.sort(['days_detected'], ascending=False).reset_index(drop=True)
 
     # Write a new CSV file for the RI
-    new_ri_detections = full_path_detections.replace('v00.csv', calculation_method+'_ri_v00.csv')
-    print "Writing CSV to "+new_ri_detections+" ..."
+    p = re.compile(r"_v(\d\d).csv")
+    new_ri_detections = p.sub(r'_%s_ri_v\1.csv' % calculation_method, full_path_detections)
+    print "Writing residence index CSV to "+new_ri_detections+" ..."
     all_stations.to_csv(new_ri_detections)
 
     # Return the stations RI DataFrame
