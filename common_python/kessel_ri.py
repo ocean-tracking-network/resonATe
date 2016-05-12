@@ -3,7 +3,6 @@ from datetime import datetime
 import common_python.compress as cp
 from library import pg_connection as pg
 import os
-import re
 
 SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
 
@@ -104,7 +103,7 @@ def aggregate_total_no_overlap(detections):
     total = pd.Timedelta(0)
 
     # sort and convert datetimes
-    detections = detections.sort(['startdate'], ascending=False).reset_index(drop=True)
+    detections = detections.sort_values(by='startdate', ascending=False).reset_index(drop=True)
     detections['startdate'] = detections['startdate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
     detections['enddate'] = detections['enddate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
 
@@ -210,7 +209,6 @@ detected anywhere on the acoustic array. - Kessel et al.
 @var Detections - CSV Path
 '''
 
-
 def residency_index(detections, calculation_method='kessel', dets_table=''):
     # Create a DataFrame from the CSV
     full_path_detections = "%s%s" % (DATADIRECTORY, detections)
@@ -223,6 +221,8 @@ def residency_index(detections, calculation_method='kessel', dets_table=''):
     # Remove any release locations
     dets = dets[~dets['startunqdetecid'].astype(str).str.contains("release")]
 
+    print 'Creating the residency index using the {0} method.\nPlease be patience, I am currently working...'.format(calculation_method),
+    
     # Determine the total days from a copy of the DataFrame
     total_days = get_days(dets.copy(), calculation_method)
 
@@ -231,6 +231,7 @@ def residency_index(detections, calculation_method='kessel', dets_table=''):
 
     # Init the stations list
     station_list = []
+    
 
     # For each unique station determine the total number of days there were detections at the station
     for station in dets['station'].unique():
@@ -246,13 +247,14 @@ def residency_index(detections, calculation_method='kessel', dets_table=''):
     all_stations = pd.DataFrame(station_list)
 
     # sort and reset the index for the station DataFrame
-    all_stations = all_stations.sort(['days_detected'], ascending=False).reset_index(drop=True)
-
+    all_stations = all_stations.sort_values(by='days_detected', ascending=False).reset_index(drop=True)
+    
+    print "OK!"
     # Write a new CSV file for the RI
-    p = re.compile(r"_v(\d\d).csv")
-    new_ri_detections = p.sub(r'_%s_ri_v\1.csv' % calculation_method, full_path_detections)
-    print "Writing residence index CSV to "+new_ri_detections+" ..."
+    new_ri_detections = full_path_detections.replace('v00.csv', calculation_method+'_ri_v00.csv')
+    print "Writing CSV to "+new_ri_detections+" ...",
     all_stations.to_csv(new_ri_detections)
+    print 'OK!'
 
     # Return the stations RI DataFrame
     return all_stations
