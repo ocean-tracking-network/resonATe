@@ -11,7 +11,6 @@ d = d.readline().splitlines()
 DATADIRECTORY = d[0]
 
 
-
 '''
 create_leafelet_timeline()
 --------------------------
