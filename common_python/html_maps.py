@@ -27,9 +27,7 @@ or used with other functions.
 
 
 def create_leafelet_timeline(title, json, center_y=0, center_x=0, zoom=8, steps=100000):
-    # Create html subfolder if there's not one already.
-    if not os.path.exists('%s/html' % DATADIRECTORY):
-        os.makedirs('%s/html' % DATADIRECTORY)
+
 
     template = ENV.get_template('leaflet_timeline.html')
 
@@ -60,6 +58,9 @@ of compressed detections
 
 
 def render_map(det_file, title, dets_table='', width=900, height=450, zoom=8):
+    # Create html subfolder for output if there's not one already.
+    if not os.path.exists('%s/html' % DATADIRECTORY):
+        os.makedirs('%s/html' % DATADIRECTORY)
 
     # Create the GeoJSON to be used
     json = gj.create_geojson(det_file, dets_table=dets_table)
