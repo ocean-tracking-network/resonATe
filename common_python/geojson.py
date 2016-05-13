@@ -67,6 +67,8 @@ def create_geojson(detections, dets_table='', inc=5000):
     # determine if the file needs to be compressed
     if not (set(['startdate', 'enddate', 'station']).issubset(dets.columns)):
         full_path_detections = cp.CompressDetections(detections)
+        if not full_path_detections:
+            return None
         dets = pd.read_csv(full_path_detections)
 
     # Remove any release locations
@@ -150,4 +152,3 @@ def create_geojson(detections, dets_table='', inc=5000):
 
     # Return the json object, filename, and the center points
     return {'json': detection_geojson, 'filename': filename, 'center_x': center_x, 'center_y': center_y}
-

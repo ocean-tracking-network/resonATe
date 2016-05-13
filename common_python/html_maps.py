@@ -12,7 +12,7 @@ DATADIRECTORY = d[0]
 
 
 '''
-create_leafelet_timeline()
+create_leaflet_timeline()
 --------------------------
 Uses Jinja to write an html file that can then be viewed through a browser
 or used with other functions.
@@ -26,7 +26,7 @@ or used with other functions.
 '''
 
 
-def create_leafelet_timeline(title, json, center_y=0, center_x=0, zoom=8, steps=100000):
+def create_leaflet_timeline(title, json, center_y=0, center_x=0, zoom=8, steps=100000):
 
 
     template = ENV.get_template('leaflet_timeline.html')
@@ -65,8 +65,12 @@ def render_map(det_file, title, dets_table='', width=900, height=450, zoom=8):
     # Create the GeoJSON to be used
     json = gj.create_geojson(det_file, dets_table=dets_table)
 
+    if not json:
+        print 'Unable to create map, please resolve issues listed above.'
+        return None
+
     # Create the HTML and javascript that will be used for the map
-    create_leafelet_timeline(json=json['filename'], title=title, center_y=json['center_y'], center_x=json['center_x'], zoom=zoom)
+    create_leaflet_timeline(json=json['filename'], title=title, center_y=json['center_y'], center_x=json['center_x'], zoom=zoom)
 
     # Create and return the IFrame to be rendered for the user
     iframe = IFrame('../data/html/'+title+'.html', width=width, height=height)
