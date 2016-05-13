@@ -10,6 +10,10 @@ d = open(SCRIPT_PATH+'/datadirectory.txt', 'r')
 d = d.readline().splitlines()
 DATADIRECTORY = d[0]
 
+# Create html subfolder if there's not one already.
+if not os.path.exists('%s/html' % DATADIRECTORY):
+    os.makedirs('%s/html' % DATADIRECTORY)
+
 '''
 create_leafelet_timeline()
 --------------------------
