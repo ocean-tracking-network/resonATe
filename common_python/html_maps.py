@@ -10,6 +10,8 @@ d = open(SCRIPT_PATH+'/datadirectory.txt', 'r')
 d = d.readline().splitlines()
 DATADIRECTORY = d[0]
 
+
+
 '''
 create_leafelet_timeline()
 --------------------------
@@ -26,6 +28,10 @@ or used with other functions.
 
 
 def create_leafelet_timeline(title, json, center_y=0, center_x=0, zoom=8, steps=100000):
+    # Create html subfolder if there's not one already.
+    if not os.path.exists('%s/html' % DATADIRECTORY):
+        os.makedirs('%s/html' % DATADIRECTORY)
+
     template = ENV.get_template('leaflet_timeline.html')
 
     html = template.render(title=title, json_file=json, zoom=zoom, center_y=center_y, center_x=center_x, steps=steps)
