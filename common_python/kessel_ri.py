@@ -221,7 +221,7 @@ def residency_index(detections, calculation_method='kessel', dets_table=''):
     # Remove any release locations
     dets = dets[~dets['startunqdetecid'].astype(str).str.contains("release")]
 
-    print 'Creating the residency index using the {0} method.\nPlease be patience, I am currently working...'.format(calculation_method),
+    print 'Creating the residency index using the {0} method.\nPlease be patient, I am currently working...'.format(calculation_method),
     
     # Determine the total days from a copy of the DataFrame
     total_days = get_days(dets.copy(), calculation_method)
@@ -231,7 +231,7 @@ def residency_index(detections, calculation_method='kessel', dets_table=''):
 
     # Init the stations list
     station_list = []
-    
+
 
     # For each unique station determine the total number of days there were detections at the station
     for station in dets['station'].unique():
@@ -248,7 +248,7 @@ def residency_index(detections, calculation_method='kessel', dets_table=''):
 
     # sort and reset the index for the station DataFrame
     all_stations = all_stations.sort_values(by='days_detected', ascending=False).reset_index(drop=True)
-    
+
     print "OK!"
     # Write a new CSV file for the RI
     new_ri_detections = full_path_detections.replace('v00.csv', calculation_method+'_ri_v00.csv')
