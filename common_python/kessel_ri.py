@@ -252,7 +252,7 @@ def residency_index(detections, calculation_method='kessel'):
 
     # sort and reset the index for the station DataFrame
     all_stations = all_stations.sort_values(by='days_detected', ascending=False).reset_index(drop=True)
-    
+
     print "OK!"
     # Write a new CSV file for the RI
     new_ri_detections = full_path_detections.replace('v00.csv', calculation_method+'_ri_v00.csv')
