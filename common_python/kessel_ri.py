@@ -3,6 +3,7 @@ from datetime import datetime
 import common_python.compress as cp
 from library import pg_connection as pg
 import os
+import re
 
 SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
 
@@ -217,7 +218,7 @@ def residency_index(detections, calculation_method='kessel'):
     tblname = 'vsisscratch'
 
     if not (set(['startdate', 'enddate', 'station']).issubset(dets.columns)):
-        full_path_detections = cp.CompressDetections(detections, createfile=False, tablename = tblname)
+        cmpr_detections = cp.CompressDetections(detections, createfile=False, tablename = tblname)
         db = pg.get_engine()
         dets = pd.read_sql_table('mv_anm_compressed',  db)
 
@@ -255,8 +256,12 @@ def residency_index(detections, calculation_method='kessel'):
 
     print "OK!"
     # Write a new CSV file for the RI
-    p = re.compile(r"_v(\d\d).csv")
-    new_ri_detections = p.sub(r'_%s_ri_v\1.csv' % calculation_method, full_path_detections)
+    print 'Source file was %s' % full_path_detections
+    p = re.compile(r"_v(\d\d)\.csv") # capture and retain version if version exists.
+    if p.search(full_path_detections): # if there's a capture group (ie there was a version number)
+        new_ri_detections = p.sub(r'_%s_ri_v\1.csv' % calculation_method, full_path_detections)
+    else:
+        new_ri_detections = re.sub('\.csv', '_%s_ri.csv' % calculation_method, full_path_detections)
     print "Writing residence index CSV to "+new_ri_detections+" ..."
     all_stations.to_csv(new_ri_detections)
     print "OK!"
