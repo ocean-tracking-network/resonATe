@@ -213,30 +213,30 @@ def residency_index(detections, calculation_method='kessel'):
     # Create a DataFrame from the CSV
     full_path_detections = "%s%s" % (DATADIRECTORY, detections)
     dets = pd.read_csv(full_path_detections)
-    
+
     tblname = 'vsisscratch'
 
     if not (set(['startdate', 'enddate', 'station']).issubset(dets.columns)):
         full_path_detections = cp.CompressDetections(detections, createfile=False, tablename = tblname)
         db = pg.get_engine()
         dets = pd.read_sql_table('mv_anm_compressed',  db)
-    
+
 
     # Converting start and end date to strings
     dets['startdate'] = dets['startdate'].astype(str)
     dets['enddate'] = dets['enddate'].astype(str)
-    
+
     # Remove any release locations
     dets = dets[~dets['startunqdetecid'].astype(str).str.contains("release")]
 
     print 'Creating the residency index using the {0} method.\nPlease be patient, I am currently working...'.format(calculation_method),
-    
+
     # Determine the total days from a copy of the DataFrame
     total_days = get_days(dets.copy(), calculation_method)
 
     # Init the stations list
     station_list = []
-    
+
     # For each unique station determine the total number of days there were detections at the station
     for station in dets['station'].unique():
         st_dets = pd.DataFrame(dets[dets['station'] == station])
@@ -255,8 +255,10 @@ def residency_index(detections, calculation_method='kessel'):
 
     print "OK!"
     # Write a new CSV file for the RI
-    new_ri_detections = full_path_detections.replace('v00.csv', calculation_method+'_ri_v00.csv')
-    print 'OK!'
-
+    p = re.compile(r"_v(\d\d).csv")
+    new_ri_detections = p.sub(r'_%s_ri_v\1.csv' % calculation_method, full_path_detections)
+    print "Writing residence index CSV to "+new_ri_detections+" ..."
+    all_stations.to_csv(new_ri_detections)
+    print "OK!"
     # Return the stations RI DataFrame
     return all_stations
