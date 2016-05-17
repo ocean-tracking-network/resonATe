@@ -209,36 +209,40 @@ detected anywhere on the acoustic array. - Kessel et al.
 @var Detections - CSV Path
 '''
 
-def residency_index(detections, calculation_method='kessel', dets_table=''):
+def residency_index(detections, calculation_method='kessel'):
     # Create a DataFrame from the CSV
     full_path_detections = "%s%s" % (DATADIRECTORY, detections)
     dets = pd.read_csv(full_path_detections)
+    
+    tblname = 'vsisscratch'
 
     if not (set(['startdate', 'enddate', 'station']).issubset(dets.columns)):
-        full_path_detections = cp.CompressDetections(detections)
-        dets = pd.read_csv(full_path_detections)
+        full_path_detections = cp.CompressDetections(detections, createfile=False, tablename = tblname)
+        db = pg.get_engine()
+        dets = pd.read_sql_table('mv_anm_compressed',  db)
+    
 
+    # Converting start and end date to strings
+    dets['startdate'] = dets['startdate'].astype(str)
+    dets['enddate'] = dets['enddate'].astype(str)
+    
     # Remove any release locations
     dets = dets[~dets['startunqdetecid'].astype(str).str.contains("release")]
 
-    print 'Creating the residency index using the {0} method.\nPlease be patience, I am currently working...'.format(calculation_method),
+    print 'Creating the residency index using the {0} method.\nPlease be patient, I am currently working...'.format(calculation_method),
     
     # Determine the total days from a copy of the DataFrame
     total_days = get_days(dets.copy(), calculation_method)
 
-    if dets_table == '':
-        dets_table = full_path_detections.lower().replace('_compressed_detections', '').replace(DATADIRECTORY, '').replace('.csv', '')
-
     # Init the stations list
     station_list = []
     
-
     # For each unique station determine the total number of days there were detections at the station
     for station in dets['station'].unique():
         st_dets = pd.DataFrame(dets[dets['station'] == station])
         total = get_days(st_dets.copy(), calculation_method)
 
-        location = get_station_location(station, dets_table)
+        location = get_station_location(station, tblname)
         # Determine the RI and add the station to the list
         station_dict = {'station': station, 'days_detected': total, 'residency_index': (total/(float(total_days))), 'longitude': location['longitude'], 'latitude': location['latitude']}
         station_list.append(station_dict)
@@ -252,8 +256,6 @@ def residency_index(detections, calculation_method='kessel', dets_table=''):
     print "OK!"
     # Write a new CSV file for the RI
     new_ri_detections = full_path_detections.replace('v00.csv', calculation_method+'_ri_v00.csv')
-    print "Writing CSV to "+new_ri_detections+" ...",
-    all_stations.to_csv(new_ri_detections)
     print 'OK!'
 
     # Return the stations RI DataFrame

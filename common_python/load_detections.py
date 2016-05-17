@@ -23,7 +23,7 @@ DATADIRECTORY = d[0]
 
 def loadDetections(detection_file, version_id, DistanceMatrix,
 				   ReloadInputFile, SuspectDetections, time_interval,
-				   detection_radius, data_directory=DATADIRECTORY):
+				   detection_radius, data_directory=DATADIRECTORY, tblname = None):
 
 	tables_created = {}
 	#Is the supplied detection_file variable is valid, quit if not
@@ -57,7 +57,11 @@ def loadDetections(detection_file, version_id, DistanceMatrix,
 	base_name = base_name.lower().replace(' ','_')   # Replace spaces with underscores
 
 	# Assign table names
-	detection_tbl = '{0}_v{1}'.format( base_name, input_version_id )
+	if not tblname:
+		detection_tbl = '{0}_v{1}'.format( base_name, input_version_id )
+	else:
+		detection_tbl = tblname
+	
 	matrix_tbl    = '{0}_distance_matrix_v{1}'.format( base_name, input_version_id )
 	suspect_tbl   = '{0}_suspect_v{1}'.format( base_name, input_version_id )
 
