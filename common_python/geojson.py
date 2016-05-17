@@ -24,8 +24,8 @@ Returns a datetime in milliseconds
 
 def unix_time_millis(dt):
     epoch = datetime.datetime.utcfromtimestamp(0)
-    date = datetime.datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
-    return (date - epoch).total_seconds() * 1000.0
+    #date = datetime.datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
+    return (dt - epoch).total_seconds() * 1000.0
 
 '''
 get_station_location()
@@ -60,23 +60,25 @@ into a GeoJSON file that can be easily read by Leaflet
 @inc inc - the number of detections to include in each subection of the json
 '''
 def create_geojson(detections, dets_table='', inc=5000):
+    db = pg.get_engine()
     # Create a DataFrame from the CSV
     full_path_detections = "%s%s" % (DATADIRECTORY, detections)
     dets = pd.read_csv(full_path_detections)
 
+    dets_table = dets_table or 'vsisscratch'
     # determine if the file needs to be compressed
     if not (set(['startdate', 'enddate', 'station']).issubset(dets.columns)):
-        full_path_detections = cp.CompressDetections(detections)
-        if not full_path_detections:
+        cmpr_detections = cp.CompressDetections(detections, createfile=False, tablename=dets_table)
+        if not cmpr_detections:
             return None
-        dets = pd.read_csv(full_path_detections)
+        dets = pd.read_sql('mv_anm_compressed', db) # read the compressed detections from the common table.
 
     # Remove any release locations
     dets = dets[~dets['startunqdetecid'].astype(str).str.contains("release")]
 
-    # Generate the table name from the file, if needed
-    if dets_table == '':
-        dets_table = full_path_detections.lower().replace('_compressed_detections', '').replace(DATADIRECTORY, '').replace('.csv', '')
+    # Converting start and end date to strings
+    #dets['startdate'] = dets['startdate'].astype(str)
+    #dets['enddate'] = dets['enddate'].astype(str)
 
     # Get a list of the unique stations
     locs = get_station_locations(dets.station.unique().astype(str), dets_table)
@@ -140,7 +142,7 @@ def create_geojson(detections, dets_table='', inc=5000):
     if start > cap:
         print "Only first "+str(cap)+" detections used, please subset your data to see more."
 
-    # Write the geojson out to a jason file
+    # Write the geojson out to a json file
     json_name = full_path_detections.lower().replace('.csv', '').replace('data/', 'data/html/')
     print "Writing JSON file to " +json_name+".json"
     output = open(json_name+".json", 'w')
