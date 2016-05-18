@@ -26,12 +26,12 @@ or used with other functions.
 '''
 
 
-def create_leaflet_timeline(title, json, center_y=0, center_x=0, zoom=8, steps=100000):
+def create_leaflet_timeline(title, json, center_y=0, center_x=0, zoom=8, steps=100000, basemap='dark_layer'):
 
 
     template = ENV.get_template('leaflet_timeline.html')
 
-    html = template.render(title=title, json_file=json, zoom=zoom, center_y=center_y, center_x=center_x, steps=steps)
+    html = template.render(title=title, json_file=json, zoom=zoom, center_y=center_y, center_x=center_x, steps=steps, layer=basemap)
     output = open(DATADIRECTORY+"html/"+title+".html", 'w')
 
     print "Writing html file to "+DATADIRECTORY+"html/"+title+".html..."
@@ -57,7 +57,7 @@ of compressed detections
 '''
 
 
-def render_map(det_file, title, dets_table='', width=900, height=450, zoom=8):
+def render_map(det_file, title, dets_table='', width=900, height=450, zoom=8, basemap='dark_layer'):
     # Create html subfolder for output if there's not one already.
     if not os.path.exists('%s/html' % DATADIRECTORY):
         os.makedirs('%s/html' % DATADIRECTORY)
@@ -70,7 +70,7 @@ def render_map(det_file, title, dets_table='', width=900, height=450, zoom=8):
         return None
 
     # Create the HTML and javascript that will be used for the map
-    create_leaflet_timeline(json=json['filename'], title=title, center_y=json['center_y'], center_x=json['center_x'], zoom=zoom)
+    create_leaflet_timeline(json=json['filename'], title=title, center_y=json['center_y'], center_x=json['center_x'], zoom=zoom, basemap=basemap)
 
     # Create and return the IFrame to be rendered for the user
     iframe = IFrame('../data/html/'+title+'.html', width=width, height=height)
