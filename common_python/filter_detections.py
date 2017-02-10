@@ -76,7 +76,7 @@ def filter_detections(detection_file, suspect_file=None,
         # TODO: Decide if we want to report the big 'before/after' triplicate in Suspect Dets
         # If so, building susp_dets gets tougher, involves a merge and then a append.
         # For now, just a matter of putting the complement of the good dets in the susp_dets
-        susp_dets = susp_dets.append(anm_dets[~anm_dets.isin(good_dets)])
+        susp_dets = df[~df['unqdetecid'].isin(good_dets['unqdetecid'])]
 
     else:
         raise GenericException("Missing required input columns: {}".format(mandatory_columns - set(df.columns)))
