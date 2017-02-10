@@ -2,13 +2,7 @@ import pandas as pd
 import datetime
 import numpy as np
 from geopy.distance import vincenty
-
-
-class GenericException(Exception):
-    def __init__(self, msg):
-        self.msg = msg
-    def __str__(self):
-        return self.msg
+from library.verifications import GenericException
 
 def get_distance_matrix(detectiondf):
 
@@ -78,10 +72,11 @@ def filter_detections(detection_file, suspect_file=None,
 
             good_dets = good_dets.append(anm_dets[(intervals <= user_int) | (post_intervals <= user_int)])
 
-            # If both are too far, put them in the suspect DF
-            # TODO: Decide if we want to report the big 'before/after' triplicate in Suspect Dets
-            # If so, building susp_dets gets tougher, involves a merge and then a append.
-            susp_dets = susp_dets.append(anm_dets[(intervals > user_int) & (post_intervals > user_int)])
+        # If they aren't a good det, they're suspect!
+        # TODO: Decide if we want to report the big 'before/after' triplicate in Suspect Dets
+        # If so, building susp_dets gets tougher, involves a merge and then a append.
+        # For now, just a matter of putting the complement of the good dets in the susp_dets
+        susp_dets = susp_dets.append(anm_dets[~anm_dets.isin(good_dets)])
 
     else:
         raise GenericException("Missing required input columns: {}".format(mandatory_columns - set(df.columns)))

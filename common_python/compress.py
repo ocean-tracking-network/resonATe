@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
 import numpy as np
-from load_detections import GenericException # TODO: put this guy in the library?
-
+from library.verifications import GenericException
 
 def compress_detections(detections):
 
@@ -14,7 +13,7 @@ def compress_detections(detections):
     if not isinstance(detections, pd.DataFrame):
         raise GenericException('input parameter must be a Pandas dataframe')
 
-    mandatory_columns = set(['datecollected', 'catalognumber', 'seqnum', 'unqdetecid'])
+    mandatory_columns = set(['datecollected', 'catalognumber', 'unqdetecid'])
 
     if mandatory_columns.issubset(detections.columns):
 
