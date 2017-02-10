@@ -92,6 +92,7 @@ def filter_detections(detection_file, suspect_file=None,
     output_dict = {"filtered": good_dets, "suspect": susp_dets}
 
     if distance_matrix:
+
         # Must now have lat and long columns as well.
         dm_mandatory_columns = set(['latitude', 'longitude'])
         if dm_mandatory_columns.issubset(df.columns):
