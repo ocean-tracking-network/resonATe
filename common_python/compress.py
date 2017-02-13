@@ -23,7 +23,7 @@ def compress_detections(detections):
         detections.sort_values(['catalognumber', 'datecollected'], inplace=True)
 
         # Set up empty data structures and the animal-based groupby object
-        detections['seqnum'] = np.nan
+        detections['seq_num'] = np.nan
         anm_group = detections.groupby('catalognumber')
         out_df = pd.DataFrame()
 
@@ -33,12 +33,12 @@ def compress_detections(detections):
             # Some say I'm too cautious. Shift logic requires this sort to be true, though.
             a.sort_values('datecollected', inplace=True)
 
-            a['seqnum'] = (a.station.shift(1) != a.station).astype(int).cumsum()
+            a['seq_num'] = (a.station.shift(1) != a.station).astype(int).cumsum()
             out_df=out_df.append(a)
 
-        stat_df = out_df.groupby(['catalognumber','seqnum']).agg({  'datecollected':['min', 'max'],
+        stat_df = out_df.groupby(['catalognumber','seq_num']).agg({  'datecollected':['min', 'max'],
                                                                     'unqdetecid':['min','max'],
-                                                                    'seqnum': 'count'})
+                                                                    'seq_num': 'count'})
 
         # Flatten the multi-index into named columns and cast dates to date objects
         stat_df.columns = ['_'.join(col).strip() for col in stat_df.columns.values]
@@ -47,14 +47,16 @@ def compress_detections(detections):
 
         # Calculate average time between detections
 		# If it's a single detection, will be 0/1
-        stat_df['avg_time_between_det'] = (stat_df['datecollected_max'] - stat_df['datecollected_min']) / stat_df['seqnum_count']
+        stat_df['avg_time_between_det'] = (stat_df['datecollected_max'] - stat_df['datecollected_min']) / stat_df['seq_num_count']
 
-        stat_df.rename(columns={'seqnum_count': 'total_count'}, inplace=True)
+        stat_df.rename(columns={'seq_num_count': 'total_count', 'datecollected_max': 'enddate',
+								'datecollected_min':'startdate', 'unqdetecid_min': 'startunqdetecid',
+								'unqdetecid_max':'endunqdetecid'}, inplace=True)
         # Reduce indexes to regular columns for joining against station number.
         stat_df.reset_index(inplace=True)
 
         # Join stations to result. Could add lat/lon here as well.
-        out_df = out_df[['catalognumber', 'station', 'seqnum']].drop_duplicates().merge(stat_df, on=['catalognumber', 'seqnum'])
+        out_df = out_df[['catalognumber', 'station', 'seq_num']].drop_duplicates().merge(stat_df, on=['catalognumber', 'seq_num'])
 
         return out_df
     else:
