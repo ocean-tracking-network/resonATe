@@ -49,6 +49,7 @@ def compress_detections(detections):
 		# If it's a single detection, will be 0/1
         stat_df['avg_time_between_det'] = (stat_df['datecollected_max'] - stat_df['datecollected_min']) / stat_df['seqnum_count']
 
+        stat_df.rename(columns={'seqnum_count': 'total_count'}, inplace=True)
         # Reduce indexes to regular columns for joining against station number.
         stat_df.reset_index(inplace=True)
 
