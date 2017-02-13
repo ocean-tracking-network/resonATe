@@ -29,6 +29,7 @@ def compress_detections(detections):
         # for each animal's detections ordered by time, when station changes, seqnum is incremented.
         for catalognum in anm_df:
             a = anm_group.get_group(catalognum)
+            a.reset_index('datecollected')
             a['seqnum'] = (a.station.shift(1) != a.station).astype(int).cumsum()
             out_df=out_df.append(a)
 
