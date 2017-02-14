@@ -1,15 +1,6 @@
 import pandas as pd
 from datetime import datetime
 import common_python.compress as cp
-from library import pg_connection as pg
-import os
-import re
-
-SCRIPT_PATH = os.path.dirname( os.path.abspath(__file__) )
-
-d = open(SCRIPT_PATH+'/datadirectory.txt', 'r')
-d = d.readline().splitlines()
-DATADIRECTORY = d[0]
 
 '''
 total_days_diff()
@@ -187,20 +178,17 @@ and the table name.
 '''
 
 
-def get_station_location(station, table):
-    db = pg.get_engine()
-    location = pd.read_sql("SELECT * FROM "+table+" WHERE station = %(station)s LIMIT 1", db, params={"station": station})
+def get_station_location(station, detections):
+    location = detections[detections.station == station][:1]
     location = location[['station', 'longitude', 'latitude']]
-    location[['longitude', 'latitude']] = location[['longitude', 'latitude']].astype(float)
-    location[['station']] = location[['station']].astype(str)
-    return location.loc[0].to_dict()
+    return location
 
 
 '''
 residency_index()
 -----------------
 
-This function takes in a commpressed detections CSV and determines the residency
+This function takes in a detections CSV and determines the residency
 index for reach station.
 
 Residence Index (RI) was calculated as the number of days an individual fish was
@@ -211,17 +199,7 @@ detected anywhere on the acoustic array. - Kessel et al.
 '''
 
 def residency_index(detections, calculation_method='kessel'):
-    # Create a DataFrame from the CSV
-    full_path_detections = "%s%s" % (DATADIRECTORY, detections)
-    dets = pd.read_csv(full_path_detections)
-
-    tblname = 'vsisscratch'
-
-    if not (set(['startdate', 'enddate', 'station']).issubset(dets.columns)):
-        cmpr_detections = cp.CompressDetections(detections, createfile=False, tablename = tblname)
-        db = pg.get_engine()
-        dets = pd.read_sql_table('mv_anm_compressed',  db)
-
+    dets = cp.compress_detections(detections)
 
     # Converting start and end date to strings
     dets['startdate'] = dets['startdate'].astype(str)
@@ -242,10 +220,10 @@ def residency_index(detections, calculation_method='kessel'):
     for station in dets['station'].unique():
         st_dets = pd.DataFrame(dets[dets['station'] == station])
         total = get_days(st_dets.copy(), calculation_method)
-
-        location = get_station_location(station, tblname)
+        location = get_station_location(station, detections)
         # Determine the RI and add the station to the list
-        station_dict = {'station': station, 'days_detected': total, 'residency_index': (total/(float(total_days))), 'longitude': location['longitude'], 'latitude': location['latitude']}
+        station_dict = {'station': station, 'days_detected': total, 'residency_index': (total/(float(total_days))),
+                        'longitude': location['longitude'].values[0], 'latitude': location['latitude'].values[0]}
         station_list.append(station_dict)
 
     # convert the station list to a Dataframe
@@ -254,16 +232,6 @@ def residency_index(detections, calculation_method='kessel'):
     # sort and reset the index for the station DataFrame
     all_stations = all_stations.sort_values(by='days_detected', ascending=False).reset_index(drop=True)
 
-    print "OK!"
-    # Write a new CSV file for the RI
-    print 'Source file was %s' % full_path_detections
-    p = re.compile(r"_v(\d\d)\.csv") # capture and retain version if version exists.
-    if p.search(full_path_detections): # if there's a capture group (ie there was a version number)
-        new_ri_detections = p.sub(r'_%s_ri_v\1.csv' % calculation_method, full_path_detections)
-    else:
-        new_ri_detections = re.sub('\.csv', '_%s_ri.csv' % calculation_method, full_path_detections)
-    print "Writing residence index CSV to "+new_ri_detections+" ..."
-    all_stations.to_csv(new_ri_detections)
     print "OK!"
     # Return the stations RI DataFrame
     return all_stations
