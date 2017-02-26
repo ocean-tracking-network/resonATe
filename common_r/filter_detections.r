@@ -24,13 +24,12 @@ filterDetections <- function(detection_file,
       group_by(catalognumber) %>% 
       arrange(datecollected) %>%
       mutate(
-        # Casting datecollected factor to time before doing math breaks lead/lag, so hold off
         last.date = lag(datecollected),
         this.date = datecollected,
         next.date = lead(datecollected),
-        # So, cast it while doing the math. Creates lovely warnings for trying to cast NAs as dates. Eat em.
-        last.diff = suppressWarnings(difftime(parse_date_time(this.date, "%Y-%m-%d %H:%M:%S"), parse_date_time(last.date, "%Y-%m-%d %H:%M:%S"), units="mins")),
-        next.diff = suppressWarnings(difftime(parse_date_time(next.date, "%Y-%m-%d %H:%M:%S"), parse_date_time(this.date, "%Y-%m-%d %H:%M:%S"), units="mins"))
+        
+        last.diff = suppressWarnings(difftime(this.date, last.date, units="mins")),
+        next.diff = suppressWarnings(difftime(next.date, this.date, units="mins"))
       ) %>%  # now need to make the first/last detection calc not-NA and not-true, evaluate only if other side within timebounds.
       replace_na(list(last.diff=min_time_buffer+1, next.diff=min_time_buffer+1)
       ) %>% # Now can run the filter step to evaluate
@@ -42,7 +41,7 @@ filterDetections <- function(detection_file,
   good <- subset(out, filter.passed)
   susp <-subset(out, !filter.passed)
   if (!distance_matrix){
-    return(list("filtered" = good, "suspect" = susp, "raw" = out))
+    return(list("filtered" = good, "suspect" = susp))
   }
   else # dist_mtrx required. Takes a long time!
   {
