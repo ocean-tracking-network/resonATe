@@ -52,27 +52,19 @@ filterDetections <- function(detection_file,
     mat <- distm(stations[,c('longitude','latitude')], fun=distVincentyEllipsoid) / 1000
     rownames(mat) <- stations$station
     colnames(mat) <- stations$station
-    print(stations)
     return(list("filtered" = good, "suspect" = susp, "dist_mtrx" = mat))
   }
 }
 
 # Testing functionality of the defined functions above.
 
+# Just Filtering:
 dat <- read.csv('~/data/nsbs_matched_detections_2015.csv')
 out <- filterDetections('~/data/nsbs_matched_detections_2015.csv')
-py_bad <- read.csv('~/data/nsbs_2015_suspect_new.csv')
-db_bad <- read.csv('~/data/nsbs_matched_detections_2015_suspect_v00.csv')
 filtered <- out$filtered
 susp <- out$suspect
-raw <- out$raw
-py_good <- read.csv('~/data/nsbs_2015_filtered_new.csv')
+# Filter w/ Distance Matrix
+mtrx_out <-filterDetections('~/data/nsbs_matched_detections_2015.csv', distance_matrix=T)
 
 # Known Issues:
 # DB filtration from old toolbox used to also flag the release locations
-print(setdiff(susp$unqdetecid, db_bad$suspect_detection))
-# Python version has a weird error with Peyton's two release rows. Not with other dual-tagged tho.
-print(setdiff(susp$unqdetecid, py_bad$unqdetecid))
-
-new_out <-filterDetections('~/data/nsbs_matched_detections_2015.csv', distance_matrix=T)
-print(new_out$dist_mtrx)
