@@ -44,18 +44,22 @@ filterDetections <- function(detection_file,
   if (!distance_matrix){
     return(list("filtered" = good, "suspect" = susp, "raw" = out))
   }
-  else
+  else # dist_mtrx required. Takes a long time!
   {
     library(geosphere) # Only need this if we're making a distmatrix
-    # TODO: Verify we only want the acceptable filtered stations here? Removes release locs.
+    # TODO: Verify we only want the acceptable filtered stations here?
     stations <- good %>% select(station, latitude, longitude) %>% distinct
-    mat <- distm(stations[,c('longitude','latitude')], fun=distVincentyEllipsoid)
+    # distances are in metres, dividing to get km.
+    mat <- distm(stations[,c('longitude','latitude')], fun=distVincentyEllipsoid) / 1000
     rownames(mat) <- stations$station
-    colnames(mat) <-stations$station
+    colnames(mat) <- stations$station
     print(stations)
     return(list("filtered" = good, "suspect" = susp, "dist_mtrx" = mat))
   }
 }
+
+# Testing functionality of the defined functions above.
+
 dat <- read.csv('~/data/nsbs_matched_detections_2015.csv')
 out <- filterDetections('~/data/nsbs_matched_detections_2015.csv')
 py_bad <- read.csv('~/data/nsbs_2015_suspect_new.csv')
@@ -65,8 +69,8 @@ susp <- out$suspect
 raw <- out$raw
 py_good <- read.csv('~/data/nsbs_2015_filtered_new.csv')
 
-# ISSUES:
-# DB filtration used to flag the release locations
+# Known Issues:
+# DB filtration from old toolbox used to also flag the release locations
 print(setdiff(susp$unqdetecid, db_bad$suspect_detection))
 # Python version has a weird error with Peyton's two release rows. Not with other dual-tagged tho.
 print(setdiff(susp$unqdetecid, py_bad$unqdetecid))
