@@ -31,7 +31,7 @@ def compress_detections(detections):
         for catalognum in anm_list:
             a = anm_group.get_group(catalognum)
             # Some say I'm too cautious. Shift logic requires this sort to be true, though.
-            a.sort_values('datecollected', inplace=True)
+            a.sort_values(['datecollected', 'station'], inplace=True)
 
             a['seq_num'] = (a.station.shift(1) != a.station).astype(int).cumsum()
             out_df=out_df.append(a)

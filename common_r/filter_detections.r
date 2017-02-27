@@ -67,7 +67,7 @@ filter_detections <- function(detection_file,
 # Testing functionality of the defined functions above.
 
 # Just Filtering:
-dat <- read.csv('~/data/test5_detections.csv')
+dat <- read.csv('~/data/nsbs_2015_filtered_new.csv')
 out <- filter_detections('~/data/test5_detections.csv')
 filtered <- out$filtered
 susp <- out$suspect

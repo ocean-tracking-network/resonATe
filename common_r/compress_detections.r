@@ -11,7 +11,7 @@ compress_detections <- function(detection_df)
   if(all(mandatory_columns %in% names(detection_df))) # if we have all column names.
   {
     # # Can't guarantee they've sorted everything by catalognumber (animal ID) in the input file.
-    detection_df <- detection_df %>% arrange(catalognumber, datecollected)
+    detection_df <- detection_df %>% arrange(catalognumber, datecollected, station)
     
     # Calculate the order of detection groups for each animal and write it as seq_num
     groups <- detection_df %>% group_by(catalognumber) %>%
@@ -27,7 +27,7 @@ compress_detections <- function(detection_df)
                          endunqdetecid=last(unqdetecid),
                          startdate=min(datecollected),
                          enddate=max(datecollected), 
-                         avg_time_between_det=enddate - startdate / max(total_count -1, 1))
+                         avg_time_between_det=(enddate - startdate) / 60 / max(total_count -1, 1))
     
     return(stat_df)
   }
@@ -43,7 +43,11 @@ compress_detections <- function(detection_df)
 source("/home/vagrant/dev-toolbox/common_r/filter_detections.r")
 comp <- compress_detections(filter_detections('~/data/nsbs_matched_detections_2015.csv')$filtered)
 py_comp <- read.csv('~/data/nsbs_2015_comp_py.csv')
+db_comp <- read.csv('~/data/nsbs_2015_filtered_new_compressed_detections_v00.csv')
 
-# Slight mess here - differences in dual-tagged animals persist.
-print(setdiff(py_comp$startunqdetecid, comp$startunqdetecid))
-print(setdiff(comp$startunqdetecid, py_comp$startunqdetecid))
+# 7 different unq-det series here, happens w/ release records w/ same release time if first record unqID > last record unqID
+bad_db_comp <- comp %>% filter(startunqdetecid %in% setdiff(comp$startunqdetecid, db_comp$startunqdetecid))
+
+bad_comp <- db_comp %>% filter(startunqdetecid %in% setdiff(db_comp$startunqdetecid, comp$startunqdetecid))
+
+bad_py_comp <-py_comp %>% filter(startunqdetecid %in% setdiff(py_comp$startunqdetecid, db_comp$startunqdetecid))
