@@ -1,235 +1,61 @@
-# -*- coding: utf-8 -*-
+import pandas as pd
+import geopy
 
-import sys
-import os
+def interval_data(compressed_df, dist_matrix_df, station_radius_df=None):
+    """
+    Creates a detection interval file from a compressed detection, distance matrix and station detection radius DataFrames
 
-# System paths
-SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
-CSF_PATH = os.path.join(SCRIPT_PATH, os.pardir, 'csf')
-sys.path.append(CSF_PATH)
+    :param compressed_df: compressed detection dataframe
+    :param dist_matrix_df: station distance matrix dataframe
+    :param station_radius: station distance radius dataframe
+    :return: interval detection Dataframe
+    """
 
-d = open(SCRIPT_PATH+'/datadirectory.txt', 'r')
-d = d.readline().splitlines()
-DATADIRECTORY = d[0]
+    # Create two dataframes from input compressed detections and decrement the second's seq_num
+    fst = compressed_df[
+        ['catalognumber', 'station', 'seq_num', 'total_count', 'startdate', 'enddate', 'endunqdetecid']].copy()
+    snd = compressed_df[
+        ['catalognumber', 'station', 'seq_num', 'total_count', 'startdate', 'enddate', 'endunqdetecid']].copy()
+    snd.seq_num -= 1
 
-# Import CSF/library scripts
-import MessageDB as mdb
-msgs = mdb.MessageDB()
-from file_io import fileIO
-from table_maintenance import table_maintenance
-from build_filename import build_filename
+    # Rename columns
+    fst.columns = ['catalognumber', 'from_station', 'seq_num', 'from_detcnt', 'from_arrive', 'from_leave',
+                    'unqdetid_from']
+    snd.columns = ['catalognumber', 'to_station', 'seq_num', 'to_detcnt', 'to_arrive', 'to_leave',
+                    'unqdetid_arrive']
 
-# Library Modules
-from library import verify_columns
-from library import compress_detections
-from library import view_intvl
-from library import putfile
+    # Merge the two DataFrames together linking catalognumber and seq_num
+    merged = pd.merge(fst, snd, how='left', on=['catalognumber', 'seq_num'])
 
-def intervalData(detection_filename, dist_matrix_filename,
-				 data_directory= DATADIRECTORY):
-	'''
-	Interval data tool, given distance_matrix and detection file,
-	export compressed detection and interval data files
-	'''
-	# Variable Assignments
-	det_column_errors = [] # (list of str) verification errors from the detection file
-	dis_mtx_column_errors = [] # (list of str) verification errors from distance matrix file
-	# (str) Set abosolute path for detection file
-	detection_filepath = os.path.join(data_directory,
-									  detection_filename)
-	# (str) Set abosolute path for distance matrix file
-	dis_mtx_filepath = os.path.join(data_directory,
-									dist_matrix_filename)
-	detection_fileh = None
-	dis_mtx_fileh = None
-	db = None # Database connection pointer
-	missing_files = [] # Accumulate a list of missing files
-	det_load_error = False
-	mtx_load_error = False
+    # Create additional column placeholders
+    merged['intervaltime'] = None
+    merged['intervalseconds'] = None
+    merged['distance_m'] = None
+    merged['metres_per_second'] = None
 
-	##### Verification Step #####
+    # Loop through all rows linking distance matrices and calculating average speed between intervals
+    for idx, item in merged.iterrows():
+        # If any of the station pairs don't exist, skip processing current row
+        if not (pd.isnull(item['from_station']) or pd.isnull(item['to_station'])):
+            # Get station matrix distance (input in km)
+            matrix_distance_km = dist_matrix_df.loc[item['from_station'], item['to_station']]
 
-	# Determine the output name for the compressed file
-	compressed_filename = build_filename('reqcompressed', detection_filename)
-	compressed_filepath = os.path.join(data_directory, compressed_filename)
+            # If matrix pair exists do distance calculations
+            if matrix_distance_km:
+                if isinstance(station_radius_df, pd.DataFrame):
+                    stn1_radius = station_radius_df.loc[item['from_station'], 'radius']
+                    stn2_radius = station_radius_df.loc[item['to_station'], 'radius']
 
-	# Determine output name for the interval data file
-	interval_data_filename = build_filename('reqinterval', detection_filename)
-	interval_data_filepath = os.path.join(data_directory, interval_data_filename)
+                    distance = max(geopy.distance.Distance(0), matrix_distance_km - stn1_radius - stn2_radius)
+                else:
+                    distance = max(geopy.distance.Distance(0), matrix_distance_km)
 
-	# Test to see if the files exist
-	compressed_exists =  fileIO().fileIO('reqexist', compressed_filepath )
-	interval_data_exists =  fileIO().fileIO('reqexist', interval_data_filepath )
+                merged.set_value(idx, 'distance_m', distance.m)
 
-	# Exit program if export files of the same name exist
-	if compressed_exists or interval_data_exists:
-		if compressed_exists:
-			print '{0}'.format(msgs.get_message(index=103,
-												params=[compressed_filepath]))
-		if interval_data_exists:
-			print '{0}'.format(msgs.get_message(index=103,
-												params=[interval_data_filepath]))
-		print '{0}'.format(msgs.get_message(index=104))
-		return ''
+                time_interval = item['to_arrive'] - item['from_leave']
+                merged.set_value(idx, 'intervaltime', time_interval)
+                merged.set_value(idx, 'intervalseconds', time_interval.seconds)
 
-	# Load and verify detection file
-	if fileIO().fileIO('reqexist', detection_filepath):
-		# Verifying Detection file:
-		print msgs.get_message(index=112, params=['Detection',
-												  detection_filename]),
-		detection_fileh = fileIO('reqopen', detection_filepath )
-		detection_file_header = detection_fileh.fileIO('reqread1',
-													   fromto=':list:')
-		det_column_errors = verify_columns.verify_columns('reqdetect',
-														  detection_fileh,
-														  detection_file_header)
-		if det_column_errors:
-			# ERROR
-			print msgs.get_message(index=114)
-		else:
-			# OK
-			print msgs.get_message(index=113)
-	else:
-		missing_files.append(detection_filename)
+                merged.set_value(idx, 'metres_per_second', distance.m / time_interval.seconds)
 
-	# Load and verify distance matrix file
-	if fileIO().fileIO('reqexist', dis_mtx_filepath):
-		# Verifying Distance Matrix file:
-		print msgs.get_message(index=112, params=['Distance Matrix',
-												  dist_matrix_filename]),
-		dis_mtx_fileh = fileIO('reqopen', dis_mtx_filepath )
-		dis_mtx_file_header = dis_mtx_fileh.fileIO('reqread1',
-												   fromto=':list:')
-		dis_mtx_column_errors = verify_columns.verify_columns('reqdistmtrx',
-															  dis_mtx_fileh,
-															  dis_mtx_file_header)
-		if dis_mtx_column_errors:
-			# ERROR
-			print msgs.get_message(index=114)
-		else:
-			# OK
-			print msgs.get_message(index=113)
-	else:
-		missing_files.append(dist_matrix_filename)
-
-	# Return if any of the files are missing
-	if missing_files:
-		for f in missing_files:
-			print msgs.get_message(19, params=[f])
-
-	# Return verification errors
-	if det_column_errors or dis_mtx_column_errors:
-		# Constuct output errors into a single list
-		output_errors = det_column_errors[:]
-		output_errors.extend(dis_mtx_column_errors) # Combine column errors from both files
-		for error in output_errors:
-			print error # Output errors
-
-	# If Errors, exit
-	if det_column_errors or dis_mtx_column_errors or missing_files:
-		return '' # Program exit
-
-	# Close the detection_file and the distance_matrix file
-	detection_fileh.fileIO('reqclose')
-	dis_mtx_fileh.fileIO('reqclose')
-
-	##### Loading Step #####
-
-	# Open database connection
-	db =  table_maintenance('reqconn')
-
-	# Drop the mv_anm_detections table if it exists.
-	anm_tbl_exists = db.table_maintenance(reqcode='reqexist',
-										   tablename='mv_anm_detections')
-	if anm_tbl_exists:
-		db.table_maintenance(reqcode='reqdropcscd',
-							 tablename='mv_anm_detections')
-
-	# Drop the distance_matrix table if it exists.
-	dis_mtx_tbl_exits = db.table_maintenance(reqcode='reqexist',
-											 tablename='distance_matrix')
-	if dis_mtx_tbl_exits:
-		db.table_maintenance(reqcode='reqdropcscd',
-							 tablename='distance_matrix')
-
-	# Create mv_anm_detections table
-	db.table_maintenance(reqcode='reqcreate',
-						 tablename='mv_anm_detections',
-						 filename=detection_file_header)
-
-	# Load mv_anm_detections csv
-	# Loading detection file:
-	print msgs.get_message(index=115, params=['Detection',
-											  detection_filename]),
-	det_load_error = db.table_maintenance(reqcode='reqload',
-										  tablename='mv_anm_detections',
-										  filename=detection_filepath)
-	if det_load_error:
-		print msgs.get_message(index=114)
-		print msgs.get_message(index=99, params=[det_load_error])
-	else:
-		print msgs.get_message(index=113)
-
-
-	# Create distance matrix table
-	db.table_maintenance(reqcode='reqcreate',
-						 tablename='distance_matrix',
-						 filename=dis_mtx_file_header)
-
-	# Load distance matrix table
-	print msgs.get_message(index=115, params=['Distance Matrix',
-											  dist_matrix_filename]),
-
-	mtx_load_error = db.table_maintenance(reqcode='reqload',
-										  tablename='distance_matrix',
-										  filename=dis_mtx_filepath)
-	if mtx_load_error:
-		print msgs.get_message(index=114)
-		print msgs.get_message(index=99, params=[mtx_load_error])
-	else:
-		print msgs.get_message(index=113)
-
-	##### Processing Step #####
-
-	# Compress the detection data
-	compress_detections.compress_detections()
-
-	# Create interval view
-	view_intvl.view_intvl()
-
-	##### File Output Step #####
-	print msgs.get_message(118)
-
-	# Create local copies of tables
-	try:
-		count_compressed = putfile.putFile('reqtabcmprcsv',
-										   'mv_anm_compressed',
-										   compressed_filepath)
-		count_interval = putfile.putFile('reqtabcsv',
-										 'vw_interval_data',
-										 interval_data_filepath)
-		print msgs.get_message(index=113)
-	except Exception, e:
-		print msgs.get_message(index=114)
-		print msgs.get_message(index=100,params=[e])
-
-	# Final export report messages
-	print msgs.get_message(116, params=[compressed_filename,
-										count_compressed])
-
-	print msgs.get_message(117, params=[interval_data_filename,
-										count_interval])
-	return '' # Program exit
-
-if __name__ == '__main__':
-	import argparse
-	parser = argparse.ArgumentParser(description="Create interval detection "\
-									 "data file")
-	parser.add_argument('-detection_file')
-	parser.add_argument('-dist_matrix_filename')
-
-	args = parser.parse_args()
-
-	intervalData(detection_filename= args.detection_filename,
-				 dist_matrix_filename= args.dist_matrix_filename
-				 )
+    return merged
