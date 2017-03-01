@@ -1,16 +1,30 @@
+#' Temporal Filter Tool
+#'
+#' This function filters out acoustic detections that are isolated by more than N minutes on either side
+#' @param detection_df A dataframe read from a CSV file of detections
+#' @param suspect_df A dataframe of suspect detections from a previous or different filter run (not yet implemented)
+#' @param detection_radius A detection radius. (not used)
+#' @param min_time_buffer How far from other detections a detection must be to be filtered (in minutes)
+#' @param distance_matrix Whether or not to generate a distance matrix from the supplied station locations.
+#' @keywords acoustic telemetry filter temporal
+#' @export
+#' @examples
+#' filter_detections(read.csv('my-detection-file.csv'))
+#' filter_detections(read.csv('my-detection-file.csv), min_time_buffer=30, distance_matrix=T)
+
 library(dplyr)
 library(lubridate)
 library(tidyr)
 
-filter_detections <- function(detection_file,
-                             suspect_file=NULL,  # TODO: deal w/ supplied suspect detfiles
-                             detection_radius=NULL, 
-                             min_time_buffer=60, 
-                             distance_matrix=F)
+filter_detections <- function(detection_df,
+                              suspect_df=NULL,  # TODO: deal w/ supplied suspect det frames? Or just let people filter out their own stuff.
+                              detection_radius=NULL, 
+                              min_time_buffer=60, 
+                              distance_matrix=F)
 {
   
   mandatory_columns <- c('station', 'unqdetecid', 'datecollected', 'catalognumber', 'latitude', 'longitude')
-  dat <- read.csv(detection_file)
+  dat <- detection_df
   
   if(all(mandatory_columns %in% names(dat))) # if we have all column names.
   {
@@ -37,7 +51,7 @@ filter_detections <- function(detection_file,
       mutate(
         filter.passed = last.diff <= min_time_buffer | next.diff <= min_time_buffer
       ) 
-  
+    
     # Subset based on the value of filter.passed
     good <- subset(out, filter.passed)
     susp <- subset(out, !filter.passed)
@@ -63,16 +77,6 @@ filter_detections <- function(detection_file,
     # TODO: raise an exception in R-land.
   }
 }
-
-# Testing functionality of the defined functions above.
-
-# Just Filtering:
-dat <- read.csv('~/data/nsbs_2015_filtered_new.csv')
-out <- filter_detections('~/data/test5_detections.csv')
-filtered <- out$filtered
-susp <- out$suspect
-# Filter w/ Distance Matrix
-mtrx_out <-filter_detections('~/data/test5_detections.csv', distance_matrix=T)
 
 # Known Issues:
 # DB filtration from old toolbox used to also flag the release locations

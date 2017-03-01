@@ -1,3 +1,12 @@
+#' Compressed Detection Dataframe
+#'
+#' This function compresses concurrent detections of a tag at a single station into an aggregate w/ simple statistics
+#' @param detection_df A dataframe read from a CSV file of detections
+#' @keywords acoustic telemetry compress temporal
+#' @export
+#' @examples
+#' compress_detections(read.csv('my-detection-file.csv'))
+
 library(dplyr)
 
 
@@ -37,17 +46,3 @@ compress_detections <- function(detection_df)
     print('whoops')
   }
 }
-
-
-# Testing the function as defined:
-source("/home/vagrant/dev-toolbox/common_r/filter_detections.r")
-comp <- compress_detections(filter_detections('~/data/nsbs_matched_detections_2015.csv')$filtered)
-py_comp <- read.csv('~/data/nsbs_2015_comp_py.csv')
-db_comp <- read.csv('~/data/nsbs_2015_filtered_new_compressed_detections_v00.csv')
-
-# 7 different unq-det series here, happens w/ release records w/ same release time if first record unqID > last record unqID
-bad_db_comp <- comp %>% filter(startunqdetecid %in% setdiff(comp$startunqdetecid, db_comp$startunqdetecid))
-
-bad_comp <- db_comp %>% filter(startunqdetecid %in% setdiff(db_comp$startunqdetecid, comp$startunqdetecid))
-
-bad_py_comp <-py_comp %>% filter(startunqdetecid %in% setdiff(py_comp$startunqdetecid, db_comp$startunqdetecid))

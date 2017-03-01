@@ -1,18 +1,1 @@
-# OTN TOOLBOX
 
-## USAGE
-
-This package is meant to be installed on an Ubuntu system with the following software packages installed
-* PostgreSQL
-* PostGIS
-* R
-* RStudio
-* PHP-Postgresql-admin
-* RPython
-* iPython
-* python packages Shapely, Kartograph, pyscopg2, bokeh
-
-Additional requirements can be found in the packages.txt file included in the repo.
-There is a Vagrant box (oceantracking/sandbox) that will provide all of these requirements.
-Install Vagrant (vagrantup.com) and type:
-    vagrant init oceantracking/sandbox
