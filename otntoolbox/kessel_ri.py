@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-import common_python.compress as cp
+import compress as cp
 
 '''
 total_days_diff()
@@ -199,6 +199,7 @@ detected anywhere on the acoustic array. - Kessel et al.
 '''
 
 def residency_index(detections, calculation_method='kessel'):
+    detections = pd.read_csv(detections)
     dets = cp.compress_detections(detections)
 
     # Converting start and end date to strings

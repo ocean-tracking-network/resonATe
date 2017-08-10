@@ -10,7 +10,7 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(
-    name='otn-toolbox',
+    name='otntoolbox',
     version='0.1.0',
     description='otn-toolbox data analysis package',
     long_description=readme,

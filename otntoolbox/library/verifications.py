@@ -2,7 +2,6 @@ import re
 import os
 import csv
 import codecs
-from . import pg_connection as pg
 
 class GenericException(Exception):
     def __init__(self, msg):
@@ -68,26 +67,6 @@ def TableExists( tablename ):
 
     return table_exists
 
-def ColumnCount( tablename ):
-    ''' (str) -> int
-
-    Get the number of columns of a table
-
-    '''
-    #connect to local postgre
-    conn, cur = pg.createConnection()
-
-    cur.execute('''SELECT count(*) FROM information_schema.columns
-                    WHERE table_schema = 'public'
-                    AND table_name = '{}';'''.format( tablename ))
-
-    column_count = cur.fetchone()[0]
-
-    cur.close()
-    conn.close()
-
-    return column_count
-
 def FileCount( filename, header=False ):
     ''' (file, bool) -> int
 
@@ -100,43 +79,6 @@ def FileCount( filename, header=False ):
 
     return num_lines
 
-def tableDifference( table_1, table_2 ):
-    # Return the difference between two table counts
-    conn, cur = pg.createConnection()
-
-    sql = '''
-    SELECT (SELECT count(*) FROM public.{0}) - (SELECT count(*)
-    FROM
-    public.{1})
-    '''.format(table_1, table_2)
-
-    #Execute SQL Script
-    cur.execute(sql)
-    table_count = cur.fetchone()[0] #get result
-
-    #Close postgresql connection
-    cur.close()
-    conn.close()
-    return table_count
-
-def TableCount( tablename ):
-    ''' (str) -> int
-
-    Return the count of records in a database table
-
-    '''
-    #connect to local postgresql
-    conn, cur = pg.createConnection()
-
-    #search for table in the public schema
-    cur.execute('''SELECT count(*) FROM public.{0};'''.format( tablename ))
-    table_count = cur.fetchone()[0] #get result
-
-    #close postgresql connection
-    cur.close()
-    conn.close()
-
-    return table_count
 
 def MandatoryColumns( csv_headers, mandatory_columns ):
     ''' (list of str, list or str) -> list of str

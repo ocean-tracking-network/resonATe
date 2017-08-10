@@ -19,10 +19,10 @@ def interval_data(compressed_df, dist_matrix_df, station_radius_df=None):
     snd.seq_num -= 1
 
     # Rename columns
-    fst.columns = ['catalognumber', 'from_station', 'seq_num', 'from_detcnt', 'from_arrive', 'from_leave',
-                    'unqdetid_from']
-    snd.columns = ['catalognumber', 'to_station', 'seq_num', 'to_detcnt', 'to_arrive', 'to_leave',
-                    'unqdetid_arrive']
+    fst.columns = ['catalognumber', 'from_station', 'seq_num', 'from_detcnt',
+                   'from_arrive', 'from_leave', 'unqdetid_from']
+    snd.columns = ['catalognumber', 'to_station', 'seq_num', 'to_detcnt',
+                   'to_arrive', 'to_leave', 'unqdetid_arrive']
 
     # Merge the two DataFrames together linking catalognumber and seq_num
     merged = pd.merge(fst, snd, how='left', on=['catalognumber', 'seq_num'])
@@ -56,6 +56,7 @@ def interval_data(compressed_df, dist_matrix_df, station_radius_df=None):
                 merged.set_value(idx, 'intervaltime', time_interval)
                 merged.set_value(idx, 'intervalseconds', time_interval.seconds)
 
-                merged.set_value(idx, 'metres_per_second', distance.m / time_interval.seconds)
+                if time_interval.seconds != 0:
+                    merged.set_value(idx, 'metres_per_second', distance.m / time_interval.seconds)
 
     return merged

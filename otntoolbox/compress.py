@@ -29,7 +29,7 @@ def compress_detections(detections):
 
         # for each animal's detections ordered by time, when station changes, seqnum is incremented.
         for catalognum in anm_list:
-            a = anm_group.get_group(catalognum)
+            a = anm_group.get_group(catalognum).copy(deep=True)
             # Some say I'm too cautious. Shift logic requires this sort to be true, though.
             a.sort_values(['datecollected', 'station'], inplace=True)
 
