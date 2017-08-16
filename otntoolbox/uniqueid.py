@@ -12,7 +12,6 @@ def add_unqdetecid(input_file, encoding='utf-8-sig'):
 
     input_df = pd.read_csv(input_file, encoding=encoding)
 
-    input_df[u'unqdetecid'] = input_df.index
+    input_df[u'unqdetecid'] = input_df.index+1
     input_df = input_df[[u'unqdetecid'] + input_df.columns[:-1].tolist()]
     return input_df
-

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
 import numpy as np
-from library.verifications import GenericException
+from library.exceptions import GenericException
 
 def compress_detections(detections):
 
@@ -47,7 +47,7 @@ def compress_detections(detections):
 
         # Calculate average time between detections
 		# If it's a single detection, will be 0/1
-        stat_df['avg_time_between_det'] = (stat_df['datecollected_max'] - stat_df['datecollected_min']) / np.maximum(1, stat_df['seq_num_count'] -1 )
+        stat_df['avg_time_between_det'] = (stat_df['datecollected_max'] - stat_df['datecollected_min']) / np.maximum(1, stat_df['seq_num_count']-1)
 
         stat_df.rename(columns={'seq_num_count': 'total_count', 'datecollected_max': 'enddate',
 								'datecollected_min':'startdate', 'unqdetecid_first': 'startunqdetecid',

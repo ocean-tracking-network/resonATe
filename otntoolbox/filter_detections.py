@@ -2,7 +2,7 @@ import pandas as pd
 import datetime
 import numpy as np
 from geopy.distance import vincenty
-from library.verifications import GenericException
+from library.exceptions import GenericException
 
 def get_distance_matrix(detectiondf):
 
