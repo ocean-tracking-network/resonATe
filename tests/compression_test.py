@@ -8,7 +8,7 @@ import pandas.testing as pt
 class CompressionTest(unittest.TestCase):
 
     def test_compression(self):
-        dfa = compress_detections(pd.read_csv('tests/assertion_files/nsbs_matched_detections_2014.csv'))
+        dfa = compress_detections(pd.read_csv('tests/assertion_files/nsbs.csv'))
         dfb = pd.read_csv('tests/assertion_files/nsbs_compressed.csv')
         dfb.startdate = pd.to_datetime(dfb.startdate)
         dfb.enddate = pd.to_datetime(dfb.enddate)
