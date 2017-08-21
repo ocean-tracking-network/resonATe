@@ -15,6 +15,7 @@ setup(
     description='otn-toolbox data analysis package',
     long_description=readme,
     author='Alex Nunes',
+    include_package_data=True,
     author_email='anunes@dal.ca',
     url='https://oceantrackingnetwork.org/',
     license=license,

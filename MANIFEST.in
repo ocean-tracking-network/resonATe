@@ -1,1 +1,2 @@
 include LICENSE
+include otntoolbox/templates/leaflet_timeline.html

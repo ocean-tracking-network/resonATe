@@ -1,6 +1,14 @@
 import pandas as pd
+import matplotlib
+import matplotlib.pyplot as plt
+from mpl_toolkits.basemap import Basemap
+import matplotlib.cm as cm
 from datetime import datetime
 import compress as cp
+import folium as fl
+import math
+
+matplotlib.style.use('ggplot')
 
 '''
 total_days_diff()
@@ -184,21 +192,90 @@ def get_station_location(station, detections):
     return location
 
 
-'''
-residency_index()
------------------
+def plot_ri(ri, bounds={'north': 90, 'south': -90, 'east': 180, 'west': -180}):
+    '''
+    Plotting Function
+    -----------------
 
-This function takes in a detections CSV and determines the residency
-index for reach station.
+    Passing the returned pandas DataFrame from the residence_index() function
+    to this function will plot out the residence index
 
-Residence Index (RI) was calculated as the number of days an individual fish was
-detected at each receiver station divided by the total number of days the fish was
-detected anywhere on the acoustic array. - Kessel et al.
+    Size, boundaries, and colors can be modified to tweek the plot.
+    '''
 
-@var Detections - CSV Path
-'''
+    # Friendly message
+    print 'Creating plot, please wait...',
+
+    # Modify the plot dimensions
+    fig = plt.figure(figsize=(12, 12))
+
+    # Create the map
+    map = Basemap(projection='merc',
+                  resolution='f',
+                  # Modify the values /to adjust the boundries of the plot
+                  llcrnrlat=bounds['south'], urcrnrlat=bounds['north'],
+                  llcrnrlon=bounds['west'], urcrnrlon=bounds['east'])
+
+    # Modify the color of the water
+    map.drawmapboundary(fill_color='#718ea4')
+
+    #Modify the color of land
+    map.fillcontinents(color='#2a7e43')
+
+    # Modify the residence index coloring
+    # http://scipy.github.io/old-wiki/pages/Cookbook/Matplotlib/Show_colormaps
+    index_coloring = cm.Oranges
+
+    indices = [ri['residency_index']]
+
+    x,y = map(ri['longitude'].values, ri['latitude'].values)
+    ri_map = map.scatter(x, y, s=ri['residency_index']*300, c=indices, cmap=index_coloring)
+    ri_map.set_clim(0,1)
+    cbar = plt.colorbar()
+
+    print 'OK!'
+    plt.show()
+
+def interactive_map(ri_data, tileset='cartodb positron', marker_size=50, zoom=8):
+
+    #create the map with a tileset, defaults to cartodb positron
+    ri_map = fl.Map(location=[ri_data.latitude.median(), ri_data.longitude.median()],
+                    tiles=tileset, attr='ESRI', zoom_start=zoom)
+
+    # Add station markers to map
+    for index, station in ri_data.iterrows():
+
+        #popup string
+        station_popup = "%s : %s" % (station['station'], station['residency_index'])
+
+        # Marker creation, variables can be changed as seen fit
+        fl.RegularPolygonMarker([station['latitude'],station['longitude']],
+                        radius=math.ceil(station['residency_index']*marker_size),
+                        fill_color='red',
+                        fill_opacity=0.2,
+                        color='black',
+                        weight=2,
+                        number_of_sides=50,
+                        popup=station_popup).add_to(ri_map)
+    return ri_map
+
 
 def residency_index(detections, calculation_method='kessel'):
+
+    '''
+    residency_index()
+    -----------------
+
+    This function takes in a detections CSV and determines the residency
+    index for reach station.
+
+    Residence Index (RI) was calculated as the number of days an individual
+    fish was detected at each receiver station divided by the total number of
+    days the fish was detected anywhere on the acoustic array. - Kessel et al.
+
+    @var Detections - CSV Path
+    '''
+
     detections = pd.read_csv(detections)
     dets = cp.compress_detections(detections)
 

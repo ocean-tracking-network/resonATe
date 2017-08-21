@@ -7,3 +7,4 @@
 otntoolbox.egg-info/*
 build/*
 dist/*
+py_notebooks/html/*
