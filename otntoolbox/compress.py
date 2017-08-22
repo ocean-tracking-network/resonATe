@@ -7,6 +7,7 @@ def compress_detections(detections):
 
     '''
     Creates compressed dataframe from detection dataframe
+
     :param detections: detection dataframe
     '''
 

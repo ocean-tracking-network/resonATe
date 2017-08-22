@@ -10,22 +10,22 @@ import math
 
 matplotlib.style.use('ggplot')
 
-'''
-total_days_diff()
------------------
-The function below determines the total days difference.
-
-The difference is determined
-by the minimal startdate of every detection and the maximum enddate of every detection.
-Both are converted into a datetime then subtracted to get a timedelta. The timedelta
-is converted to seconds and divided by the number of seconds in a day (86400). The function
-returns a floating point number of days (i.e. 503.76834).
-
-@var Detections - Pandas DataFrame pulled from the compressed detections CSV
-'''
-
 
 def total_days_diff(detections):
+    """
+    total_days_diff
+    Determines the total days difference.
+
+    The difference is determined
+    by the minimal startdate of every detection and the maximum enddate of
+    every detection. Both are converted into a datetime then subtracted to
+    get a timedelta. The timedelta is converted to seconds and divided by
+    the number of seconds in a day (86400). The function returns a floating
+    point number of days (i.e. 503.76834).
+
+    @var Detections - Pandas DataFrame pulled from the compressed detections
+    CSV
+    """
     first = datetime.strptime(detections.startdate.min(), "%Y-%m-%d %H:%M:%S")
     last = datetime.strptime(detections.enddate.max(), "%Y-%m-%d %H:%M:%S")
     total = last - first
@@ -33,45 +33,45 @@ def total_days_diff(detections):
     return total
 
 
-'''
-total_days_count()
-------------------
-The function below takes a Pandas DataFrame and determines the number of days any
-detections were seen on the array.
 
-The function converst both the startdate and enddate columns into a date with no hours, minutes,
-or seconds. Next it creates a list of the unique days where a detection was seen. The size of the
-list is returned as the total number of days as an integer.
-
-*** NOTE ****
-Possible rounding error may occur as a detection on 2016-01-01 23:59:59 and a detection on
-2016-01-02 00:00:01 would be counted as days when it is really 2-3 seconds.
-
-
-@var Detections - Pandas DataFrame pulled from the compressed detections CSV
-'''
 
 
 def total_days_count(detections):
+    '''
+    total_days_count
+    The function below takes a Pandas DataFrame and determines the number of days any
+    detections were seen on the array.
+
+    The function converst both the startdate and enddate columns into a date with no hours, minutes,
+    or seconds. Next it creates a list of the unique days where a detection was seen. The size of the
+    list is returned as the total number of days as an integer.
+
+    *** NOTE ****
+    Possible rounding error may occur as a detection on 2016-01-01 23:59:59 and a detection on
+    2016-01-02 00:00:01 would be counted as days when it is really 2-3 seconds.
+
+
+    @var Detections - Pandas DataFrame pulled from the compressed detections CSV
+    '''
     detections['startdate'] = detections['startdate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",)).apply(datetime.date)
     detections['enddate'] = detections['enddate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",)).apply(datetime.date)
     detections = pd.unique(detections[['startdate', 'enddate']].values.ravel())
     return detections.size
 
 
-'''
-aggregate_total_with_overlap()
-----------------------------------------
 
-The function below aggregates timedelta of startdate and enddate of each detection into
-a final timedelta then returns a float of the number of days. If the startdate and enddate
-are the same, a timedelta of one second is assumed.
-
-@var Detections - Pandas DataFrame pulled from the compressed detections CSV
-'''
 
 
 def aggregate_total_with_overlap(detections):
+    '''
+    aggregate_total_with_overlap
+
+    The function below aggregates timedelta of startdate and enddate of each detection into
+    a final timedelta then returns a float of the number of days. If the startdate and enddate
+    are the same, a timedelta of one second is assumed.
+
+    @var Detections - Pandas DataFrame pulled from the compressed detections CSV
+    '''
     total = pd.Timedelta(0)
     detections['startdate'] = detections['startdate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
     detections['enddate'] = detections['enddate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
@@ -86,20 +86,20 @@ def aggregate_total_with_overlap(detections):
     return total.total_seconds()/86400.0
 
 
-'''
-aggregate_total_no_overlap()
---------------------------------------
 
-The function below aggregates timedelta of startdate and enddate, excluding overlap between
-detections. Any overlap between two detections is converted to a new detection using the earlier
-startdate and the latest enddate. If the startdate and enddate are the same, a timedelta of one
-second is assumed.
-
-@var Detections - Pandas DataFrame pulled from the compressed detections CSV
-'''
 
 
 def aggregate_total_no_overlap(detections):
+    '''
+    aggregate_total_no_overlap
+
+    The function below aggregates timedelta of startdate and enddate, excluding overlap between
+    detections. Any overlap between two detections is converted to a new detection using the earlier
+    startdate and the latest enddate. If the startdate and enddate are the same, a timedelta of one
+    second is assumed.
+
+    @var Detections - Pandas DataFrame pulled from the compressed detections CSV
+    '''
     total = pd.Timedelta(0)
 
     # sort and convert datetimes
@@ -146,20 +146,20 @@ def aggregate_total_no_overlap(detections):
     return total.total_seconds()/86400.0
 
 
-'''
-get_days()
-----------
 
-Determines which calculation method to use for the residency index.
-
-Wrapper method for the calulation methods above.
-
-@var dets - Pandas DataFrame pulled from the compressed detections CSV
-@var calculation_method - determines which method above will be used to count total time and station time
-'''
 
 
 def get_days(dets, calculation_method='kessel'):
+    '''
+    get_days
+
+    Determines which calculation method to use for the residency index.
+
+    Wrapper method for the calulation methods above.
+
+    @var dets - Pandas DataFrame pulled from the compressed detections CSV
+    @var calculation_method - determines which method above will be used to count total time and station time
+    '''
     days = 0
 
     if calculation_method == 'aggregate_with_overlap':
@@ -174,19 +174,16 @@ def get_days(dets, calculation_method='kessel'):
     return days
 
 
-'''
-get_station_location()
-----------------------
-
-Returns the longitude and latitude of a station/receiver given the station
-and the table name.
-
-@var station - String that contains the station name
-@var table - the table name in which to find the station
-'''
-
-
 def get_station_location(station, detections):
+    '''
+    get_station_location
+
+    Returns the longitude and latitude of a station/receiver given the station
+    and the table name.
+
+    @var station - String that contains the station name
+    @var table - the table name in which to find the station
+    '''
     location = detections[detections.station == station][:1]
     location = location[['station', 'longitude', 'latitude']]
     return location
@@ -195,7 +192,6 @@ def get_station_location(station, detections):
 def plot_ri(ri, bounds={'north': 90, 'south': -90, 'east': 180, 'west': -180}):
     '''
     Plotting Function
-    -----------------
 
     Passing the returned pandas DataFrame from the residence_index() function
     to this function will plot out the residence index
@@ -236,7 +232,15 @@ def plot_ri(ri, bounds={'north': 90, 'south': -90, 'east': 180, 'west': -180}):
     print 'OK!'
     plt.show()
 
+
+
 def interactive_map(ri_data, tileset='cartodb positron', marker_size=50, zoom=8):
+    '''
+    interactive_map
+
+
+    Documents this!
+    '''
 
     #create the map with a tileset, defaults to cartodb positron
     ri_map = fl.Map(location=[ri_data.latitude.median(), ri_data.longitude.median()],
@@ -263,8 +267,7 @@ def interactive_map(ri_data, tileset='cartodb positron', marker_size=50, zoom=8)
 def residency_index(detections, calculation_method='kessel'):
 
     '''
-    residency_index()
-    -----------------
+    residency_index
 
     This function takes in a detections CSV and determines the residency
     index for reach station.

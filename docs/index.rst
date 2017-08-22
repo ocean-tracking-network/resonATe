@@ -4,14 +4,20 @@
    contain the root `toctree` directive.
 
 Welcome to otn-toolbox's documentation!
-==================================
+=======================================
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
-
+   compression
+   cohort
+   detection_map
+   filter
+   interval_data
+   residence_index
+   unqid
 
 Indices and tables
 ==================
