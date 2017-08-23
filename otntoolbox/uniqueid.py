@@ -5,6 +5,7 @@ import pandas as pd
 def add_unqdetecid(input_file, encoding='utf-8-sig'):
     """
     Adds the unqdetecid column to an input csv file. The resulting file is returned as a pandas DataFrame object.
+    
     :param input_file: Path to the input csv file.
     :param encoding: source encoding for the input file (Default utf8-bom)
     :return: padnas DataFrame including unqdetecid column.

@@ -1,3 +1,7 @@
+.. _detection_map_page:
+
+.. include:: notebooks/visual_detection_timeline.ipynb.rst
+
 Detection Map
 =============
 

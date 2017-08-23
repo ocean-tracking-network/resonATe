@@ -23,8 +23,7 @@ def total_days_diff(detections):
     the number of seconds in a day (86400). The function returns a floating
     point number of days (i.e. 503.76834).
 
-    @var Detections - Pandas DataFrame pulled from the compressed detections
-    CSV
+    :param detections: Pandas DataFrame pulled from the compressed detections CSV
     """
     first = datetime.strptime(detections.startdate.min(), "%Y-%m-%d %H:%M:%S")
     last = datetime.strptime(detections.enddate.max(), "%Y-%m-%d %H:%M:%S")
@@ -51,7 +50,7 @@ def total_days_count(detections):
     2016-01-02 00:00:01 would be counted as days when it is really 2-3 seconds.
 
 
-    @var Detections - Pandas DataFrame pulled from the compressed detections CSV
+    :param detections: Pandas DataFrame pulled from the compressed detections CSV
     '''
     detections['startdate'] = detections['startdate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",)).apply(datetime.date)
     detections['enddate'] = detections['enddate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",)).apply(datetime.date)
@@ -70,7 +69,7 @@ def aggregate_total_with_overlap(detections):
     a final timedelta then returns a float of the number of days. If the startdate and enddate
     are the same, a timedelta of one second is assumed.
 
-    @var Detections - Pandas DataFrame pulled from the compressed detections CSV
+    :param detections: Pandas DataFrame pulled from the compressed detections CSV
     '''
     total = pd.Timedelta(0)
     detections['startdate'] = detections['startdate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
@@ -98,7 +97,7 @@ def aggregate_total_no_overlap(detections):
     startdate and the latest enddate. If the startdate and enddate are the same, a timedelta of one
     second is assumed.
 
-    @var Detections - Pandas DataFrame pulled from the compressed detections CSV
+    :param detections: pandas DataFrame pulled from the compressed detections CSV
     '''
     total = pd.Timedelta(0)
 
@@ -157,8 +156,8 @@ def get_days(dets, calculation_method='kessel'):
 
     Wrapper method for the calulation methods above.
 
-    @var dets - Pandas DataFrame pulled from the compressed detections CSV
-    @var calculation_method - determines which method above will be used to count total time and station time
+    :param dets: A Pandas DataFrame pulled from the compressed detections CSV
+    :param calculation_method: determines which method above will be used to count total time and station time
     '''
     days = 0
 
@@ -181,8 +180,8 @@ def get_station_location(station, detections):
     Returns the longitude and latitude of a station/receiver given the station
     and the table name.
 
-    @var station - String that contains the station name
-    @var table - the table name in which to find the station
+    :param station: String that contains the station name
+    :param table: the table name in which to find the station
     '''
     location = detections[detections.station == station][:1]
     location = location[['station', 'longitude', 'latitude']]
@@ -197,6 +196,10 @@ def plot_ri(ri, bounds={'north': 90, 'south': -90, 'east': 180, 'west': -180}):
     to this function will plot out the residence index
 
     Size, boundaries, and colors can be modified to tweek the plot.
+
+    :param ri: pandas df
+    :param bounds: {'north': 90, 'south': -90, 'east': 180, 'west': -180}
+
     '''
 
     # Friendly message
@@ -276,7 +279,8 @@ def residency_index(detections, calculation_method='kessel'):
     fish was detected at each receiver station divided by the total number of
     days the fish was detected anywhere on the acoustic array. - Kessel et al.
 
-    @var Detections - CSV Path
+    :param detections: CSV Path
+    :param calculation_method: determines which method above will be used to count total time and station time
     '''
 
     detections = pd.read_csv(detections)
