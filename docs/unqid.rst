@@ -2,7 +2,7 @@
 
 .. include:: notebooks/add_uniquecid.ipynb.rst
 
-Unique Detections ID
-====================
+Unique Detections Function
+--------------------------
 
 .. autofunction:: uniqueid.add_unqdetecid

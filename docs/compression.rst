@@ -2,7 +2,7 @@
 
 .. include:: notebooks/detection_compression.ipynb.rst
 
-Compression Tool
-================
+Compression Functions
+---------------------
 
 .. autofunction:: compress.compress_detections

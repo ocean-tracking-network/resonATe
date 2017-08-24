@@ -1,6 +1,6 @@
 
 Subsetting Data
----------------
+===============
 
 Sometimes there is too much data for a visualization tool to handle, or
 you wish to only take a certain subset of your input data and apply it
@@ -11,7 +11,7 @@ manipulation package, are meant as a starting point. More complex
 operations are possible in Pandas, but these should form a baseline of
 understanding that will cover the most common operations.
 
-.. code:: ipython2
+.. code:: python
 
     import pandas as pd
     directory = "/home/vagrant/data/"  # Working directory. Defaults to the shared data folder.
@@ -25,7 +25,7 @@ Provide a date field, as well as starting and ending date range. By
 default, the detection date column of a detection extract file is
 provided.
 
-.. code:: ipython2
+.. code:: python
 
     # Enter the column name that contains the date you wish to evaluate
     datecol = 'datecollected'
@@ -47,7 +47,7 @@ Subsetting on column value
 Provide the column you expect to have a certain value and the value
 you'd like to create a subset from.
 
-.. code:: ipython2
+.. code:: python
 
     # Enter the column you want to subset
     column=''

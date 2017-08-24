@@ -1,5 +1,8 @@
 
-.. code:: ipython2
+Visual Timeline
+===============
+
+.. code:: python
 
     # Enter a detection CSV file and title text for the visualization
     import otntoolbox.html_maps as hmaps
@@ -10,7 +13,7 @@
     
     # You can supply a basemap argument to choose from a few alternate basemap tilesets:
     # Available basemaps are:
-    # 
+    #  
     # no basemap set, or basemap='dark_layer' - CartoDB/OpenStreetMap Dark
     # basemap='Esri_OceanBasemap' - coarse ocean bathymetry
     # basemap='CartoDB_Positron' - grayscale land/ocean 

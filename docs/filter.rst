@@ -2,8 +2,8 @@
 
 .. include:: notebooks/filter_detections.ipynb.rst
 
-Filter Tool
-===========
+Filtering Functions
+-------------------
 
 .. _distance_matrix_page:
 .. autofunction:: filter_detections.get_distance_matrix

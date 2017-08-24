@@ -1,12 +1,16 @@
 
-# Create Interval Data
-----------------------
+Create Interval Data
+====================
+
+.. raw:: html
+
+   <hr>
 
 Creates a compressed detections table and an interval data file.
 Intervals are lengths of time in which a station detected an animal.
 Many consecutive detections of an animal are replaced by one interval.
 
-.. code:: ipython2
+.. code:: python
 
     #%cd /home/user/data/ # uncomment to change the working directory
     from otntoolbox.filter_detections import get_distance_matrix
@@ -15,7 +19,7 @@ Many consecutive detections of an animal are replaced by one interval.
     import pandas as pd
     import geopy
 
-.. code:: ipython2
+.. code:: python
 
     # Input DataFrames
     
@@ -23,7 +27,7 @@ Many consecutive detections of an animal are replaced by one interval.
     compressed = compress_detections(input_file) # compressed detections
     matrix = get_distance_matrix(input_file) # station distance matrix
 
-.. code:: ipython2
+.. code:: python
 
     # Set your station radius values
     detection_radius = 100 # (in meters) applies same detection radius to all stations
@@ -32,7 +36,7 @@ Many consecutive detections of an animal are replaced by one interval.
     station_det_radius.set_index('station', inplace=True)
     station_det_radius # preview radius values
 
-.. code:: ipython2
+.. code:: python
 
     # Modify and run this cell to change individual station detection radiuses
     station_name = 'station'
@@ -40,12 +44,12 @@ Many consecutive detections of an animal are replaced by one interval.
     
     station_det_radius.set_value(station_name, 'radius', geopy.distance.Distance( station_detection_radius/1000.0 ))
 
-.. code:: ipython2
+.. code:: python
 
     interval = interval_data(compressed_df=compressed, dist_matrix_df=matrix, station_radius_df=station_det_radius)
     interval #preview interval data
 
-.. code:: ipython2
+.. code:: python
 
     # Saves the interval data file
     interval.to_csv('/path/to/output.csv', index=False)

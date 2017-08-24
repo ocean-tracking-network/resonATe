@@ -1,12 +1,16 @@
 
-# Filtering Detections on Distance / Time
------------------------------------------
+Filtering Detections on Distance / Time
+=======================================
+
+.. raw:: html
+
+   <hr>
 
 -  Use the variables below to point the Toolbox scripts at your data.
 -  Fill in the strings that are commented with **# REQUIRED:** then
    highlight a cell and hit Run Cell ('play' button above)
 
-.. code:: ipython2
+.. code:: python
 
     #  Set some variables
     detection_file = ''      #  REQUIRED: And provide the filename here
@@ -20,7 +24,7 @@
     #  between stations found in the above detection file
     CreateDistanceMatrix = True #  True / False
 
-.. code:: ipython2
+.. code:: python
 
     #%cd /home/user/data/ # uncomment to change the working directory
     from otntoolbox.filter_detections import get_distance_matrix

@@ -2,7 +2,7 @@
 
 .. include:: notebooks/cohort_data.ipynb.rst
 
-Cohort Tool
-===========
+Cohort Functions
+----------------
 
 .. autofunction:: cohorts.cohort

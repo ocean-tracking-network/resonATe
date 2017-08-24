@@ -47,7 +47,7 @@ determine the table name from detection file name.
 **Kessel et al. Paper -
 https://www.researchgate.net/publication/279269147 **
 
-.. code:: ipython2
+.. code:: python
 
     from otntoolbox import kessel_ri as ri
     import matplotlib
@@ -91,7 +91,7 @@ T = Distinct number of days detected anywhere on the array
 2016-01-01 23:59:59 and a detection on 2016-01-02 00:00:01 would be
 counted as two days when it is really 2-3 seconds.
 
-.. code:: ipython2
+.. code:: python
 
     # From Raw Detection File
     kessel_ri = ri.residency_index(detfile, calculation_method='kessel')
@@ -120,7 +120,7 @@ time at the station
 :math:`\Delta T` = Last detection time on an array - First detection
 time on the array
 
-.. code:: ipython2
+.. code:: python
 
     # From Raw Detection File
     timedelta_ri = ri.residency_index(detfile, calculation_method='timedelta')
@@ -147,7 +147,7 @@ AwOS = Sum of length of time of each detection at the station
 
 AwOT = Sum of length of time of each detection on the array
 
-.. code:: ipython2
+.. code:: python
 
     # From Raw Detection File
     with_overlap_ri = ri.residency_index(detfile, calculation_method='aggregate_with_overlap')
@@ -184,13 +184,13 @@ any overlap
 AnOT = Sum of length of time of each detection on the array, excluding
 any overlap
 
-.. code:: ipython2
+.. code:: python
 
     # From Raw Detection File
     no_overlap_ri = ri.residency_index(detfile, calculation_method='aggregate_no_overlap')
     
     ri.plot_ri(no_overlap_ri, project=project_bounds)
 
-.. code:: ipython2
+.. code:: python
 
     ri.interactive_map(kessel_ri)

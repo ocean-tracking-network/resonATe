@@ -2,8 +2,8 @@
 
 .. include:: notebooks/visual_detection_timeline.ipynb.rst
 
-Detection Map
-=============
+Detection Map Functions
+-----------------------
 
 .. autofunction:: html_maps.render_map
 

@@ -2,8 +2,8 @@
 
 .. include:: notebooks/residence_index.ipynb.rst
 
-Residence Index Tool
-====================
+Residence Index Functions
+-------------------------
 
 .. autofunction:: kessel_ri.total_days_diff
 

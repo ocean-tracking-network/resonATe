@@ -22,6 +22,7 @@ for file in os.listdir("../py_notebooks"):
         f=open('../docs/notebooks/'+str(file)+'.rst', 'w')
         rst = rst.replace('raw-latex', 'math')
         rst = rst.replace('$', '')
+        rst = rst.replace('ipython2', 'python')
         f.write(rst)
         f.close()
         del rst, rest

@@ -1,13 +1,17 @@
 
-# Detections Compression
-------------------------
+Detections Compression
+======================
+
+.. raw:: html
+
+   <hr>
 
 Compresses your detection files. Compressed detection files are needed
 for the tools, such as interval and cohort. Important: Input files must
 include the following manadatory columns: dataecollected, catalognumber
 and unqdetecid.
 
-.. code:: ipython2
+.. code:: python
 
     #%cd /home/user/data/ # uncomment to change the working directory
     from otntoolbox.compress import compress_detections
@@ -20,7 +24,7 @@ and unqdetecid.
     compressed = compress_detections(detections=detections)
     compressed # preview compression
 
-.. code:: ipython2
+.. code:: python
 
     # Save your compressed detection DataFrame to a CSV 
     compressed.to_csv('', index=False)
