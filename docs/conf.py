@@ -18,11 +18,13 @@ import nbformat
 rst_exporter = RSTExporter()
 for file in os.listdir("../py_notebooks"):
     if file.endswith(".ipynb"):
-        rst, rest = rst_exporter.from_notebook_node(nbformat.read('../py_notebooks/'+file, as_version=4))
+        rst, rest = rst_exporter.from_notebook_node(nbformat.read('../py_notebooks/'+file, as_version=4), wrap ='preserve')
         f=open('../docs/notebooks/'+str(file)+'.rst', 'w')
         rst = rst.replace('raw-latex', 'math')
         rst = rst.replace('$', '')
         rst = rst.replace('ipython2', 'python')
+        rst = rst.replace('Warning:', '.. warning:: ')
+        rst = rst.replace('``,\n', '``\n\t')
         f.write(rst)
         f.close()
         del rst, rest

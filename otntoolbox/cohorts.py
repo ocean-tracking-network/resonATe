@@ -1,11 +1,25 @@
 import pandas as pd
 
+
 def cohort(compressed_df, interval_time=60):
     """
     Creates a dataframe of cohorts using a compressed detection file
+
     :param compressed_df: compressed dataframe
     :param interval_time: cohort detection time interval (in minutes)
-    :return: compressed dataframe
+    :return: cohort dataframe with the following columns
+
+        * anml_1
+        * anml_1_seq
+        * station
+        * anml_2
+        * anml_2_seq
+        * anml_2_arrive
+        * anml_2_depart
+        * anml_2_startunqdetecid
+        * anml_2_endunqdetecid
+        * anml_2_detcount
+
     """
 
     # Convert input int interval_time into a timedelta object

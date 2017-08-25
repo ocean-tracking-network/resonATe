@@ -7,24 +7,23 @@ Detections Compression
    <hr>
 
 Compresses your detection files. Compressed detection files are needed
-for the tools, such as interval and cohort. Important: Input files must
-include the following manadatory columns: dataecollected, catalognumber
-and unqdetecid.
+for the tools, such as interval and cohort.
+
+.. warning::  Input files must include ``dataecollected``, ``catalognumber``
+	and ``unqdetecid`` as columns.
 
 .. code:: python
 
-    #%cd /home/user/data/ # uncomment to change the working directory
     from otntoolbox.compress import compress_detections
     import pandas as pd
     
-    # Input detection file (uncompressed) file -> pandas DataFrame object
-    detections = pd.read_csv('/Users/alexnunes/Desktop/otn-toolbox/tests/assertion_files/nsbs.csv')
+    detections = pd.read_csv('/path/to/data.csv')
     
-    # Runs the compression operation and exports the compressed detection file
     compressed = compress_detections(detections=detections)
-    compressed # preview compression
+
+You can use the Pandas ``DataFrame.to_csv()`` function to output the
+file to a desired location.
 
 .. code:: python
 
-    # Save your compressed detection DataFrame to a CSV 
-    compressed.to_csv('', index=False)
+    compressed.to_csv('/path/to/output.csv', index=False)
