@@ -9,8 +9,9 @@ Detections Compression
 Compresses your detection files. Compressed detection files are needed
 for the tools, such as interval and cohort.
 
-.. warning::  Input files must include ``dataecollected``, ``catalognumber``
-	and ``unqdetecid`` as columns.
+.. warning:: 
+
+    Input files must include ``dataecollected``, ``catalognumber``, and ``unqdetecid`` as columns.
 
 .. code:: python
 

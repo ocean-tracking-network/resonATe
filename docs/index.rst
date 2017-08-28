@@ -25,12 +25,8 @@ White-Mihoff False Filtering
 
 
 OTN has developed a tool which will assist with filtering false detections. The first level of filtering involves identifying isolated detections. The original concept came from work done by Easton White. He was kind enough to share his research database with OTN. We did some preliminary research and developed a proposal for a filtering tool based on what Easton had done. This proof of concept was presented to Steve Kessel and Eddie Halfyard in December 2013 and a decision was made to develop a tool for general use.
-
-This is a very simple tool, the first in a suite that OTN is developing. It will take an input file of detections and based on an input parameter will identify suspect detections. The suspect detections will be put into a file which the user can examine. There will be enough information for each suspect detection for the user to understand why it was flagged. There is also enough information to be able to reference the detection in the original file if the user wants to see what was happening at the same time.
-
-The input parameter is a time in minutes. We used 60 as the default as this is what was used in Easton’s code. This value can be changed by the user. The output file contains a record for each detection for which there has been more than xx minutes since the previous detection (of that tag/animal) and more than the same amount of time until the next detection. It ignores which receiver the detection occurred at. That is all it does, nothing more and nothing less.
-
-Once you are happy with the file of false detections you can then request the tool delete them. The original file will never be overwritten. Details are in :ref:`Filter Tool <filter_page>`.
+This is a very simple tool. It will take an input file of detections and based on an input parameter will identify suspect detections. The suspect detections will be put into a dataframe which the user can examine. There will be enough information for each suspect detection for the user to understand why it was flagged. There is also enough information to be able to reference the detection in the original file if the user wants to see what was happening at the same time.
+The input parameter is a time in minutes. We used 60 as the default as this is what was used in Easton's code. This value can be changed by the user. The output file contains a record for each detection for which there has been more than xx minutes since the previous detection (of that tag/animal) and more than the same amount of time until the next detection. It ignores which receiver the detection occurred at. That is all it does, nothing more and nothing less. Details are in :ref:`Filter Tool <filter_page>`.
 
 
 .. _distance_matrix:
@@ -86,12 +82,12 @@ Contents:
    self
    cohort
    compression
-   detection_map
    filter
    interval_data
    residence_index
-   unqid
    notebooks/data_subsetting.ipynb
+   unqid
+   detection_map
 
 Indices and tables
 ==================

@@ -1,6 +1,6 @@
 
-Create Interval Data
-====================
+Interval Data Tool
+==================
 
 .. raw:: html
 
@@ -12,7 +12,6 @@ Many consecutive detections of an animal are replaced by one interval.
 
 .. code:: python
 
-    #%cd /home/user/data/ # uncomment to change the working directory
     from otntoolbox.filter_detections import get_distance_matrix
     from otntoolbox.compress import compress_detections
     from otntoolbox.interval_data_tool import interval_data
@@ -22,8 +21,7 @@ Many consecutive detections of an animal are replaced by one interval.
 .. code:: python
 
     # Input DataFrames
-    
-    input_file = pd.read_csv("/Path") 
+    input_file = pd.read_csv("/path/to/detections_data.csv") 
     compressed = compress_detections(input_file) # compressed detections
     matrix = get_distance_matrix(input_file) # station distance matrix
 
@@ -47,7 +45,8 @@ Many consecutive detections of an animal are replaced by one interval.
 .. code:: python
 
     interval = interval_data(compressed_df=compressed, dist_matrix_df=matrix, station_radius_df=station_det_radius)
-    interval #preview interval data
+    
+    interval
 
 .. code:: python
 

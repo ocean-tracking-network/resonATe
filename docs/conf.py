@@ -24,7 +24,7 @@ for file in os.listdir("../py_notebooks"):
         rst = rst.replace('$', '')
         rst = rst.replace('ipython2', 'python')
         rst = rst.replace('Warning:', '.. warning:: ')
-        rst = rst.replace('``,\n', '``\n\t')
+        rst = rst.replace('\n::\n', '')
         f.write(rst)
         f.close()
         del rst, rest

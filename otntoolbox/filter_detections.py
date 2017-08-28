@@ -4,8 +4,17 @@ import numpy as np
 from geopy.distance import vincenty
 from library.exceptions import GenericException
 
+
 def get_distance_matrix(detectiondf):
 
+    """
+    Creates a distance matrix of all stations in the array or line.
+
+    :param detectiondf: a Pandas DataFrame of detections
+
+    :return: A Pandas DataFrame matrix of station to station distances
+
+    """
     def get_v_distance(col):
         end = stn_locs.ix[col.name]['coords']
         return stn_locs['coords'].apply(vincenty, args=(end,), ellipsoid='WGS-84')
@@ -34,12 +43,29 @@ def filter_detections(detection_file, suspect_file=None,
     dist_matrix is created as a matrix of between-station distances from
     stations defined in the input file.
 
+    :param detection_file: A CSV file of acoustic detections
+
+    :param suspect_file: Path to a user specified suspect file
+
+    :param detection_radius:
+
+    :param min_time_buffer: The minimum of time required for outlier detections in
+        minutes
+
+    :param distance_matrix: A boolean of whether or not to generate the
+        distance matrix
+
+    :return: A list of Pandas DataFrames of filtered detections, suspect
+        detections, and a distance matrix
+
     """
 
+    # Set of mandatory column names for detection_file
     mandatory_columns = set(['station',
-                     'unqdetecid',
-                     'datecollected',
-                     'catalognumber']) # Set of mandatory column names for detection_file
+                             'unqdetecid',
+                             'datecollected',
+                             'catalognumber'])
+
     # Load the file into a dataframe
     df = pd.read_csv(detection_file)
 

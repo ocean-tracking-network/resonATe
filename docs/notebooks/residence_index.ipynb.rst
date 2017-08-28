@@ -2,6 +2,8 @@
 Residence Index
 ===============
 
+Kessel et al. Paper https://www.researchgate.net/publication/279269147
+
 This residence index tool will take a compressed or uncompressed
 detection file and caculate the residency index for each
 station/receiver in the detections. A CSV file will be written to the
@@ -18,34 +20,23 @@ program time to compress the file and add the rows to the database. A
 compressed file will be created in the data directory. Use the
 compressed file for any future runs of the residence index function.
 
-.. raw:: html
-
-   <hr/>
-
 **calculation\_method:** The method used to calculate the residence
-index.
+index. Methods are:
 
-Methods are: - kessel - timedelta - aggregate\_with\_overlap -
-aggregate\_no\_overlap.
+-  kessel
+-  timedelta
+-  aggregate\_with\_overlap
+-  aggregate\_no\_overlap.
+
+**project\_bounds:** North, South, East, and West bounding longitudes
+and latitudes for visualization.
 
 The calculation methods are listed and described below before they are
 called. The function will default to the Kessel method when nothing is
 passed.
 
-.. raw:: html
-
-   <hr/>
-
-**table:** The database table to use to determine the station/receiver
-location(lat, long). If no table is passed the function will try to
-determine the table name from detection file name.
-
-.. raw:: html
-
-   <hr/>
-
-**Kessel et al. Paper -
-https://www.researchgate.net/publication/279269147 **
+Below is an example of inital variables to set up, which are the
+detection file and the project bounds.
 
 .. code:: python
 
@@ -58,8 +49,12 @@ https://www.researchgate.net/publication/279269147 **
                       'east': -61.93, 
                       'west': -64.18}
     
-    # Declare the uncompressed detections file you want to plot
-    detfile = "../tests/assertion_files/nsbs.csv"
+    
+    detfile = "/path/to/detection_data.csv"
+
+.. raw:: html
+
+   <hr/>
 
 Kessel Residence Index Calculation
 ----------------------------------
@@ -71,10 +66,6 @@ as the total number of days as an integer. This calculation is used to
 determine the total number of distinct days (T) and the total number of
 distinct days per station (S).
 
-.. raw:: html
-
-   <hr/>
-
 :math:`RI = \frac{S}{T}`
 
 RI = Residence Index
@@ -83,19 +74,23 @@ S = Distinct number of days detected at the station
 
 T = Distinct number of days detected anywhere on the array
 
-.. raw:: html
+.. warning:: 
 
-   <hr/>
+    Possible rounding error may occur as a detection on ``2016-01-01 23:59:59``
+    and a detection on ``2016-01-02 00:00:01`` would be counted as two days when it is really 2-3 seconds.
 
-\*\*\* NOTE \*\*\*\* Possible rounding error may occur as a detection on
-2016-01-01 23:59:59 and a detection on 2016-01-02 00:00:01 would be
-counted as two days when it is really 2-3 seconds.
+Example Code
+~~~~~~~~~~~~
 
 .. code:: python
 
-    # From Raw Detection File
     kessel_ri = ri.residency_index(detfile, calculation_method='kessel')
+    
     ri.plot_ri(kessel_ri, bounds=project_bounds)
+
+.. raw:: html
+
+   <hr/>
 
 Timedelta Residence Index Calculation
 -------------------------------------
@@ -105,10 +100,6 @@ detections and the last enddate of all detections. The time difference
 is then taken as the values to be used in calculating the residence
 index. The timedelta for each station is divided by the timedelta of the
 array to determine the residence index.
-
-.. raw:: html
-
-   <hr/>
 
 :math:`RI = \frac{\Delta S}{\Delta T}`
 
@@ -120,12 +111,18 @@ time at the station
 :math:`\Delta T` = Last detection time on an array - First detection
 time on the array
 
+Example Code
+~~~~~~~~~~~~
+
 .. code:: python
 
-    # From Raw Detection File
     timedelta_ri = ri.residency_index(detfile, calculation_method='timedelta')
     
     ri.plot_ri(timedelta_ri, bounds=project_bounds)
+
+.. raw:: html
+
+   <hr/>
 
 Aggregate With Overlap Residence Index Calculation
 --------------------------------------------------
@@ -135,10 +132,6 @@ of each detection and sums them together. A total is returned. The sum
 for each station is then divided by the sum of the array to determine
 the residence index.
 
-.. raw:: html
-
-   <hr/>
-
 RI = :math:`\frac{AwOS}{AwOT}` 
 
 RI = Residence Index
@@ -147,12 +140,18 @@ AwOS = Sum of length of time of each detection at the station
 
 AwOT = Sum of length of time of each detection on the array
 
+Example Code
+~~~~~~~~~~~~
+
 .. code:: python
 
-    # From Raw Detection File
     with_overlap_ri = ri.residency_index(detfile, calculation_method='aggregate_with_overlap')
     
     ri.plot_ri(with_overlap_ri, bounds=project_bounds)
+
+.. raw:: html
+
+   <hr/>
 
 Aggregate No Overlap Residence Index Calculation
 ------------------------------------------------
@@ -170,10 +169,6 @@ A total is returned once all detections of been added without overlap.
 The sum for each station is then divided by the sum of the array to
 determine the residence index.
 
-.. raw:: html
-
-   <hr/>
-
 RI = :math:`\frac{AnOS}{AnOT}` 
 
 RI = Residence Index
@@ -184,12 +179,28 @@ any overlap
 AnOT = Sum of length of time of each detection on the array, excluding
 any overlap
 
+Example Code
+~~~~~~~~~~~~
+
 .. code:: python
 
-    # From Raw Detection File
     no_overlap_ri = ri.residency_index(detfile, calculation_method='aggregate_no_overlap')
     
     ri.plot_ri(no_overlap_ri, project=project_bounds)
+
+.. raw:: html
+
+   <hr/>
+
+Interactive Residence Index Map
+-------------------------------
+
+Maps a residence index dataframe using folium and a leaflet tileset,
+rendering as an interective javascript map and saving the HTML and JSON
+to an html folder.
+
+Example Code
+~~~~~~~~~~~~
 
 .. code:: python
 
