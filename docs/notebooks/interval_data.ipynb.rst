@@ -1,12 +1,15 @@
 
-Interval Data Tool
-==================
+Interval Data
+=============
 
 .. raw:: html
 
    <hr>
 
-Creates a compressed detections table and an interval data file.
+``interval_data()`` takes a compressed detections DataFrame, a distance
+matrix, and a detection radiues DataFrame and creates an interval data
+DataFrame.
+
 Intervals are lengths of time in which a station detected an animal.
 Many consecutive detections of an animal are replaced by one interval.
 
@@ -17,30 +20,37 @@ Many consecutive detections of an animal are replaced by one interval.
     from otntoolbox.interval_data_tool import interval_data
     import pandas as pd
     import geopy
-
-.. code:: python
-
-    # Input DataFrames
-    input_file = pd.read_csv("/path/to/detections_data.csv") 
-    compressed = compress_detections(input_file) # compressed detections
-    matrix = get_distance_matrix(input_file) # station distance matrix
-
-.. code:: python
-
-    # Set your station radius values
-    detection_radius = 100 # (in meters) applies same detection radius to all stations
     
-    station_det_radius = pd.DataFrame([(x, geopy.distance.Distance(detection_radius/1000.0)) for x in matrix.columns.tolist()], columns=['station','radius'])
-    station_det_radius.set_index('station', inplace=True)
-    station_det_radius # preview radius values
+    input_file = pd.read_csv("/path/to/detections_data.csv") 
+    compressed = compress_detections(input_file) 
+    matrix = get_distance_matrix(input_file)
+
+Set the station radius for each station name.
 
 .. code:: python
 
-    # Modify and run this cell to change individual station detection radiuses
+    detection_radius = 100 
+    
+    station_det_radius = pd.DataFrame([(x, geopy.distance.Distance(detection_radius/1000.0)) 
+                                       for x in matrix.columns.tolist()], columns=['station','radius'])
+    
+    station_det_radius.set_index('station', inplace=True)
+    
+    station_det_radius 
+
+You can modify individual stations if needed by using
+``DatraFrame.set_value()`` from Pandas.
+
+.. code:: python
+
     station_name = 'station'
-    station_detection_radius = 500 # Value in meters
+    
+    station_detection_radius = 500
     
     station_det_radius.set_value(station_name, 'radius', geopy.distance.Distance( station_detection_radius/1000.0 ))
+
+Create the interval data by passing the compressed detections, the
+matrix, and the station radii.
 
 .. code:: python
 
@@ -48,7 +58,9 @@ Many consecutive detections of an animal are replaced by one interval.
     
     interval
 
+You can use the Pandas ``DataFrame.to_csv()`` function to output the
+file to a desired location.
+
 .. code:: python
 
-    # Saves the interval data file
     interval.to_csv('/path/to/output.csv', index=False)

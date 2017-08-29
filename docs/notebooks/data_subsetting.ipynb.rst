@@ -14,8 +14,7 @@ understanding that will cover the most common operations.
 .. code:: python
 
     import pandas as pd
-    directory = "/home/vagrant/data/"  # Working directory. Defaults to the shared data folder.
-    filename = "Your detection file goes here"
+    filename = "/path/to/data.csv"
     data = pd.read_csv(directory+filename)
 
 Subsetting data by date range

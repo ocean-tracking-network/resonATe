@@ -24,6 +24,9 @@ def total_days_diff(detections):
     point number of days (i.e. 503.76834).
 
     :param detections: Pandas DataFrame pulled from the compressed detections CSV
+
+    :return: An float in the number of days
+
     """
     first = datetime.strptime(detections.startdate.min(), "%Y-%m-%d %H:%M:%S")
     last = datetime.strptime(detections.enddate.max(), "%Y-%m-%d %H:%M:%S")
@@ -51,6 +54,9 @@ def total_days_count(detections):
 
 
     :param detections: Pandas DataFrame pulled from the compressed detections CSV
+
+    :return: An int in the number of days
+
     '''
     detections['startdate'] = detections['startdate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",)).apply(datetime.date)
     detections['enddate'] = detections['enddate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",)).apply(datetime.date)
@@ -70,6 +76,9 @@ def aggregate_total_with_overlap(detections):
     are the same, a timedelta of one second is assumed.
 
     :param detections: Pandas DataFrame pulled from the compressed detections CSV
+
+    :return: An float in the number of days
+
     '''
     total = pd.Timedelta(0)
     detections['startdate'] = detections['startdate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
@@ -98,6 +107,9 @@ def aggregate_total_no_overlap(detections):
     second is assumed.
 
     :param detections: pandas DataFrame pulled from the compressed detections CSV
+
+    :return: An float in the number of days
+
     '''
     total = pd.Timedelta(0)
 
@@ -157,7 +169,12 @@ def get_days(dets, calculation_method='kessel'):
     Wrapper method for the calulation methods above.
 
     :param dets: A Pandas DataFrame pulled from the compressed detections CSV
-    :param calculation_method: determines which method above will be used to count total time and station time
+
+    :param calculation_method: determines which method above will be used to
+        count total time and station time
+
+    :return: An int in the number of days
+
     '''
     days = 0
 
@@ -181,7 +198,10 @@ def get_station_location(station, detections):
     and the table name.
 
     :param station: String that contains the station name
-    :param table: the table name in which to find the station
+    :param detections: the table name in which to find the station
+
+    :return: A Pandas DataFrame of station, latitude, and longitude
+
     '''
     location = detections[detections.station == station][:1]
     location = location[['station', 'longitude', 'latitude']]
@@ -199,6 +219,8 @@ def plot_ri(ri, bounds={'north': 90, 'south': -90, 'east': 180, 'west': -180}):
 
     :param ri: pandas df
     :param bounds: {'north': 90, 'south': -90, 'east': 180, 'west': -180}
+
+    :return: A static plot confined to defined bounds
 
     '''
 
@@ -218,7 +240,7 @@ def plot_ri(ri, bounds={'north': 90, 'south': -90, 'east': 180, 'west': -180}):
     # Modify the color of the water
     map.drawmapboundary(fill_color='#718ea4')
 
-    #Modify the color of land
+    # Modify the color of land
     map.fillcontinents(color='#2a7e43')
 
     # Modify the residence index coloring
@@ -227,7 +249,7 @@ def plot_ri(ri, bounds={'north': 90, 'south': -90, 'east': 180, 'west': -180}):
 
     indices = [ri['residency_index']]
 
-    x,y = map(ri['longitude'].values, ri['latitude'].values)
+    x, y = map(ri['longitude'].values, ri['latitude'].values)
     ri_map = map.scatter(x, y, s=ri['residency_index']*300, c=indices, cmap=index_coloring)
     ri_map.set_clim(0,1)
     cbar = plt.colorbar()
@@ -236,34 +258,53 @@ def plot_ri(ri, bounds={'north': 90, 'south': -90, 'east': 180, 'west': -180}):
     plt.show()
 
 
-
-def interactive_map(ri_data, tileset='cartodb positron', marker_size=50, zoom=8):
+def interactive_map(ri_data,
+                    tileset='cartodb positron',
+                    marker_size=50,
+                    zoom=8):
     '''
     interactive_map
 
+    This function leverages ``folium`` to render a ``leaflet`` map that
+    uses markers to display the residence index. The map can be interacted with
+    to view more detail about each station. The function takes a Pandas
+    DataFrame.
 
-    Documents this!
+    :param ri_data: A Pandas DataFrame generated from ``residency_index()``
+
+    :param tileset: The tilset for leaflet to use
+
+    :param marker: The marker size scalar multiplier
+
+    :param zoom: The initial zoom setting
+
+    :return: A folium map
+
     '''
 
-    #create the map with a tileset, defaults to cartodb positron
-    ri_map = fl.Map(location=[ri_data.latitude.median(), ri_data.longitude.median()],
+    # create the map with a tileset, defaults to cartodb positron
+    ri_map = fl.Map(location=[ri_data.latitude.median(),
+                    ri_data.longitude.median()],
                     tiles=tileset, attr='ESRI', zoom_start=zoom)
 
     # Add station markers to map
     for index, station in ri_data.iterrows():
 
-        #popup string
-        station_popup = "%s : %s" % (station['station'], station['residency_index'])
+        # popup string
+        station_popup = "%s : %s" % (station['station'],
+                                     station['residency_index'])
 
         # Marker creation, variables can be changed as seen fit
-        fl.RegularPolygonMarker([station['latitude'],station['longitude']],
-                        radius=math.ceil(station['residency_index']*marker_size),
-                        fill_color='red',
-                        fill_opacity=0.2,
-                        color='black',
-                        weight=2,
-                        number_of_sides=50,
-                        popup=station_popup).add_to(ri_map)
+        fl.RegularPolygonMarker([station['latitude'], station['longitude']],
+                                radius=math.ceil(
+                                    station['residency_index']*marker_size
+                                ),
+                                fill_color='red',
+                                fill_opacity=0.2,
+                                color='black',
+                                weight=2,
+                                number_of_sides=50,
+                                popup=station_popup).add_to(ri_map)
     return ri_map
 
 
@@ -280,7 +321,17 @@ def residency_index(detections, calculation_method='kessel'):
     days the fish was detected anywhere on the acoustic array. - Kessel et al.
 
     :param detections: CSV Path
-    :param calculation_method: determines which method above will be used to count total time and station time
+    :param calculation_method: determines which method above will be used to
+        count total time and station time
+
+    :return: A residence index DataFrame with the following columns
+
+        * days_detected
+        * latitud
+        * longitude
+        * residency_index
+        * station
+
     '''
 
     detections = pd.read_csv(detections)

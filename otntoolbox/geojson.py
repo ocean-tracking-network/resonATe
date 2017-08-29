@@ -5,34 +5,30 @@ import simplejson as json
 import otntoolbox.compress as cp
 
 
-
-'''
-unix_time_millis(dt)
--------------------
-Returns a datetime in milliseconds
-
-@var dt - datetime/timestamp
-'''
-
-
 def unix_time_millis(dt):
+    """
+    Returns a datetime in milliseconds
+
+    :param dt: datetime/timestamp
+    :return: datetime in milliseconds
+    """
     epoch = datetime.datetime.utcfromtimestamp(0)
-    #date = datetime.datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
     return (dt - epoch).total_seconds() * 1000.0
 
 
-'''
-create_geojson()
-----------------
-This function maps a compressed file and converts the necessary fields
-into a GeoJSON file that can be easily read by Leaflet
 
-@var detections - a compressed or uncompressed csv detections file
-@var dets_table - An override variable if the table does not match the name file name
-@inc inc - the number of detections to include in each subection of the json
-'''
 def create_geojson(detections, title, dets_table='', inc=5000):
+    """
+    This function maps a compressed file and converts the necessary fields
+    into a GeoJSON file that can be easily read by Leaflet
 
+    :param detections: a compressed or uncompressed csv detections file
+    :param dets_table: An override variable if the table does not match the
+        file name
+    :param inc: the number of detections to include in each subection of
+        the json
+
+    """
     dets = cp.compress_detections(detections)
 
     # Remove any release locations

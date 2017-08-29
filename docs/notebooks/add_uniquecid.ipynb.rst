@@ -18,10 +18,8 @@ Pandas dataframe.
 
     from otntoolbox.uniqueid import add_unqdetecid
     
-    # CSV file without unqdetecid column
-    input_file = 'example.csv'
+    input_file = '/path/to/detections.csv'
     
-    # Creates a new file including the uniqdecid column
     unqdet_det = add_unqdetecid(input_file);
 
 You can use the Pandas ``DataFrame.to_csv()`` function to output the
@@ -29,6 +27,4 @@ file to a desired location.
 
 .. code:: python
 
-    # Modify and run this cell to save the changes to an output CSV file
-    output_path = '/path/to/output.csv'
-    unqdet_det.to_csv(output_path, index=False)
+    unqdet_det.to_csv('/path/to/output.csv', index=False)

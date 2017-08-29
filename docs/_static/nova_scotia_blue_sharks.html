@@ -1,7 +1,8 @@
+<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>{{  title }}</title>
+		<title>nova_scotia_blue_sharks</title>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css" />
 		<style media="screen">
@@ -48,17 +49,17 @@
 
 
 			var map = L.map('map', {
-				center: [{{ center_y }} , {{ center_x }}],
-				zoom: {{ zoom }}
+				center: [44.19641 , -63.27502],
+				zoom: 8
 			});
 
-			map.addLayer({{layer}});
+			map.addLayer(dark_layer);
 
 			var timelineControl = L.timelineSliderControl({
 				formatOutput: function(date) {
 					return new Date(date).toString();
 				},
-				steps: {{ steps }},
+				steps: 100000,
 				waitToUpdateMap: true,
 			});
 
@@ -87,7 +88,7 @@
 				timelineControl.addTimelines(timeline);
 				timeline.addTo(map);
 			}
-			$.getJSON("{{ json_file }}", function(data) {
+			$.getJSON("nova_scotia_blue_sharks.json", function(data) {
 					eqfeed_callback(data[0], timelineControl);
 				console.log("Success!");
 			}).fail( function(d, textStatus, error) {
