@@ -7,8 +7,8 @@ Compressing Detections
    <hr>
 
 Compressing detections is done by looking at the detection times and
-locations of an animal. Any detections that occur successively in time
-in the same location are combined into a sngle detection with a start
+locations of an animal. Any detections that occur successively in time,
+in the same location are combined into a single detection with a start
 and end time. The result is a compressed detections Pandas DataFrame.
 
 Compression is the first step of the Mihoff Interval Data Tool.

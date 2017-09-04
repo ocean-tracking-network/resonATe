@@ -22,13 +22,13 @@ the user to understand why it was flagged. There is also enough
 information to be able to reference the detection in the original file
 if the user wants to see what was happening at the same time.
 
-The input parameter is a time in minutes. We used 60 as the default as
-this is what was used in Easton's code. This value can be changed by the
-user. The output file contains a record for each detection for which
-there has been more than xx minutes since the previous detection (of
-that tag/animal) and more than the same amount of time until the next
-detection. It ignores which receiver the detection occurred at. That is
-all it does, nothing more and nothing less.
+The input parameter is a time in minutes. We used 60 minutes as the
+default as this is what was used in Easton's code. This value can be
+changed by the user. The output contains a record for each detection for
+which there has been more than xx minutes since the previous detection
+(of that tag/animal) and more than the same amount of time until the
+next detection. It ignores which receiver the detection occurred at.
+That is all it does, nothing more and nothing less.
 
 Below the interval is set to 60 minutes and is not using a a user
 specified suspect file. The function will also create a distance matrix.

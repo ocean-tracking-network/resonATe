@@ -47,7 +47,7 @@ def render_map(det_file, title, width=900, height=450,
     :param height: The height of the iframe
     :param zoom: The initial zoom of the map
 
-    :return:
+    :return: An iFrame containing the detections map
     """
     # Create html subfolder for output if there's not one already.
     if not os.path.exists('./html'):

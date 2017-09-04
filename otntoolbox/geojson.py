@@ -28,6 +28,8 @@ def create_geojson(detections, title, dets_table='', inc=5000):
     :param inc: the number of detections to include in each subection of
         the json
 
+    :return: JSON object, the filename, center_x, center_y
+
     """
     dets = cp.compress_detections(detections)
 

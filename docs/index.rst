@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-OTN Toolbox
-===========
+OTN Toolbox Overview
+====================
 
 * :ref:`Cohort <cohort>`
 * :ref:`Compressing Detections  <compress>`
@@ -20,14 +20,14 @@ OTN Toolbox
 Cohort
 ------
 
-The tool takes a file of compressed detections and a time parameter in minutes. It identifies groups of animals traveling together. Each station a animal visits is checked for other animals detected there within the specified time period. Details are in :ref:`Cohort Tool <cohort_page>`.
+The tool takes a file of compressed detections and a time parameter in minutes. It identifies groups of animals traveling together. Each station an animal visits is checked for other animals detected there within the specified time period. Details are in :ref:`Cohort Tool <cohort_page>`.
 
 .. _compress:
 
 Compressing Detections
 ----------------------
 
-Compressing detections is done by looking at the detection times and locations of an animal. Any detections that occur successively in time in the same location are combined into a sngle detection with a start and end time. The result is a compressed detections Pandas DataFrame.
+Compressing detections is done by looking at the detection times and locations of an animal. Any detections that occur successively in time, in the same location are combined into a single detection with a start and end time. The result is a compressed detections Pandas DataFrame.
 
 Compression is the first step of the Mihoff Interval Data Tool. Compressed detection DataFrames are needed for the tools, such as interval and cohort.  Details are in :ref:`Compression Tool <compression_page>`.
 
@@ -44,7 +44,7 @@ OTN has developed a tool which will assist with filtering false detections. The 
 
 This is a very simple tool. It will take an input file of detections and based on an input parameter will identify suspect detections. The suspect detections will be put into a dataframe which the user can examine. There will be enough information for each suspect detection for the user to understand why it was flagged. There is also enough information to be able to reference the detection in the original file if the user wants to see what was happening at the same time.
 
-The input parameter is a time in minutes. We used 60 as the default as this is what was used in Easton's code. This value can be changed by the user. The output file contains a record for each detection for which there has been more than xx minutes since the previous detection (of that tag/animal) and more than the same amount of time until the next detection. It ignores which receiver the detection occurred at. That is all it does, nothing more and nothing less. Details are in :ref:`Filter Tool <filter_page>`.
+The input parameter is a time in minutes. We used 60 minutes as the default as this is what was used in Easton's code. This value can be changed by the user. The output contains a record for each detection for which there has been more than xx minutes since the previous detection (of that tag/animal) and more than the same amount of time until the next detection. It ignores which receiver the detection occurred at. That is all it does, nothing more and nothing less. Details are in :ref:`Filter Tool <filter_page>`.
 
 
 .. _distance_matrix:
@@ -52,7 +52,7 @@ The input parameter is a time in minutes. We used 60 as the default as this is w
 Distance Matrix
 ---------------
 
-This takes a file created by the White-Mihoff False Filtering tool. The file contains rows of station pairs with the straight line distance between them calculated in metres. A station pair will only be in the file if an animal traveled between the stations. If an animal goes from stn1 to stn2 and then to stn3, pairs stn1-stn2 and stn2-stn3 will be in the file. If no animal goes between stn1 and stn3, that pair will not be in the file. The tool also takes a file that the researcher provides of ‘real distances’.  The output will be a file which looks like the first file with the ‘real distance’ column updated. Details are in :ref:`Distance Matrix Tool <distance_matrix_page>`
+This takes a DataFrame created by the White-Mihoff False Filtering tool. The file contains rows of station pairs with the straight line distance between them calculated in metres. A station pair will only be in the file if an animal traveled between the stations. If an animal goes from stn1 to stn2 and then to stn3, pairs stn1-stn2 and stn2-stn3 will be in the file. If no animal goes between stn1 and stn3, that pair will not be in the file. The tool also takes a file that the researcher provides of ‘real distances’.  The output will be a file which looks like the first file with the ‘real distance’ column updated. Details are in :ref:`Distance Matrix Tool <distance_matrix_page>`
 
 .. _interval:
 
