@@ -54,7 +54,7 @@ def interval_data(compressed_df, dist_matrix_df, station_radius_df=None):
 
                 time_interval = item['to_arrive'] - item['from_leave']
                 merged.set_value(idx, 'intervaltime', time_interval)
-                merged.set_value(idx, 'intervalseconds', time_interval.seconds)
+                merged.set_value(idx, 'intervalseconds', time_interval.total_seconds())
 
                 if time_interval.seconds != 0:
                     merged.set_value(idx, 'metres_per_second', distance.m / time_interval.seconds)

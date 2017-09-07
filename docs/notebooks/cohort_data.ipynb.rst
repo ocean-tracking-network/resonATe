@@ -25,7 +25,7 @@ minutes (default is 60) to create the cohort dataframe.
     
     time_interval = 60
     
-    data = pd.read_csv('../tests/assertion_files/nsbs.csv')
+    data = pd.read_csv('/path/to/detections.csv')
     
     compressed_df = compress_detections(data)
     

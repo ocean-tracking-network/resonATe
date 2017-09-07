@@ -26,7 +26,7 @@ def get_distance_matrix(detectiondf):
     dist_mtx = pd.DataFrame(
         np.zeros(len(stn_locs) ** 2).reshape(len(stn_locs), len(stn_locs)),
         index=stn_locs.index, columns=stn_locs.index).apply(get_v_distance, axis=1).T
-
+    dist_mtx.index.name = None
     return dist_mtx
 
 
@@ -69,12 +69,14 @@ def filter_detections(detection_file, suspect_file=None,
     # Load the file into a dataframe
     df = pd.read_csv(detection_file)
 
-    # TODO: Subtract all detections found in the suspect file
+    # Subtract all detections found in the user defined suspect file
     if suspect_file:
         print "Found suspect file {0}. Subtracting detections from input".format(suspect_file)
-        pre_susp_df = pd.read_csv(suspect_file)
+        susp_dets = pd.read_csv(suspect_file)
+        good_dets = pd.concat([df, susp_dets], ignore_index=True)
+        good_dets.drop_duplicates(mandatory_columns, keep=False, inplace=True)
 
-    if mandatory_columns.issubset(df.columns):
+    elif mandatory_columns.issubset(df.columns):
         # calculate detections to filtered
 
         # For each individual catalognumber:
@@ -93,13 +95,12 @@ def filter_detections(detection_file, suspect_file=None,
             anm_dets = grouped.get_group(anm)
             intervals = anm_dets['datecollected'] - anm_dets['datecollected'].shift(1)
             post_intervals = anm_dets['datecollected'].shift(-1) - anm_dets['datecollected']
-            # TODO: do we need infinities for last in intervals and first in post-intervals?
-            # If either are within the user-specified interval, keep them in the filtered DF.
+
 
             good_dets = good_dets.append(anm_dets[(intervals <= user_int) | (post_intervals <= user_int)])
 
         # If they aren't a good det, they're suspect!
-        # TODO: Decide if we want to report the big 'before/after' triplicate in Suspect Dets
+        # TODO: Reporting: Decide if we want to report the big 'before/after' triplicate in Suspect Dets
         # If so, building susp_dets gets tougher, involves a merge and then a append.
         # For now, just a matter of putting the complement of the good dets in the susp_dets
         susp_dets = df[~df['unqdetecid'].isin(good_dets['unqdetecid'])]

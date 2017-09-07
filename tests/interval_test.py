@@ -15,16 +15,30 @@ class IntervalTest(unittest.TestCase):
         compressed = compress_detections(input_file) # compressed detections
         matrix = get_distance_matrix(input_file) # station distance matrix
 
-        detection_radius = 100 # (in meters) applies same detection radius to all stations
+        detection_radius = 400 # (in meters) applies same detection radius to all stations
         station_det_radius = pd.DataFrame([(x, geopy.distance.Distance(detection_radius/1000.0)) for x in matrix.columns.tolist()], columns=['station','radius'])
         station_det_radius.set_index('station', inplace=True)
         station_det_radius # preview radius values
         dfa = interval_data(compressed_df=compressed, dist_matrix_df=matrix, station_radius_df=station_det_radius)
-        dfa.drop(['to_leave', 'to_detcnt'], axis=1, inplace=True)
+
+
         dfb = pd.read_csv('tests/assertion_files/nsbs_interval.csv')
+
+        dfa = dfa.where((pd.notnull(dfa)), None)
+        dfb = dfb.where((pd.notnull(dfb)), None)
+
         dfb.from_arrive = pd.to_datetime(dfb.from_arrive)
         dfb.from_leave = pd.to_datetime(dfb.from_leave)
         dfb.to_arrive = pd.to_datetime(dfb.to_arrive)
+        dfb.to_leave = pd.to_datetime(dfb.to_leave)
+
+
+        dfa.intervaltime = pd.to_timedelta(dfa.intervaltime)
+        dfb.intervaltime = pd.to_timedelta(dfb.intervaltime)
+        print dfa.dtypes
+        print dfb.dtypes
+
+
         pt.assert_frame_equal(dfa, dfb)
 
 

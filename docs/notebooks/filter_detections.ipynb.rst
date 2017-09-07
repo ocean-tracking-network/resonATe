@@ -38,7 +38,7 @@ specified suspect file. The function will also create a distance matrix.
     from otntoolbox.filter_detections import get_distance_matrix
     from otntoolbox.filter_detections import filter_detections
     
-    detection_file = '/path/to/data.csv'
+    detection_file = '../tests/assertion_files/nsbs.csv'
     
     time_interval = 60 # in Minutes
     
@@ -51,15 +51,24 @@ specified suspect file. The function will also create a distance matrix.
                                             min_time_buffer=time_interval,
                                             distance_matrix=CreateDistanceMatrix)
     
-    filtered_detections['filtered']
+    filtered_detections['filtered'].to_csv('/Users/alexnunes/Desktop/filtered.csv', index=False)
+
+
+.. parsed-literal::
+
+    Total detections in filtered dataframe: 19738
+    64 suspect detections removed
+    There are 222 station locations in the distance matrix
+
 
 You can use the Pandas ``DataFrame.to_csv()`` function to output the
 file to a desired location.
 
 .. code:: python
 
-    filtered_detections['filtered'].to_csv('/path/to/output.csv', index=False)
+    filtered_detections['filtered'].to_csv('../tests/assertion_files/nsbs_filtered.csv', index=False)
     
-    filtered_detections['suspect'].to_csv('/path/to/output.csv', index=False)
+    # filtered_detections['suspect'].to_csv('/path/to/output.csv', index=False)
     
-    filtered_detections['dist_mtrx'].to_csv('/path/to/output.csv', index=False)
+    # filtered_detections['dist_mtrx'].to_csv('/path/to/output.csv', index=False)
+

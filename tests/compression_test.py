@@ -15,5 +15,6 @@ class CompressionTest(unittest.TestCase):
         dfb.avg_time_between_det = pd.to_timedelta(dfb.avg_time_between_det)
         pt.assert_frame_equal(dfa, dfb)
 
+
 if __name__ == '__main__':
     unittest.main()
