@@ -3,3 +3,5 @@ numpy
 sphinx
 geopy
 simplejson
+nose
+colorama
