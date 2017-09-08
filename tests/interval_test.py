@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from otntoolbox.filter_detections import get_distance_matrix
-from otntoolbox.compress import compress_detections
-from otntoolbox.interval_data_tool import interval_data
+from resonate.filter_detections import get_distance_matrix
+from resonate.compress import compress_detections
+from resonate.interval_data_tool import interval_data
 import pandas as pd
 import geopy
 import unittest

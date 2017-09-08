@@ -1,6 +1,6 @@
 import jinja2 as jin
 import pandas as pd
-import otntoolbox.geojson as gj
+import resonate.geojson as gj
 from IPython.display import IFrame
 import os
 

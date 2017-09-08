@@ -16,7 +16,7 @@ Pandas dataframe.
 
 .. code:: python
 
-    from otntoolbox.uniqueid import add_unqdetecid
+    from resonate.uniqueid import add_unqdetecid
     
     input_file = '/path/to/detections.csv'
     

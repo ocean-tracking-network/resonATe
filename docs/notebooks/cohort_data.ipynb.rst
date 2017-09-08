@@ -19,8 +19,8 @@ minutes (default is 60) to create the cohort dataframe.
 
 .. code:: python
 
-    from otntoolbox.cohorts import cohort
-    from otntoolbox.compress import compress_detections
+    from resonate.cohorts import cohort
+    from resonate.compress import compress_detections
     import pandas as pd
     
     time_interval = 60

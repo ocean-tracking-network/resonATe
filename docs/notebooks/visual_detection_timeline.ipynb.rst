@@ -23,6 +23,6 @@ tilesets. Available basemaps are:
 
 .. code:: python
 
-    import otntoolbox.html_maps as hmaps
+    import resonate.html_maps as hmaps
     hmaps.render_map("/path/to/detection.csv", "Title")
 

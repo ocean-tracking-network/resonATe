@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from otntoolbox.uniqueid import add_unqdetecid
+from resonate.uniqueid import add_unqdetecid
 import unittest
 import pandas as pd
 import pandas.testing as pt

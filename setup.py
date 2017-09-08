@@ -3,16 +3,16 @@
 from setuptools import setup, find_packages
 
 
-with open('README.rst') as f:
+with open('README.md') as f:
     readme = f.read()
 
 with open('LICENSE') as f:
     license = f.read()
 
 setup(
-    name='otntoolbox',
+    name='resonate',
     version='0.1.0',
-    description='otn-toolbox data analysis package',
+    description='resonate data analysis package',
     long_description=readme,
     author='Alex Nunes',
     include_package_data=True,

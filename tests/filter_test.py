@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from otntoolbox.filter_detections import filter_detections
+from resonate.filter_detections import filter_detections
 import unittest
 import pandas as pd
 import pandas.testing as pt

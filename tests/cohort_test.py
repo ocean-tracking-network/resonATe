@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from otntoolbox.cohorts import cohort
-from otntoolbox.compress import compress_detections
+from resonate.cohorts import cohort
+from resonate.compress import compress_detections
 import unittest
 import pandas as pd
 import pandas.testing as pt

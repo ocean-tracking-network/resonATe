@@ -35,8 +35,8 @@ specified suspect file. The function will also create a distance matrix.
 
 .. code:: python
 
-    from otntoolbox.filter_detections import get_distance_matrix
-    from otntoolbox.filter_detections import filter_detections
+    from resonate.filter_detections import get_distance_matrix
+    from resonate.filter_detections import filter_detections
     
     detection_file = '../tests/assertion_files/nsbs.csv'
     

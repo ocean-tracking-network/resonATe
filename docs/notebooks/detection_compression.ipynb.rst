@@ -21,7 +21,7 @@ interval and cohort.
 
 .. code:: python
 
-    from otntoolbox.compress import compress_detections
+    from resonate.compress import compress_detections
     import pandas as pd
     
     detections = pd.read_csv('/path/to/data.csv')

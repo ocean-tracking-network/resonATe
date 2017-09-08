@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from otntoolbox.compress import compress_detections
+from resonate.compress import compress_detections
 import unittest
 import pandas as pd
 import pandas.testing as pt

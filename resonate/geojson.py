@@ -2,7 +2,7 @@ import pandas as pd
 import os, sys
 import datetime
 import simplejson as json
-import otntoolbox.compress as cp
+import resonate.compress as cp
 
 
 def unix_time_millis(dt):

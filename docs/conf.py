@@ -11,7 +11,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os, otntoolbox
+import sys, os, resonate
 from nbconvert import RSTExporter
 import nbformat
 
@@ -32,7 +32,7 @@ for file in os.listdir("../py_notebooks"):
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('../otntoolbox'))
+sys.path.insert(0, os.path.abspath('../resonate'))
 
 # -- General configuration -----------------------------------------------------
 
@@ -182,7 +182,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'otn-toolbox-doc'
+htmlhelp_basename = 'resonate-doc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -201,7 +201,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'otn-toolbox.tex', u'otn-toolbox Documentation',
+  ('index', 'resonate.tex', u'resonate Documentation',
    u'Kenneth Reitz', 'manual'),
 ]
 
@@ -231,7 +231,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'otn-toolbox', u'otn-toolbox Documentation',
+    ('index', 'resonate', u'resonate Documentation',
      [u'Kenneth Reitz'], 1)
 ]
 
@@ -245,8 +245,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'otn-toolbox', u'otn-toolbox Documentation',
-   u'Kenneth Reitz', 'otn-toolbox', 'One line description of project.',
+  ('index', 'resonate', u'resonate Documentation',
+   u'Kenneth Reitz', 'resonate', 'One line description of project.',
    'Miscellaneous'),
 ]
 

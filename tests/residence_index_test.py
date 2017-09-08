@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import otntoolbox.kessel_ri as ri
+import resonate.kessel_ri as ri
 import unittest
 import pandas as pd
 import pandas.testing as pt

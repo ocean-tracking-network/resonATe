@@ -40,7 +40,7 @@ detection file and the project bounds.
 
 .. code:: python
 
-    from otntoolbox import kessel_ri as ri
+    from resonate import kessel_ri as ri
     import matplotlib
     %matplotlib inline
     
