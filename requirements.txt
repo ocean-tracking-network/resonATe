@@ -5,3 +5,5 @@ geopy
 simplejson
 nose
 colorama
+folium
+basemap

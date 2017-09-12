@@ -21,7 +21,7 @@ Many consecutive detections of an animal are replaced by one interval.
     import pandas as pd
     import geopy
     
-    input_file = pd.read_csv("../tests/assertion_files/nsbs.csv") 
+    input_file = pd.read_csv("/path/to/detections.csv") 
     compressed = compress_detections(input_file) 
     matrix = get_distance_matrix(input_file)
 

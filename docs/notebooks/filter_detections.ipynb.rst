@@ -38,7 +38,7 @@ specified suspect file. The function will also create a distance matrix.
     from resonate.filter_detections import get_distance_matrix
     from resonate.filter_detections import filter_detections
     
-    detection_file = '../tests/assertion_files/nsbs.csv'
+    detection_file = '/path/to/detections.csv'
     
     time_interval = 60 # in Minutes
     
@@ -50,15 +50,6 @@ specified suspect file. The function will also create a distance matrix.
                                             suspect_file=SuspectFile, 
                                             min_time_buffer=time_interval,
                                             distance_matrix=CreateDistanceMatrix)
-    
-    filtered_detections['filtered'].to_csv('/Users/alexnunes/Desktop/filtered.csv', index=False)
-
-
-.. parsed-literal::
-
-    Total detections in filtered dataframe: 19738
-    64 suspect detections removed
-    There are 222 station locations in the distance matrix
 
 
 You can use the Pandas ``DataFrame.to_csv()`` function to output the
@@ -68,7 +59,6 @@ file to a desired location.
 
     filtered_detections['filtered'].to_csv('../tests/assertion_files/nsbs_filtered.csv', index=False)
     
-    # filtered_detections['suspect'].to_csv('/path/to/output.csv', index=False)
+    filtered_detections['suspect'].to_csv('/path/to/output.csv', index=False)
     
-    # filtered_detections['dist_mtrx'].to_csv('/path/to/output.csv', index=False)
-
+    filtered_detections['dist_mtrx'].to_csv('/path/to/output.csv', index=False)
