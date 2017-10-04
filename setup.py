@@ -11,14 +11,14 @@ with open('LICENSE') as f:
 
 setup(
     name='resonate',
-    version='0.1',
+    version='0.1.2',
     description='resonate data analysis package',
     long_description=readme,
     author='Alex Nunes',
     include_package_data=True,
     author_email='anunes@dal.ca',
     url='https://gitlab.oceantrack.org/otndc/resonate',
-    download_url = 'https://gitlab.oceantrack.org/otndc/resonate/archive/0.1.tar.gz',
+    download_url = 'https://gitlab.oceantrack.org/otndc/resonate',
     license=license,
     packages=find_packages(exclude=('tests', 'docs'))
 )
