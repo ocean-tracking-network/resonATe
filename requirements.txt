@@ -6,4 +6,5 @@ simplejson
 nose
 colorama
 folium
-basemap
+matplotlib
+mpl_toolkits
