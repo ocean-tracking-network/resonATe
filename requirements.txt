@@ -7,4 +7,3 @@ nose
 colorama
 folium
 matplotlib
-mpl_toolkit
