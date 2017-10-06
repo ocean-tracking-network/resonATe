@@ -1,0 +1,43 @@
+package:
+  name: resonate
+  version: "0.1.4"
+
+source:
+  git_rev: v0.1.4
+  git_url: https://gitlab.oceantrack.org/otndc/resonate
+
+requirements:
+  build:
+    - python
+    - setuptools
+    - pandas
+    - numpy
+    - sphinx
+    - geopy
+    - simplejson
+    - nose
+    - colorama
+    - folium
+    - matplotlib
+    - nbconvert
+  run:
+    - python
+    - setuptools
+    - pandas
+    - numpy
+    - sphinx
+    - geopy
+    - simplejson
+    - nose
+    - colorama
+    - folium
+    - matplotlib
+    - nbconvert
+test:
+  imports:
+    - resonate
+
+about:
+  home: https://gitlab.oceantrack.org/otndc/resonate
+  license: GPL
+  license_file: LICENSE

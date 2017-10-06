@@ -1,5 +1,5 @@
-OTN Toolbox
-===========
+resonATe
+========
 
 Python based tool set for data analysis.
 

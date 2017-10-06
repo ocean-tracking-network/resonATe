@@ -10,8 +10,8 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(
-    name='resonate',
-    version='0.1.2',
+    name='resonATe',
+    version='0.1.4',
     description='resonate data analysis package',
     long_description=readme,
     author='Alex Nunes',

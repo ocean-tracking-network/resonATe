@@ -9,3 +9,4 @@ build/*
 dist/*
 py_notebooks/html/*
 docs/_build
+conda-dist/*

@@ -1,19 +1,9 @@
-OTN Toolbox
-===========
+resonate
+========
 
-Python based tool set for data analysis.
-
-
-
-
-* [Cohort] (#cohort)
-* [Compress Detections] (#compressing-detections)
-* [Distance Matrix] (#distance-matrix)
-* [Filtering] (#filtering)
-* [Interval Data] (#interval-data)
-* [Residence Index] (#residence-index)
-* [Unique ID] (#unique-id)
-* [Visual Timeline] (#visual-timeline)
+resonATe is the Ocean Tracking Network's acoustic telemetry analysis toolkit.
+It can be used to filter, compress, visualize and analyze acoustic detection
+extracts from OTN.
 
 
 Cohort
