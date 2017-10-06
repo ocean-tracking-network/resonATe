@@ -93,6 +93,7 @@ Contents:
    :maxdepth: 2
 
    self
+   installation
    cohort
    compression
    filter
