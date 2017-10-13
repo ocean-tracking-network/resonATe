@@ -7,7 +7,7 @@ Interval Data
    <hr>
 
 ``interval_data()`` takes a compressed detections DataFrame, a distance
-matrix, and a detection radiues DataFrame and creates an interval data
+matrix, and a detection radius DataFrame and creates an interval data
 DataFrame.
 
 Intervals are lengths of time in which a station detected an animal.
