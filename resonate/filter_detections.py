@@ -30,7 +30,7 @@ def get_distance_matrix(detectiondf):
     return dist_mtx
 
 
-def filter_detections(detection_file, suspect_file=None,
+def filter_detections(detections, suspect_file=None,
                       detection_radius=None, min_time_buffer=60,
                       distance_matrix=False):
 
@@ -67,7 +67,7 @@ def filter_detections(detection_file, suspect_file=None,
                              'catalognumber'])
 
     # Load the file into a dataframe
-    df = pd.read_csv(detection_file)
+    df = detections
 
     # Subtract all detections found in the user defined suspect file
     if suspect_file:

@@ -34,7 +34,7 @@ def create_leaflet_timeline(title, json, center_y=0, center_x=0, zoom=8,
     return "HTML file written to ./html/"+title+".html"
 
 
-def render_map(det_file, title, width=900, height=450,
+def render_map(dets, title, width=900, height=450,
                zoom=8, basemap='dark_layer'):
     """
     Return an IFrame with Leaflet Timeline map of a limited number of
@@ -54,7 +54,6 @@ def render_map(det_file, title, width=900, height=450,
         os.makedirs('./html')
 
     # Create the GeoJSON to be used
-    dets = pd.read_csv(det_file)
     json = gj.create_geojson(dets, title=title)
 
     if not json:

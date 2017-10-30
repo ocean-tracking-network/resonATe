@@ -11,7 +11,7 @@ with open('LICENSE') as f:
 
 setup(
     name='resonATe',
-    version='0.1.4',
+    version='0.1.6',
     description='resonate data analysis package',
     long_description=readme,
     author='Alex Nunes',

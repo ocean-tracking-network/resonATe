@@ -333,8 +333,6 @@ def residency_index(detections, calculation_method='kessel'):
         * station
 
     '''
-
-    detections = pd.read_csv(detections)
     dets = cp.compress_detections(detections)
 
     # Converting start and end date to strings
@@ -352,7 +350,8 @@ def residency_index(detections, calculation_method='kessel'):
     # Init the stations list
     station_list = []
 
-    # For each unique station determine the total number of days there were detections at the station
+    # For each unique station determine the total number of days there were
+    # detections at the station
     for station in dets['station'].unique():
         st_dets = pd.DataFrame(dets[dets['station'] == station])
         total = get_days(st_dets.copy(), calculation_method)
