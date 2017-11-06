@@ -8,3 +8,4 @@ colorama
 folium
 matplotlib
 nbconvert
+basemap
