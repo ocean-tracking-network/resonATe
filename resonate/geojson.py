@@ -96,11 +96,11 @@ def create_geojson(detections, title, dets_table='', inc=5000):
 
     # Print message if there are more than cap for detections, defaulting to 100000
     if start > cap:
-        print "Only first "+str(cap)+" detections used, please subset your data to see more."
+        print("Only first "+str(cap)+" detections used, please subset your data to see more.")
 
     # Write the geojson out to a json file
     json_name = title.lower().replace(' ', '_')
-    print "Writing JSON file to " +json_name+".json"
+    print("Writing JSON file to " +json_name+".json")
     output = open("./html/"+json_name+".json", 'w')
     json.dump(detection_geojson, output)
     output.close()

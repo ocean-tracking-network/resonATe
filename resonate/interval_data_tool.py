@@ -50,13 +50,13 @@ def interval_data(compressed_df, dist_matrix_df, station_radius_df=None):
                 else:
                     distance = max(geopy.distance.Distance(0), matrix_distance_km)
 
-                merged.set_value(idx, 'distance_m', distance.m)
+                merged.loc[idx, 'distance_m'] =  distance.m
 
                 time_interval = item['to_arrive'] - item['from_leave']
-                merged.set_value(idx, 'intervaltime', time_interval)
-                merged.set_value(idx, 'intervalseconds', time_interval.total_seconds())
+                merged.loc[idx, 'intervaltime'] =  time_interval
+                merged.loc[idx, 'intervalseconds'] = time_interval.total_seconds()
 
                 if time_interval.seconds != 0:
-                    merged.set_value(idx, 'metres_per_second', distance.m / time_interval.seconds)
+                    merged.loc[idx, 'metres_per_second']= distance.m / time_interval.seconds
 
     return merged

@@ -225,7 +225,7 @@ def plot_ri(ri, bounds={'north': 90, 'south': -90, 'east': 180, 'west': -180}):
     '''
 
     # Friendly message
-    print 'Creating plot, please wait...',
+    print('Creating plot, please wait...')
 
     # Modify the plot dimensions
     fig = plt.figure(figsize=(12, 12))
@@ -254,7 +254,7 @@ def plot_ri(ri, bounds={'north': 90, 'south': -90, 'east': 180, 'west': -180}):
     ri_map.set_clim(0,1)
     cbar = plt.colorbar()
 
-    print 'OK!'
+    print('OK!')
     plt.show()
 
 
@@ -342,7 +342,7 @@ def residency_index(detections, calculation_method='kessel'):
     # Remove any release locations
     dets = dets[~dets['startunqdetecid'].astype(str).str.contains("release")]
 
-    print 'Creating the residency index using the {0} method.\nPlease be patient, I am currently working...'.format(calculation_method),
+    print('Creating the residency index using the {0} method.\nPlease be patient, I am currently working...'.format(calculation_method))
 
     # Determine the total days from a copy of the DataFrame
     total_days = get_days(dets.copy(), calculation_method)
@@ -367,6 +367,6 @@ def residency_index(detections, calculation_method='kessel'):
     # sort and reset the index for the station DataFrame
     all_stations = all_stations.sort_values(by='days_detected', ascending=False).reset_index(drop=True)
 
-    print "OK!"
+    print("OK!")
     # Return the stations RI DataFrame
     return all_stations
