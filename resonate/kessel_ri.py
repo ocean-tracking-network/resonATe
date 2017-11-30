@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import matplotlib.cm as cm
 from datetime import datetime
-import compress as cp
+import resonate.compress as cp
 import folium as fl
 import math
 
