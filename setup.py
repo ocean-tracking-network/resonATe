@@ -11,7 +11,7 @@ with open('LICENSE') as f:
 
 setup(
     name='resonATe',
-    version='0.2.1',
+    version='0.2.2',
     description='resonate data analysis package',
     long_description=readme,
     author='Alex Nunes',
@@ -20,5 +20,14 @@ setup(
     url='https://gitlab.oceantrack.org/otndc/resonate',
     download_url = 'https://gitlab.oceantrack.org/otndc/resonate',
     license=license,
+    classifiers=[
+        'Natural Language :: English',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+    ],
     packages=find_packages(exclude=('tests', 'docs'))
 )
