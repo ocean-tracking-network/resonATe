@@ -2,7 +2,7 @@ import pandas as pd
 import datetime
 import numpy as np
 from geopy.distance import vincenty
-from library.exceptions import GenericException
+from resonate.library.exceptions import GenericException
 
 
 def get_distance_matrix(detectiondf):
@@ -71,7 +71,7 @@ def filter_detections(detections, suspect_file=None,
 
     # Subtract all detections found in the user defined suspect file
     if suspect_file:
-        print "Found suspect file {0}. Subtracting detections from input".format(suspect_file)
+        print("Found suspect file {0}. Subtracting detections from input".format(suspect_file))
         susp_dets = pd.read_csv(suspect_file)
         good_dets = pd.concat([df, susp_dets], ignore_index=True)
         good_dets.drop_duplicates(mandatory_columns, keep=False, inplace=True)
@@ -108,8 +108,8 @@ def filter_detections(detections, suspect_file=None,
     else:
         raise GenericException("Missing required input columns: {}".format(mandatory_columns - set(df.columns)))
 
-    print "Total detections in filtered dataframe: {0}".format(len(good_dets.index))
-    print "{0} suspect detections removed".format(len(susp_dets.index))
+    print("Total detections in filtered dataframe: {0}".format(len(good_dets.index)))
+    print("{0} suspect detections removed".format(len(susp_dets.index)))
 
     output_dict = {"filtered": good_dets, "suspect": susp_dets}
 
@@ -119,7 +119,7 @@ def filter_detections(detections, suspect_file=None,
         dm_mandatory_columns = set(['latitude', 'longitude'])
         if dm_mandatory_columns.issubset(df.columns):
             output_dict['dist_mtrx'] = get_distance_matrix(df)
-            print "There are {0} station locations in the distance matrix".format(len(output_dict['dist_mtrx'].index))
+            print("There are {0} station locations in the distance matrix".format(len(output_dict['dist_mtrx'].index)))
         else:
             raise GenericException("Missing required input columns for distance matrix calc: {}".format(dm_mandatory_columns - set(df.columns)))
 

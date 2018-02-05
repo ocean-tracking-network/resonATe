@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
 import numpy as np
-from library.exceptions import GenericException
+from resonate.library.exceptions import GenericException
 
 def compress_detections(detections):
 

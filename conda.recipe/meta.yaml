@@ -1,14 +1,22 @@
 package:
   name: resonate
-  version: "0.1.7"
+  version: "0.2.4"
 
 source:
-  git_rev: v0.1.7
+  git_rev: master
   git_url: https://gitlab.oceantrack.org/otndc/resonate
+
+build:
+  number: 3
+
+python:
+  - 2.7
+  - 3.5
+  - 3.6
 
 requirements:
   build:
-    - python
+    - python {{ python }}
     - setuptools
     - pandas
     - numpy
@@ -21,7 +29,7 @@ requirements:
     - matplotlib
     - nbconvert
   run:
-    - python
+    - python {{ python }}
     - setuptools
     - pandas
     - numpy

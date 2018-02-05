@@ -13,7 +13,7 @@ from colorama import Fore as c
 class IntervalTest(unittest.TestCase):
 
     def test_filter(self):
-        print c.YELLOW+'Testing Interval...'+c.RESET
+        print( c.YELLOW+'Testing Interval...'+c.RESET)
         input_file = pd.read_csv('tests/assertion_files/nsbs.csv')
         compressed = compress_detections(input_file) # compressed detections
         matrix = get_distance_matrix(input_file) # station distance matrix
@@ -40,7 +40,7 @@ class IntervalTest(unittest.TestCase):
         dfb.intervaltime = pd.to_timedelta(dfb.intervaltime)
 
         pt.assert_frame_equal(dfa, dfb)
-        print c.GREEN+'OK!\n'+c.RESET
+        print( c.GREEN+'OK!\n'+c.RESET)
 
 
 if __name__ == '__main__':
