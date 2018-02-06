@@ -15,17 +15,18 @@ def get_distance_matrix(detectiondf):
     :return: A Pandas DataFrame matrix of station to station distances
 
     """
-    def get_v_distance(col):
-        end = stn_locs.ix[col.name]['coords']
-        return stn_locs['coords'].apply(vincenty, args=(end,), ellipsoid='WGS-84')
-
     stn_grouped = detectiondf.groupby('station')
     stn_locs = stn_grouped[['longitude', 'latitude']].mean()
-    stn_locs['coords'] = zip(stn_locs.latitude, stn_locs.longitude)
 
     dist_mtx = pd.DataFrame(
         np.zeros(len(stn_locs) ** 2).reshape(len(stn_locs), len(stn_locs)),
-        index=stn_locs.index, columns=stn_locs.index).apply(get_v_distance, axis=1).T
+        index=stn_locs.index, columns=stn_locs.index)
+
+    for cstation in dist_mtx.columns:
+        for rstation in dist_mtx.index:
+            cpoint = (stn_locs.loc[cstation,'latitude'], stn_locs.loc[cstation,'longitude'])
+            rpoint = (stn_locs.loc[rstation,'latitude'], stn_locs.loc[rstation,'longitude'])
+            dist_mtx.loc[rstation,cstation]= vincenty(cpoint,rpoint).km
     dist_mtx.index.name = None
     return dist_mtx
 

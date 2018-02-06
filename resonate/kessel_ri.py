@@ -119,7 +119,7 @@ def aggregate_total_no_overlap(detections):
     detections['enddate'] = detections['enddate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
 
     # A stack is used as an easy way to organize and maintain the detections
-    detection_stack = detections.T.to_dict().values()
+    detection_stack = list(detections.T.to_dict().values())
 
     # Run the loop while the stack is not empty
     while len(detection_stack) > 0:
