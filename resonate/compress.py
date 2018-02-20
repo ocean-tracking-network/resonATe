@@ -9,6 +9,8 @@ def compress_detections(detections):
     Creates compressed dataframe from detection dataframe
 
     :param detections: detection dataframe
+
+    :return: A Pandas DataFrame matrix of detections events
     '''
 
     if not isinstance(detections, pd.DataFrame):

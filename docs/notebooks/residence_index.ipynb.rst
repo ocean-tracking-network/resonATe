@@ -38,9 +38,14 @@ passed.
 Below is an example of inital variables to set up, which are the
 detection file and the project bounds.
 
+.. warning:: 
+
+    Input files must include ``datecollected``, ``station``, ``longitude``, ``latitude``, ``catalognumber``, and ``unqdetecid`` as columns.
+
 .. code:: python
 
     from resonate import kessel_ri as ri
+    import pandas as pd
     import matplotlib
     %matplotlib inline
     
@@ -50,7 +55,7 @@ detection file and the project bounds.
                       'west': -64.18}
     
     
-    detfile = "/path/to/detection_data.csv"
+    detections = pd.read_csv("/path/to/detection.csv")
 
 .. raw:: html
 
@@ -84,7 +89,8 @@ Example Code
 
 .. code:: python
 
-    kessel_ri = ri.residency_index(detfile, calculation_method='kessel')
+    %%time
+    kessel_ri = ri.residency_index(detections, calculation_method='kessel')
     
     ri.plot_ri(kessel_ri, bounds=project_bounds)
 
@@ -116,7 +122,7 @@ Example Code
 
 .. code:: python
 
-    timedelta_ri = ri.residency_index(detfile, calculation_method='timedelta')
+    timedelta_ri = ri.residency_index(detections, calculation_method='timedelta')
     
     ri.plot_ri(timedelta_ri, bounds=project_bounds)
 
@@ -145,7 +151,7 @@ Example Code
 
 .. code:: python
 
-    with_overlap_ri = ri.residency_index(detfile, calculation_method='aggregate_with_overlap')
+    with_overlap_ri = ri.residency_index(detections, calculation_method='aggregate_with_overlap')
     
     ri.plot_ri(with_overlap_ri, bounds=project_bounds)
 
@@ -184,9 +190,9 @@ Example Code
 
 .. code:: python
 
-    no_overlap_ri = ri.residency_index(detfile, calculation_method='aggregate_no_overlap')
+    no_overlap_ri = ri.residency_index(detections, calculation_method='aggregate_no_overlap')
     
-    ri.plot_ri(no_overlap_ri, project=project_bounds)
+    ri.plot_ri(no_overlap_ri, bounds=project_bounds)
 
 .. raw:: html
 

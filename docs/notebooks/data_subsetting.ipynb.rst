@@ -59,4 +59,3 @@ you'd like to create a subset from.
     
     # Output the subset data to a new CSV in the indicated directory
     data_column_subset.to_csv(directory+column+"_"+value.replace(" ", "_")+"_"+filename, index=False)
-

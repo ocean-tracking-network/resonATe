@@ -101,6 +101,8 @@ Contents:
    residence_index
    notebooks/data_subsetting.ipynb
    unqid
+   abacus_plot
+   bubble_plot
    visual_timeline
 
 Indices and tables
