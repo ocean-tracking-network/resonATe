@@ -26,7 +26,7 @@ def create_leaflet_timeline(title, json, center_y=0, center_x=0, zoom=8,
     html = template.render(title=title, json_file=json, zoom=zoom, center_y=center_y, center_x=center_x, steps=steps, layer=basemap)
     output = open("./html/"+title+".html", 'w')
 
-    print "Writing html file to ./html/"+title+".html..."
+    print("Writing html file to ./html/"+title+".html...")
 
     output.write(html)
     output.close()
@@ -57,7 +57,7 @@ def render_map(dets, title, width=900, height=450,
     json = gj.create_geojson(dets, title=title)
 
     if not json:
-        print 'Unable to create map, please resolve issues listed above.'
+        print('Unable to create map, please resolve issues listed above.')
         return None
 
     # Create the HTML and javascript that will be used for the map
