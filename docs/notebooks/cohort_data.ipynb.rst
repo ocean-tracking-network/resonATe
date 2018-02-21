@@ -17,6 +17,11 @@ result from the ``compress_detections()`` function. Pass the compressed
 dataframe into the ``cohort()`` function along with a time interval in
 minutes (default is 60) to create the cohort dataframe.
 
+.. warning:: 
+
+       Input files must include ``station``, ``catalognumber``,
+        ``seq_num``, ``unqdetecid``, and ``datecollected`` as columns.
+
 .. code:: python
 
     from resonate.cohorts import cohort

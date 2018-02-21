@@ -33,12 +33,17 @@ That is all it does, nothing more and nothing less.
 Below the interval is set to 60 minutes and is not using a a user
 specified suspect file. The function will also create a distance matrix.
 
+.. warning:: 
+
+    Input files must include ``datecollected``, ``catalognumber``, ``station`` and ``unqdetecid`` as columns.
+
 .. code:: python
 
     from resonate.filter_detections import get_distance_matrix
     from resonate.filter_detections import filter_detections
+    import pandas as pd
     
-    detection_file = '/path/to/detections.csv'
+    detections = pd.read_csv('/path/to/detections.csv')
     
     time_interval = 60 # in Minutes
     
@@ -46,7 +51,7 @@ specified suspect file. The function will also create a distance matrix.
     
     CreateDistanceMatrix = True
     
-    filtered_detections = filter_detections(detection_file, 
+    filtered_detections = filter_detections(detections, 
                                             suspect_file=SuspectFile, 
                                             min_time_buffer=time_interval,
                                             distance_matrix=CreateDistanceMatrix)

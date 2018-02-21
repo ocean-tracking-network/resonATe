@@ -21,8 +21,13 @@ tilesets. Available basemaps are:
 -  ``basemap='Stamen_Toner'`` - Stamen Toner - high-contrast black and
    white - black ocean
 
-.. code:: python
+.. warning:: 
+
+    Input files must include ``datecollected``, ``catalognumber``, ``station``, ``latitude``, ``longitude``, and ``unqdetecid`` as columns.
+
+.. code:: ipython3
 
     import resonate.html_maps as hmaps
-    hmaps.render_map("/path/to/detection.csv", "Title")
-
+    import pandas as pd
+    detections = pd.read_csv("/path/to/detection.csv")
+    hmaps.render_map(detections, "Title")

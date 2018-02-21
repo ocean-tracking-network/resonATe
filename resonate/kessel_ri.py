@@ -1,14 +1,9 @@
 import pandas as pd
-import matplotlib
-import matplotlib.pyplot as plt
-from mpl_toolkits.basemap import Basemap
-import matplotlib.cm as cm
 from datetime import datetime
 import resonate.compress as cp
-import folium as fl
+import plotly.offline as py
+import plotly.graph_objs as go
 import math
-
-matplotlib.style.use('ggplot')
 
 
 def total_days_diff(detections):
@@ -207,105 +202,118 @@ def get_station_location(station, detections):
     location = location[['station', 'longitude', 'latitude']]
     return location
 
-
-def plot_ri(ri, bounds={'north': 90, 'south': -90, 'east': 180, 'west': -180}):
+def plot_ri(ri_data, ipython_display=True,
+                    title = 'Bubble Plot', height=700,
+                    width=1000, plotly_geo=None, filename=None,
+                    marker_size = 6, colorscale='Viridis',
+                    mapbox_token=None):
     '''
-    Plotting Function
-
-    Passing the returned pandas DataFrame from the residence_index() function
-    to this function will plot out the residence index
-
-    Size, boundaries, and colors can be modified to tweek the plot.
-
-    :param ri: pandas df
-    :param bounds: {'north': 90, 'south': -90, 'east': 180, 'west': -180}
-
-    :return: A static plot confined to defined bounds
-
-    '''
-
-    # Friendly message
-    print('Creating plot, please wait...')
-
-    # Modify the plot dimensions
-    fig = plt.figure(figsize=(12, 12))
-
-    # Create the map
-    map = Basemap(projection='merc',
-                  resolution='f',
-                  # Modify the values /to adjust the boundries of the plot
-                  llcrnrlat=bounds['south'], urcrnrlat=bounds['north'],
-                  llcrnrlon=bounds['west'], urcrnrlon=bounds['east'])
-
-    # Modify the color of the water
-    map.drawmapboundary(fill_color='#718ea4')
-
-    # Modify the color of land
-    map.fillcontinents(color='#2a7e43')
-
-    # Modify the residence index coloring
-    # http://scipy.github.io/old-wiki/pages/Cookbook/Matplotlib/Show_colormaps
-    index_coloring = cm.Oranges
-
-    indices = [ri['residency_index']]
-
-    x, y = map(ri['longitude'].values, ri['latitude'].values)
-    ri_map = map.scatter(x, y, s=ri['residency_index']*300, c=indices, cmap=index_coloring)
-    ri_map.set_clim(0,1)
-    cbar = plt.colorbar()
-
-    print('OK!')
-    plt.show()
-
-
-def interactive_map(ri_data,
-                    tileset='cartodb positron',
-                    marker_size=50,
-                    zoom=8):
-    '''
-    interactive_map
-
-    This function leverages ``folium`` to render a ``leaflet`` map that
-    uses markers to display the residence index. The map can be interacted with
-    to view more detail about each station. The function takes a Pandas
-    DataFrame.
+    plot_ri
 
     :param ri_data: A Pandas DataFrame generated from ``residency_index()``
+    :param ipython_display: a boolean to show in a notebook
+    :param title: the title of the plot
+    :param height: the height of the plotl
+    :param width: the width of the plotly
+    :param plotly_geo: an optional dictionary to controle the
+        geographix aspects of the plot
+    :param filename: Plotly filename to write to
+    :param mapbox_token: A string of mapbox access token
+    :param marker_size: An int to indicate the diameter in pixels
+    :param colorscale: A string to indicate the color index
 
-    :param tileset: The tilset for leaflet to use
-
-    :param marker: The marker size scalar multiplier
-
-    :param zoom: The initial zoom setting
-
-    :return: A folium map
+    :return: A plotly geoscatter
 
     '''
+    ri_data = ri_data.sort_values('residency_index')
 
-    # create the map with a tileset, defaults to cartodb positron
-    ri_map = fl.Map(location=[ri_data.latitude.median(),
-                    ri_data.longitude.median()],
-                    tiles=tileset, attr='ESRI', zoom_start=zoom)
+    map_type = 'scattergeo'
 
-    # Add station markers to map
-    for index, station in ri_data.iterrows():
+    if mapbox_token is not None:
+        map_type = 'scattermapbox'
+        mapbox=dict(
+            accesstoken=mapbox_token,
+            center=dict(
+                lon = ri_data.longitude.mean(),
+                lat = ri_data.latitude.mean()
+            ),
+            zoom=5,
+            style='light'
+        )
+    data = [
+        {
+            'lon': ri_data.longitude.tolist(),
+            'lat': ri_data.latitude.tolist(),
+            'text': ri_data.station+" : "+ri_data.residency_index.astype(str),
+            'mode': 'markers',
+            'marker': {
+                'color': ri_data.residency_index.tolist(),
+                'size':marker_size,
+                'showscale': True,
+                'colorscale':colorscale,
+                'colorbar':{
+                    'title':'Detection Count'
+                }
+            },
+            'type':map_type
+        }
+    ]
 
-        # popup string
-        station_popup = "%s : %s" % (station['station'],
-                                     station['residency_index'])
+    if plotly_geo is None:
+        plotly_geo = dict(
+            showland = True,
+            landcolor = "rgb(255, 255, 255)",
+            showocean = True,
+            oceancolor = "rgb(212,212,212)",
+            showlakes = True,
+            lakecolor = "rgb(212,212,212)",
+            showrivers = True,
+            rivercolor = "rgb(212,212,212)",
+            resolution = 50,
+            showcoastlines = False,
+            showframe=False,
+            projection = dict(
+                type = 'mercator',
+            )
+        )
+    plotly_geo.update(
+        center = dict(
+            lon = ri_data.longitude.mean(),
+            lat = ri_data.latitude.mean()
+        ),
+        lonaxis = dict(
+            range= [ ri_data.longitude.min(), ri_data.longitude.max()],
+        ),
+        lataxis = dict (
+            range= [ ri_data.latitude.min(), ri_data.latitude.max()],
+        )
+    )
 
-        # Marker creation, variables can be changed as seen fit
-        fl.RegularPolygonMarker([station['latitude'], station['longitude']],
-                                radius=math.ceil(
-                                    station['residency_index']*marker_size
-                                ),
-                                fill_color='red',
-                                fill_opacity=0.2,
-                                color='black',
-                                weight=2,
-                                number_of_sides=50,
-                                popup=station_popup).add_to(ri_map)
-    return ri_map
+
+    if mapbox_token is None:
+        layout = dict(
+            geo = plotly_geo,
+            title = title
+        )
+    else:
+        layout = dict(title=title,
+                        autosize=True,
+                        hovermode='closest',
+                        mapbox=mapbox
+                    )
+
+    if ipython_display:
+        layout.update(
+            height=height,
+            width=width
+        )
+        fig = { 'data':data, 'layout':layout }
+
+        py.init_notebook_mode()
+        return py.iplot(fig)
+    else:
+        fig = { 'data':data, 'layout':layout }
+        return py.plot(fig, filename=filename)
 
 
 def residency_index(detections, calculation_method='kessel'):
@@ -327,7 +335,7 @@ def residency_index(detections, calculation_method='kessel'):
     :return: A residence index DataFrame with the following columns
 
         * days_detected
-        * latitud
+        * latitude
         * longitude
         * residency_index
         * station

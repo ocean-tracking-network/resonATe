@@ -6,6 +6,8 @@
 resonATe Overview
 ====================
 
+* :ref:`Abacus Plot <abacus>`
+* :ref:`Bubble Plot <bubble>`
 * :ref:`Cohort <cohort>`
 * :ref:`Compressing Detections  <compress>`
 * :ref:`Distance Matrix  <distance_matrix>`
@@ -14,6 +16,21 @@ resonATe Overview
 * :ref:`Residence Index <residence_index>`
 * :ref:`Unique ID  <unqid>`
 * :ref:`Visual Timeline <timeline>`
+
+
+.. _abacus:
+
+Abacus Plot
+-----------
+
+The abacus plot is a way to plot annimal along time. The function uses Plotly to place your points on a scatter plot. ``ycolumn`` is used as the y axis and ``datecollected`` is used as the x axis. ``color_column`` is used to group detections together and assign them a color Details are in :ref:`Abacus Plot <abacus_plot_page>`.
+
+.. _bubble:
+
+Bubble Plot
+-----------
+
+The bubble plot function returns a Plotly scatter plot layered ontop of a map. The color of the markers will indicate the number of detections at each location. Alternatively, you can indicate the number of individuals seen at each location by using ``type = 'individual'``. Details are in :ref:`Bubble Plot <bubble_plot_page>`.
 
 .. _cohort:
 
@@ -27,7 +44,7 @@ The tool takes a file of compressed detections and a time parameter in minutes. 
 Compressing Detections
 ----------------------
 
-Compressing detections is done by looking at the detection times and locations of an animal. Any detections that occur successively in time, in the same location are combined into a single detection with a start and end time. The result is a compressed detections Pandas DataFrame.
+Compressing detections is done by looking at the detection times and locations of an animal. Any detections that occur successively in time, in the same location, and the time between detections does not exceed the ``timefilter``, are combined into a single detection with a start and end time. The result is a compressed detections Pandas DataFrame.
 
 Compression is the first step of the Mihoff Interval Data Tool. Compressed detection DataFrames are needed for the tools, such as interval and cohort.  Details are in :ref:`Compression Tool <compression_page>`.
 
@@ -94,6 +111,8 @@ Contents:
 
    self
    installation
+   abacus_plot
+   bubble_plot
    cohort
    compression
    filter

@@ -3,12 +3,15 @@ import pandas as pd
 import numpy as np
 from resonate.library.exceptions import GenericException
 
-def compress_detections(detections):
+def compress_detections(detections, timefilter=3600):
 
     '''
     Creates compressed dataframe from detection dataframe
 
     :param detections: detection dataframe
+    :param timefilter: A maximum amount of time in seconds that can pass before
+        a new detction event is started
+    :return: A Pandas DataFrame matrix of detections events
     '''
 
     if not isinstance(detections, pd.DataFrame):
@@ -33,8 +36,8 @@ def compress_detections(detections):
             a = anm_group.get_group(catalognum).copy(deep=True)
             # Some say I'm too cautious. Shift logic requires this sort to be true, though.
             a.sort_values(['datecollected', 'station'], inplace=True)
-
-            a['seq_num'] = (a.station.shift(1) != a.station).astype(int).cumsum()
+            a.datecollected = pd.to_datetime(a.datecollected)
+            a['seq_num'] = ((a.station.shift(1) != a.station) | (a.datecollected.diff().dt.total_seconds() > timefilter)).astype(int).cumsum()
             out_df=out_df.append(a)
 
         stat_df = out_df.groupby(['catalognumber','seq_num']).agg({  'datecollected':['min', 'max'],

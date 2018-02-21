@@ -38,19 +38,16 @@ passed.
 Below is an example of inital variables to set up, which are the
 detection file and the project bounds.
 
-.. code:: python
+.. warning:: 
+
+    Input files must include ``datecollected``, ``station``, ``longitude``, ``latitude``, ``catalognumber``, and ``unqdetecid`` as columns.
+
+.. code:: ipython3
 
     from resonate import kessel_ri as ri
-    import matplotlib
-    %matplotlib inline
+    import pandas as pd
     
-    project_bounds = {'north': 44.54, 
-                      'south': 42.84, 
-                      'east': -61.93, 
-                      'west': -64.18}
-    
-    
-    detfile = "/path/to/detection_data.csv"
+    detections = pd.read_csv('/path/to/detections.csv')
 
 .. raw:: html
 
@@ -82,11 +79,11 @@ T = Distinct number of days detected anywhere on the array
 Example Code
 ~~~~~~~~~~~~
 
-.. code:: python
+.. code:: ipython3
 
-    kessel_ri = ri.residency_index(detfile, calculation_method='kessel')
+    kessel_ri = ri.residency_index(detections, calculation_method='kessel')
     
-    ri.plot_ri(kessel_ri, bounds=project_bounds)
+    ri.plot_ri(kessel_ri)
 
 .. raw:: html
 
@@ -114,11 +111,11 @@ time on the array
 Example Code
 ~~~~~~~~~~~~
 
-.. code:: python
+.. code:: ipython3
 
-    timedelta_ri = ri.residency_index(detfile, calculation_method='timedelta')
+    timedelta_ri = ri.residency_index(detections, calculation_method='timedelta')
     
-    ri.plot_ri(timedelta_ri, bounds=project_bounds)
+    ri.plot_ri(timedelta_ri)
 
 .. raw:: html
 
@@ -143,11 +140,11 @@ AwOT = Sum of length of time of each detection on the array
 Example Code
 ~~~~~~~~~~~~
 
-.. code:: python
+.. code:: ipython3
 
-    with_overlap_ri = ri.residency_index(detfile, calculation_method='aggregate_with_overlap')
+    with_overlap_ri = ri.residency_index(detections, calculation_method='aggregate_with_overlap')
     
-    ri.plot_ri(with_overlap_ri, bounds=project_bounds)
+    ri.plot_ri(with_overlap_ri)
 
 .. raw:: html
 
@@ -182,26 +179,29 @@ any overlap
 Example Code
 ~~~~~~~~~~~~
 
-.. code:: python
+.. code:: ipython3
 
-    no_overlap_ri = ri.residency_index(detfile, calculation_method='aggregate_no_overlap')
+    no_overlap_ri = ri.residency_index(detections, calculation_method='aggregate_no_overlap')
     
-    ri.plot_ri(no_overlap_ri, project=project_bounds)
+    ri.plot_ri(no_overlap_ri)
 
 .. raw:: html
 
    <hr/>
 
-Interactive Residence Index Map
--------------------------------
+Mapbox
+------
 
-Maps a residence index dataframe using folium and a leaflet tileset,
-rendering as an interective javascript map and saving the HTML and JSON
-to an html folder.
+Alternatively you can use a Mapbox access token plot your map. Mapbox is
+much for responsive than standard Scattergeo plot.
 
 Example Code
 ~~~~~~~~~~~~
 
-.. code:: python
+.. code:: ipython3
 
-    ri.interactive_map(kessel_ri)
+    mapbox_access_token = 'ADD_YOUR_TOKEN_HERE'
+    
+    kessel_ri = ri.residency_index(detections, calculation_method='kessel')
+    
+    ri.plot_ri(kessel_ri, mapbox_token=mapbox_access_token)
