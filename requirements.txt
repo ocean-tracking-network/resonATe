@@ -5,6 +5,5 @@ geopy
 simplejson
 nose
 colorama
-folium
-matplotlib
 nbconvert
+plotly

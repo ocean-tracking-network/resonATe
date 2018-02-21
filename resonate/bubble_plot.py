@@ -3,7 +3,10 @@ import plotly.offline as py
 import plotly.graph_objs as go
 from resonate.library.exceptions import GenericException
 
-def bubble_plot(detections, type='detections', ipython_display=True, title = 'Bubble Plot', height=700, width=1000, plotly_geo=None, filename=None):
+def bubble_plot(detections, type='detections', ipython_display=True,
+                title = 'Bubble Plot', height=700, width=1000,
+                plotly_geo=None, filename=None, mapbox_token=None,
+                marker_size=10,colorscale='Viridis'):
 
     '''
     Creates a plotly abacus plot from a pandas dataframe
@@ -16,8 +19,11 @@ def bubble_plot(detections, type='detections', ipython_display=True, title = 'Bu
     :param plotly_geo: an optional dictionary to controle the
         geographix aspects of the plot
     :param filename: Plotly filename to write to
+    :param mapbox_token: A string of mapbox access token
+    :param marker_size: An int to indicate the diameter in pixels
+    :param colorscale: A string to indicate the color index
 
-    :return: A plotly geoscatter plot
+    :return: A plotly geoscatter plot or mapbox plot
     '''
 
     if not isinstance(detections, pd.DataFrame):
@@ -35,6 +41,19 @@ def bubble_plot(detections, type='detections', ipython_display=True, title = 'Bu
             detections = detections.drop(['unqdetecid', 'datecollected'],axis=1).drop_duplicates()
         detections = detections.groupby(['station', 'latitude', 'longitude']).size().reset_index(name='counts')
 
+        map_type = 'scattergeo'
+
+        if mapbox_token is not None:
+            map_type = 'scattermapbox'
+            mapbox=dict(
+                accesstoken=mapbox_token,
+                center=dict(
+                    lon = detections.longitude.mean(),
+                    lat = detections.latitude.mean()
+                ),
+                zoom=5,
+                style='light'
+            )
 
         data = [
             {
@@ -44,14 +63,14 @@ def bubble_plot(detections, type='detections', ipython_display=True, title = 'Bu
                 'mode': 'markers',
                 'marker': {
                     'color': detections.counts.tolist(),
-                    'size':10,
+                    'size':marker_size,
                     'showscale': True,
-                    'colorscale':'Viridis',
+                    'colorscale':colorscale,
                     'colorbar':{
                         'title':'Detection Count'
                     }
                 },
-                'type':'scattergeo'
+                'type':map_type
             }
         ]
 
@@ -72,6 +91,7 @@ def bubble_plot(detections, type='detections', ipython_display=True, title = 'Bu
                     type = 'mercator',
                 )
             )
+
         plotly_geo.update(
             center = dict(
                 lon = detections.longitude.mean(),
@@ -86,10 +106,20 @@ def bubble_plot(detections, type='detections', ipython_display=True, title = 'Bu
         )
 
 
-        if ipython_display:
+        if mapbox_token is None:
             layout = dict(
                 geo = plotly_geo,
-                title = title,
+                title = title
+            )
+        else:
+            layout = dict(title=title,
+                            autosize=True,
+                            hovermode='closest',
+                            mapbox=mapbox
+                        )
+
+        if ipython_display:
+            layout.update(
                 height=height,
                 width=width
             )
@@ -98,10 +128,6 @@ def bubble_plot(detections, type='detections', ipython_display=True, title = 'Bu
             py.init_notebook_mode()
             return py.iplot(fig)
         else:
-            layout = dict(
-                geo = plotly_geo,
-                title = title
-            )
             fig = { 'data':data, 'layout':layout }
             return py.plot(fig, filename=filename)
     else:

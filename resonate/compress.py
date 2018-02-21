@@ -9,7 +9,7 @@ def compress_detections(detections, timefilter=3600):
     Creates compressed dataframe from detection dataframe
 
     :param detections: detection dataframe
-    :param timefilter: A maximum amount of time that can pass before
+    :param timefilter: A maximum amount of time in seconds that can pass before
         a new detction event is started
     :return: A Pandas DataFrame matrix of detections events
     '''

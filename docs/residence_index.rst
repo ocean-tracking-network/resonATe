@@ -19,6 +19,4 @@ Residence Index Functions
 
 .. autofunction:: kessel_ri.plot_ri
 
-.. autofunction:: kessel_ri.interactive_map
-
 .. autofunction:: kessel_ri.residency_index

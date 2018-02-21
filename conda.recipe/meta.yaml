@@ -25,8 +25,7 @@ requirements:
     - simplejson
     - nose
     - colorama
-    - folium
-    - matplotlib
+    - plotly
     - nbconvert
   run:
     - python {{ python }}
@@ -38,8 +37,7 @@ requirements:
     - simplejson
     - nose
     - colorama
-    - folium
-    - matplotlib
+    - plotly
     - nbconvert
 test:
   imports:
