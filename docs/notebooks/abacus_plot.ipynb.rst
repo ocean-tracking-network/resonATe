@@ -11,7 +11,7 @@ is used to group detections together and assign them a color.
 
     Input files must include ``datecollected`` as a column.
 
-.. code:: ipython3
+.. code:: python
 
     from resonate.abacus_plot import abacus_plot
     import pandas as pd
@@ -20,12 +20,12 @@ is used to group detections together and assign them a color.
 
 To display the plot in iPython use:
 
-.. code:: ipython3
+.. code:: python
 
     abacus_plot(df, ycolumn='catalognumber', color_column='receiver_group')
 
 Or use the standard plotting function to save as HTML:
 
-.. code:: ipython3
+.. code:: python
 
     abacus_plot(df, ipython_display=False, filename='example.html')

@@ -42,7 +42,7 @@ detection file and the project bounds.
 
     Input files must include ``datecollected``, ``station``, ``longitude``, ``latitude``, ``catalognumber``, and ``unqdetecid`` as columns.
 
-.. code:: ipython3
+.. code:: python
 
     from resonate import kessel_ri as ri
     import pandas as pd
@@ -79,7 +79,7 @@ T = Distinct number of days detected anywhere on the array
 Example Code
 ~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: python
 
     kessel_ri = ri.residency_index(detections, calculation_method='kessel')
     
@@ -111,7 +111,7 @@ time on the array
 Example Code
 ~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: python
 
     timedelta_ri = ri.residency_index(detections, calculation_method='timedelta')
     
@@ -140,7 +140,7 @@ AwOT = Sum of length of time of each detection on the array
 Example Code
 ~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: python
 
     with_overlap_ri = ri.residency_index(detections, calculation_method='aggregate_with_overlap')
     
@@ -179,7 +179,7 @@ any overlap
 Example Code
 ~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: python
 
     no_overlap_ri = ri.residency_index(detections, calculation_method='aggregate_no_overlap')
     
@@ -198,7 +198,7 @@ much for responsive than standard Scattergeo plot.
 Example Code
 ~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: python
 
     mapbox_access_token = 'ADD_YOUR_TOKEN_HERE'
     

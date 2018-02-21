@@ -20,7 +20,7 @@ interval and cohort.
 
     Input files must include ``datecollected``, ``catalognumber``, and ``unqdetecid`` as columns.
 
-.. code:: ipython3
+.. code:: python
 
     from resonate.compress import compress_detections
     import pandas as pd
@@ -32,6 +32,6 @@ interval and cohort.
 You can use the Pandas ``DataFrame.to_csv()`` function to output the
 file to a desired location.
 
-.. code:: ipython3
+.. code:: python
 
     compressed.to_csv('/path/to/output.csv', index=False)

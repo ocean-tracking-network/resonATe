@@ -11,7 +11,7 @@ individuals seen at each location by using ``type = 'individual'``.
 
     Input files must include ``station`` , ``catalognumber``, ``unqdetecid``, ``latitude``, ``longitude``, and ``datecollected`` as  columns.
 
-.. code:: ipython3
+.. code:: python
 
     from resonate.bubble_plot import bubble_plot
     import pandas as pd
@@ -21,20 +21,20 @@ individuals seen at each location by using ``type = 'individual'``.
 
 To display the plot in iPython use:
 
-.. code:: ipython3
+.. code:: python
 
     bubble_plot(df)
 
 Or use the standard plotting function to save as HTML:
 
-.. code:: ipython3
+.. code:: python
 
     bubble_plot(df,ipython_display=False, filename='/path_to_plot.html')
 
 You can also do your count by number of individuals by using
 ``type = 'individual``:
 
-.. code:: ipython3
+.. code:: python
 
     bubble_plot(df, type='individual')
 
@@ -51,7 +51,7 @@ much for responsive than standard Scattergeo plot.
 Example Code
 ~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: python
 
     mapbox_access_token = 'ADD_YOUR_TOKEN_HERE'
     bubble_plot(df, mapbox_token=mapbox_access_token)

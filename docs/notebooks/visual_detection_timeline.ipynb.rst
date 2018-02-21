@@ -25,7 +25,7 @@ tilesets. Available basemaps are:
 
     Input files must include ``datecollected``, ``catalognumber``, ``station``, ``latitude``, ``longitude``, and ``unqdetecid`` as columns.
 
-.. code:: ipython3
+.. code:: python
 
     import resonate.html_maps as hmaps
     import pandas as pd

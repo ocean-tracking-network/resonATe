@@ -10,7 +10,6 @@ Conda
 
   conda config --add channels ioos
   conda config --add channels conda-forge
-  conda install basemap -y
   conda install -c anunes resonate
 
 
