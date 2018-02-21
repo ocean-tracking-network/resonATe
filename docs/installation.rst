@@ -20,4 +20,4 @@ Pip
 
 .. code:: bash
 
-  pip install --extra-index-url https://testpypi.python.org/pypi resonate
+  pip install resonate
