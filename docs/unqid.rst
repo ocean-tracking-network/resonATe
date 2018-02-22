@@ -5,4 +5,5 @@
 Unique Detections Function
 --------------------------
 
-.. autofunction:: uniqueid.add_unqdetecid
+.. automodule:: uniqueid
+   :members:

@@ -5,4 +5,5 @@
 Cohort Functions
 ----------------
 
-.. autofunction:: cohorts.cohort
+.. automodule:: cohorts
+   :members:

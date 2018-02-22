@@ -5,4 +5,5 @@
 Compression Functions
 ---------------------
 
-.. autofunction:: compress.compress_detections
+.. automodule:: compress
+   :members:

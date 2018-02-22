@@ -13,4 +13,5 @@ Below is the sample output for blue sharks off of the coast of Nova Scotia.
 Abacus Plot Function
 --------------------
 
-.. autofunction:: abacus_plot.abacus_plot
+.. automodule:: abacus_plot
+   :members:

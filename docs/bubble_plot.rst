@@ -13,4 +13,5 @@ Below is the sample output for blue sharks off of the coast of Nova Scotia.
 Bubble Plot Function
 --------------------
 
-.. autofunction:: bubble_plot.bubble_plot
+.. automodule:: bubble_plot
+   :members:

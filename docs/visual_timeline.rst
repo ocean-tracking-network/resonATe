@@ -13,10 +13,8 @@ Below is the sample output for blue sharks off of the coast of Nova Scotia.
 Visual Timeline Functions
 -------------------------
 
-.. autofunction:: html_maps.render_map
+.. automodule:: html_maps
+   :members:
 
-.. autofunction:: html_maps.create_leaflet_timeline
-
-.. autofunction:: geojson.unix_time_millis
-
-.. autofunction:: geojson.create_geojson
+.. automodule:: geojson
+   :members:

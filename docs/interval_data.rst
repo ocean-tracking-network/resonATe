@@ -5,4 +5,5 @@
 Interval Data Functions
 -----------------------
 
-.. autofunction:: interval_data_tool.interval_data
+.. automodule:: interval_data_tool
+   :members:
