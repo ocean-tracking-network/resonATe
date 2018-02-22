@@ -1,11 +1,14 @@
 resonATe
 ========
 
-Python based tool set for data analysis.
+resonATe is the Ocean Tracking Network's acoustic telemetry analysis toolkit.
+It can be used to filter, compress, visualize and analyze acoustic detection
+extracts from OTN.
 
 
 
-
+* [Abacus Plot] (#abacus-plot)
+* [Bubble Plot] (#bubble-plot)
 * [Cohort] (#cohort)
 * [Compress Detections] (#compressing-detections)
 * [Distance Matrix] (#distance-matrix)
@@ -14,6 +17,20 @@ Python based tool set for data analysis.
 * [Residence Index] (#residence-index)
 * [Unique ID] (#unique-id)
 * [Visual Timeline] (#visual-timeline)
+
+
+Abacus Plot
+-----------
+
+The abacus plot is a way to plot annimal along time. The function uses Plotly to place your points on a scatter plot. ``ycolumn`` is used as the y axis and ``datecollected`` is used as the x axis. ``color_column`` is used to group detections together and assign them a color.
+
+
+
+Bubble Plot
+-----------
+
+The bubble plot function returns a Plotly scatter plot layered ontop of a map. The color of the markers will indicate the number of detections at each location. Alternatively, you can indicate the number of individuals seen at each location by using ``type = 'individual'``.
+
 
 
 Cohort

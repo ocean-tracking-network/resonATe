@@ -23,7 +23,7 @@ resonATe Overview
 Abacus Plot
 -----------
 
-The abacus plot is a way to plot annimal along time. The function uses Plotly to place your points on a scatter plot. ``ycolumn`` is used as the y axis and ``datecollected`` is used as the x axis. ``color_column`` is used to group detections together and assign them a color Details are in :ref:`Abacus Plot <abacus_plot_page>`.
+The abacus plot is a way to plot annimal along time. The function uses Plotly to place your points on a scatter plot. ``ycolumn`` is used as the y axis and ``datecollected`` is used as the x axis. ``color_column`` is used to group detections together and assign them a color. Details are in :ref:`Abacus Plot <abacus_plot_page>`.
 
 .. _bubble:
 
