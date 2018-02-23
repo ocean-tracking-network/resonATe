@@ -111,6 +111,7 @@ Contents:
 
    self
    installation
+   data_prep
    abacus_plot
    bubble_plot
    cohort
