@@ -144,11 +144,11 @@ html_static_path = ['_static']
 
 
 
-html_context = {
-    'css_files': [
-        '_static/custom.css',  # override wide tables in RTD theme
-        ],
-     }
+# html_context = {
+#     'css_files': [
+#         '_static/custom.css',  # override wide tables in RTD theme
+#         ],
+#      }
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 #html_last_updated_fmt = '%b %d, %Y'
