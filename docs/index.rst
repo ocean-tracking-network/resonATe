@@ -6,6 +6,10 @@
 resonATe Overview
 ====================
 
+resonATe is the Ocean Tracking Network's acoustic telemetry analysis toolkit.
+It can be used to filter, compress, visualize and analyze acoustic detection
+extracts from OTN and other marine telemetry data.
+
 * :ref:`Abacus Plot <abacus>`
 * :ref:`Bubble Plot <bubble>`
 * :ref:`Cohort <cohort>`
