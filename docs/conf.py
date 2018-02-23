@@ -36,6 +36,10 @@ for file in os.listdir("../py_notebooks"):
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath('.')), 'resonate'))
 
 
+def setup(app):
+    app.add_stylesheet('full_width_resonate.css')
+
+    
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -144,11 +148,11 @@ html_static_path = ['_static']
 
 
 
-html_context = {
-    'css_files': [
-        '_static/full_width_resonate.css',  # override wide tables in RTD theme
-        ],
-     }
+# html_context = {
+#     'css_files': [
+#         '_static/full_width_resonate.css',  # override wide tables in RTD theme
+#         ],
+#      }
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 #html_last_updated_fmt = '%b %d, %Y'
