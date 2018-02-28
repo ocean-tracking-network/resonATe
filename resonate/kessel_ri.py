@@ -205,8 +205,8 @@ def get_station_location(station, detections):
 def plot_ri(ri_data, ipython_display=True,
                     title = 'Bubble Plot', height=700,
                     width=1000, plotly_geo=None, filename=None,
-                    marker_size = 6, colorscale='Viridis',
-                    mapbox_token=None):
+                    marker_size = 6, scale_markers=False,
+                    colorscale='Viridis', mapbox_token=None):
     '''
     plot_ri
 
@@ -220,6 +220,7 @@ def plot_ri(ri_data, ipython_display=True,
     :param filename: Plotly filename to write to
     :param mapbox_token: A string of mapbox access token
     :param marker_size: An int to indicate the diameter in pixels
+    :param scale_markers: A boolean to indicate whether or not markers are scaled by their value
     :param colorscale: A string to indicate the color index
 
     :return: A plotly geoscatter
@@ -240,6 +241,11 @@ def plot_ri(ri_data, ipython_display=True,
             zoom=5,
             style='light'
         )
+
+    if scale_markers:
+        marker_size = (ri_data.residency_index * marker_size + 5).tolist()
+    else:
+        marker_size+=5
     data = [
         {
             'lon': ri_data.longitude.tolist(),
