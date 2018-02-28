@@ -2,7 +2,7 @@
 python setup.py sdist upload -r testpypi;
 python setup.py sdist upload -r pypi
 rm -f ~/anaconda3/conda-bld/osx-64/resonate*;
-conda-build conda.recipe --python=3.5 &&
+conda-build conda.recipe &&
 rm -rf conda-dist &&
 mkdir conda-dist;
 mkdir conda-dist/osx-64;
