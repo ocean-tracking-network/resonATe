@@ -33,8 +33,7 @@ def bubble_plot(detections, type='detections', ipython_display=True,
 
 
     if mandatory_columns.issubset(detections.columns):
-        detections = detections[['station', 'catalognumber', 'unqdetecid', 'latitude', 'longitude', 'datecollected']]
-        detections = detections[~detections.unqdetecid.str.contains('release')].reset_index(drop=True)
+        detections = detections[['station', 'catalognumber', 'unqdetecid', 'latitude', 'longitude', 'datecollected']].reset_index(drop=True)
 
 
         if type =='individual':
