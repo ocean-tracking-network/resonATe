@@ -1,5 +1,17 @@
-def REI(detections, deployments):
+import pandas as pd
+import datetime
 
+def REI(detections, deployments):
+    '''
+    Calculates a returns a list of each station and the REI (defined here):
+
+    :param detections: a pandas DataFrame of detections
+    :param deployments: a pandas DataFrame of station deployment histories
+
+    :return: a pandas DataFrame of station, REI, latitude, and longitude
+    '''
+
+    # Check for proper dataframe and the correct columns
     if not isinstance(detections, pd.DataFrame):
         raise GenericException('input parameter must be a Pandas dataframe')
 
@@ -8,28 +20,34 @@ def REI(detections, deployments):
 
     if mandatory_detection_columns.issubset(detections.columns) and mandatory_deployment_columns.issubset(deployments.columns):
 
+        # Copy and change the deployments to create dates in the 3 mandatory date columns
         deployments = deployments.copy(deep=True)
         deployments['recovery_notes'] = deployments.recovery_date.str.extract('([A-Za-z\//:]+)', expand=False)
         deployments.recovery_date = deployments.recovery_date.str.extract('(\d+-\d+-\d+)', expand=False)
         deployments.loc[deployments.recovery_date.isnull(), 'recovery_date'] = deployments.last_download
         deployments = deployments[(deployments.last_download != '-') & (deployments.recovery_date != '-')]
 
+        # Cast the date columns to a datetime
         deployments.deploy_date = pd.to_datetime(deployments.deploy_date)
         deployments.recovery_date = pd.to_datetime(deployments.recovery_date)
         deployments.last_download = pd.to_datetime(deployments.last_download)
 
+        # Calculate each receivers total days deployed
         deployments['days_deployed'] = deployments[['last_download', 'recovery_date']].max(axis=1) - deployments.deploy_date
-
-        detections = detections[detections.station.isin(deployments.station_name)]
-
         days_active = deployments.groupby('station_name').agg({'days_deployed':'sum'}).reset_index()
         days_active.set_index('station_name', inplace=True)
 
+        # Exclude all detections that are not registered with receivers in the deployments
+        detections = detections[detections.station.isin(deployments.station_name)]
+
+        # Calculate array counts and initialize the dataframe
         array_unique_tags = len(detections.fieldnumber.unique())
         array_unique_species = len(detections.scientificname.unique())
         days_with_detections = len(pd.to_datetime(detections.datecollected).dt.date.unique())
         station_reis = pd.DataFrame(columns=['station','rei'])
 
+
+        # Loop through each station in the detections and Calculate REI for each station
         for name, data in detections.groupby('station'):
             receiver_unique_tags = len(data.fieldnumber.unique())
             receiver_unique_species = len(data.scientificname.unique())
@@ -46,8 +64,9 @@ def REI(detections, deployments):
 
 
 
-
+        # Normalize REIs to value from 0 to 1
         station_reis.rei = station_reis.rei/ station_reis.rei.sum()
+        # Cleanup and return the station REI's
         del deployments
         return station_reis
     else:
