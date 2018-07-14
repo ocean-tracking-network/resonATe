@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup, find_packages
-
+from codecs import open
 
 with open('README', encoding='utf-8') as f:
     readme = f.read()
