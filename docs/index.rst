@@ -123,6 +123,7 @@ Contents:
    filter
    interval_data
    residence_index
+   receiver_efficiency_index
    notebooks/data_subsetting.ipynb
    unqid
    visual_timeline

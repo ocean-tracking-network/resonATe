@@ -40,18 +40,15 @@ detection file and the project bounds.
 
 .. warning:: 
 
-    Input files must include ``datecollected``, ``station``, ``longitude``, ``latitude``, ``catalognumber``, and ``unqdetecid`` as columns.
+    Input files must include ``datecollected``, ``station``, ``longitude``, 
+    ``latitude``, ``catalognumber``, and ``unqdetecid`` as columns.
 
 .. code:: python
 
     from resonate import kessel_ri as ri
     import pandas as pd
     
-    detections = pd.read_csv('/path/to/detections.csv')
-
-.. raw:: html
-
-   <hr/>
+    detections = pd.read_csv('/Path/to/detections.csv')
 
 Kessel Residence Index Calculation
 ----------------------------------
@@ -76,18 +73,14 @@ T = Distinct number of days detected anywhere on the array
     Possible rounding error may occur as a detection on ``2016-01-01 23:59:59``
     and a detection on ``2016-01-02 00:00:01`` would be counted as two days when it is really 2-3 seconds.
 
-Example Code
-~~~~~~~~~~~~
+Kessel RI Example Code
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
     kessel_ri = ri.residency_index(detections, calculation_method='kessel')
     
     ri.plot_ri(kessel_ri)
-
-.. raw:: html
-
-   <hr/>
 
 Timedelta Residence Index Calculation
 -------------------------------------
@@ -108,18 +101,14 @@ time at the station
 :math:`\Delta T` = Last detection time on an array - First detection
 time on the array
 
-Example Code
-~~~~~~~~~~~~
+Timedelta RI Example Code
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
     timedelta_ri = ri.residency_index(detections, calculation_method='timedelta')
     
     ri.plot_ri(timedelta_ri)
-
-.. raw:: html
-
-   <hr/>
 
 Aggregate With Overlap Residence Index Calculation
 --------------------------------------------------
@@ -137,18 +126,14 @@ AwOS = Sum of length of time of each detection at the station
 
 AwOT = Sum of length of time of each detection on the array
 
-Example Code
-~~~~~~~~~~~~
+Aggregate With Overlap RI Example Code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
     with_overlap_ri = ri.residency_index(detections, calculation_method='aggregate_with_overlap')
     
     ri.plot_ri(with_overlap_ri)
-
-.. raw:: html
-
-   <hr/>
 
 Aggregate No Overlap Residence Index Calculation
 ------------------------------------------------
@@ -176,18 +161,14 @@ any overlap
 AnOT = Sum of length of time of each detection on the array, excluding
 any overlap
 
-Example Code
-~~~~~~~~~~~~
+Aggregate No Overlap RI Example Code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
     no_overlap_ri = ri.residency_index(detections, calculation_method='aggregate_no_overlap')
     
-    ri.plot_ri(no_overlap_ri)
-
-.. raw:: html
-
-   <hr/>
+    ri.plot_ri(no_overlap_ri, title="ANO RI")
 
 Mapbox
 ------
@@ -195,13 +176,11 @@ Mapbox
 Alternatively you can use a Mapbox access token plot your map. Mapbox is
 much for responsive than standard Scattergeo plot.
 
-Example Code
-~~~~~~~~~~~~
+Mapbox Example Code
+~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
-    mapbox_access_token = 'ADD_YOUR_TOKEN_HERE'
-    
+    mapbox_access_token = 'YOUR MAPBOX ACCESS TOKEN HERE'
     kessel_ri = ri.residency_index(detections, calculation_method='kessel')
-    
-    ri.plot_ri(kessel_ri, mapbox_token=mapbox_access_token)
+    ri.plot_ri(kessel_ri, mapbox_token=mapbox_access_token,marker_size=40, scale_markers=True)
