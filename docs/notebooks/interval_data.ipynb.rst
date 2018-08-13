@@ -15,7 +15,7 @@ Many consecutive detections of an animal are replaced by one interval.
 
 .. warning:: 
 
-    Input files must include ``datecollected``, ``catalognumber``, and ``unqdetecid`` as columns.
+   Input files must include ``datecollected``, ``catalognumber``, and ``unqdetecid`` as columns.
 
 .. code:: python
 

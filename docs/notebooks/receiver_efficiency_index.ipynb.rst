@@ -4,7 +4,7 @@ Receiver Efficiency Index
 
 .. warning:: 
 
-    Detection input files must include ``datecollected``, ``fieldnumber``, ``station``, and ``scientificname`` as columns and deployment input files must include ``station_name``, ``deploy_date``, ``last_download``, and ``recovery_date`` as columns.
+   Detection input files must include ``datecollected``, ``fieldnumber``, ``station``, and ``scientificname`` as columns and deployment input files must include ``station_name``, ``deploy_date``, ``last_download``, and ``recovery_date`` as columns.
 
 .. code:: python
 

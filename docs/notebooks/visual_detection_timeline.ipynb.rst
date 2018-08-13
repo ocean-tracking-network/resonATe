@@ -23,7 +23,7 @@ tilesets. Available basemaps are:
 
 .. warning:: 
 
-    Input files must include ``datecollected``, ``catalognumber``, ``station``, ``latitude``, ``longitude``, and ``unqdetecid`` as columns.
+   Input files must include ``datecollected``, ``catalognumber``, ``station``, ``latitude``, ``longitude``, and ``unqdetecid`` as columns.
 
 .. code:: python
 

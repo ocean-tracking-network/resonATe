@@ -28,7 +28,7 @@ def get_distance_matrix(detectiondf):
                       stn_locs.loc[cstation, 'longitude'])
             rpoint = (stn_locs.loc[rstation, 'latitude'],
                       stn_locs.loc[rstation, 'longitude'])
-            dist_mtx.loc[rstation, cstation] = vincenty(cpoint, rpoint).km
+            dist_mtx.loc[rstation, cstation] = vincenty(cpoint, rpoint).m
     dist_mtx.index.name = None
     return dist_mtx
 
@@ -168,8 +168,8 @@ def distance_filter(detections, maximum_distance=100000):
         stn = group.station.unique()[0]
         lag_stn = group.lag_station.unique()[0]
         lead_stn = group.lead_station.unique()[0]
-        lag_distance = dm.loc[stn, lag_stn].m
-        lead_distance = dm.loc[stn, lead_stn].m
+        lag_distance = dm.loc[stn, lag_stn]
+        lead_distance = dm.loc[stn, lead_stn]
         group['lag_distance_km'] = lag_distance
         group['lead_distance_km'] = lead_distance
         distance_df = distance_df.append(group)
@@ -218,8 +218,8 @@ def velocity_filter(detections, maximum_velocity=10):
         lag_stn = group.lag_station.unique()[0]
         lead_stn = group.lead_station.unique()[0]
 
-        lag_distance = dm.loc[stn, lag_stn].m
-        lead_distance = dm.loc[stn, lead_stn].m
+        lag_distance = dm.loc[stn, lag_stn]
+        lead_distance = dm.loc[stn, lead_stn]
 
         group['lag_distance_m'] = lag_distance
         group['lead_distance_m'] = lead_distance

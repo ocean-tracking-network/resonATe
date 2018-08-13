@@ -23,7 +23,7 @@ information to be able to reference the detection in the original file
 if the user wants to see what was happening at the same time.
 
 The input parameter is a time in minutes. We used 60 minutes as the
-default as this is what was used in Easton's code. This value can be
+default as this is what was used in Easton’s code. This value can be
 changed by the user. The output contains a record for each detection for
 which there has been more than xx minutes since the previous detection
 (of that tag/animal) and more than the same amount of time until the
@@ -35,7 +35,7 @@ specified suspect file. The function will also create a distance matrix.
 
 .. warning:: 
 
-    Input files must include ``datecollected``, ``catalognumber``, ``station`` and ``unqdetecid`` as columns.
+   Input files must include ``datecollected``, ``catalognumber``, ``station`` and ``unqdetecid`` as columns.
 
 .. code:: python
 
@@ -67,3 +67,31 @@ file to a desired location.
     filtered_detections['suspect'].to_csv('/path/to/output.csv', index=False)
     
     filtered_detections['dist_mtrx'].to_csv('/path/to/output.csv', index=False)
+
+.. code:: python
+
+    from resonate.filter_detections import distance_filter
+    import pandas as pd
+    
+    detections = pd.read_csv('../tests/assertion_files/nsbs.csv')
+    
+    
+    filtered_detections = distance_filter(detections)
+
+.. code:: python
+
+    filtered_detections['filtered'].to_csv('../tests/assertion_files/nsbs_distance_filtered.csv', index=False)
+
+.. code:: python
+
+    from resonate.filter_detections import velocity_filter
+    import pandas as pd
+    
+    detections = pd.read_csv('../tests/assertion_files/nsbs.csv')
+    
+    
+    filtered_detections = velocity_filter(detections)
+
+.. code:: python
+
+    filtered_detections['filtered'].to_csv('../tests/assertion_files/nsbs_velocity_filtered.csv', index=False)

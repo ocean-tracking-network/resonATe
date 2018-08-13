@@ -44,7 +44,7 @@ Subsetting on column value
 --------------------------
 
 Provide the column you expect to have a certain value and the value
-you'd like to create a subset from.
+you’d like to create a subset from.
 
 .. code:: python
 

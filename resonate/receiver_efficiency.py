@@ -22,8 +22,8 @@ def REI(detections, deployments):
     mandatory_deployment_columns = set(
         ['station_name', 'deploy_date', 'recovery_date', 'last_download'])
 
-    if mandatory_detection_columns.issubset(detections.columns) and
-    mandatory_deployment_columns.issubset(deployments.columns):
+    if mandatory_detection_columns.issubset(detections.columns) and \
+            mandatory_deployment_columns.issubset(deployments.columns):
 
         # Copy and change the deployments to create dates in the 3 mandatory
         # date columns
@@ -77,9 +77,9 @@ def REI(detections, deployments):
                 if receiver_days_active > 0:
                     rei = ((receiver_unique_tags / array_unique_tags) *
                            (receiver_unique_species / array_unique_species)
-                           ) /
-                        (days_with_detections / receiver_days_with_detections)
-                    / receiver_days_active
+                           ) / \
+                        (days_with_detections /
+                         receiver_days_with_detections) / receiver_days_active
                     station_reis = station_reis.append({
                         'station': name,
                         'rei': rei,
