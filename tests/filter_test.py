@@ -4,7 +4,7 @@ import unittest
 import pandas as pd
 import pandas.testing as pt
 from colorama import Fore as c
-from resonate.filter_detections import (distance_filter, filter_detections,
+from resonate.filters import (distance_filter, filter_detections,
                                         velocity_filter)
 
 
