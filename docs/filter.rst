@@ -1,11 +1,11 @@
 .. _filter_page:
 
-.. include:: notebooks/filters.ipynb.rst
+.. include:: notebooks/filter_detections.ipynb.rst
 
 Filtering Functions
 -------------------
 
 .. _distance_matrix_page:
 
-.. automodule:: filters
+.. automodule:: filter_detections
    :members:

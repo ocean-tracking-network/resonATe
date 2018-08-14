@@ -1,10 +1,10 @@
 import pandas as pd
-import plotly.graph_objs as go
 import plotly.offline as py
+import plotly.graph_objs as go
 from resonate.library.exceptions import GenericException
 
+def abacus_plot(detections, ycolumn='catalognumber', color_column=None,ipython_display=True, title = 'Abacus Plot', filename=None):
 
-def abacus_plot(detections, ycolumn='catalognumber', color_column=None, ipython_display=True, title='Abacus Plot', filename=None):
     '''
     Creates a plotly abacus plot from a pandas dataframe
 
@@ -28,8 +28,7 @@ def abacus_plot(detections, ycolumn='catalognumber', color_column=None, ipython_
 
     if mandatory_columns.issubset(detections.columns):
 
-        detections = detections[~detections.unqdetecid.str.contains(
-            'release')].reset_index(drop=True)
+        detections = detections[~detections.unqdetecid.str.contains('release')].reset_index(drop=True)
 
         if color_column is not None:
             data = list()
@@ -53,21 +52,20 @@ def abacus_plot(detections, ycolumn='catalognumber', color_column=None, ipython_
             ]
 
         layout = dict(
-            title=title,
+            title = title,
             xaxis=dict(
                 autorange=False,
-                range=[detections.datecollected.min(
-                ), detections.datecollected.max()]
+                range=[detections.datecollected.min(), detections.datecollected.max()]
             ),
             yaxis=dict(
                 autorange=True
             ),
-            margin=dict(
+            margin= dict(
                 l=175
             )
         )
 
-        fig = {'data': data, 'layout': layout}
+        fig = { 'data':data, 'layout':layout }
 
         if ipython_display:
             py.init_notebook_mode()
@@ -75,5 +73,4 @@ def abacus_plot(detections, ycolumn='catalognumber', color_column=None, ipython_
         else:
             return py.plot(fig, filename=filename)
     else:
-        raise GenericException("Missing required input columns: {}".format(
-            mandatory_columns - set(detections.columns)))
+        raise GenericException("Missing required input columns: {}".format(mandatory_columns - set(detections.columns)))

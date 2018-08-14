@@ -18,7 +18,7 @@ interval and cohort.
 
 .. warning:: 
 
-   Input files must include ``datecollected``, ``catalognumber``, and ``unqdetecid`` as columns.
+    Input files must include ``datecollected``, ``catalognumber``, and ``unqdetecid`` as columns.
 
 .. code:: python
 

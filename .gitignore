@@ -11,4 +11,3 @@ py_notebooks/html/*
 docs/_build
 conda-dist/*
 Icon*
-.pytest_*

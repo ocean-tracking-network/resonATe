@@ -1,6 +1,5 @@
-import geopy
 import pandas as pd
-
+import geopy
 
 def interval_data(compressed_df, dist_matrix_df, station_radius_df=None):
     """
@@ -38,30 +37,26 @@ def interval_data(compressed_df, dist_matrix_df, station_radius_df=None):
     for idx, item in merged.iterrows():
         # If any of the station pairs don't exist, skip processing current row
         if not (pd.isnull(item['from_station']) or pd.isnull(item['to_station'])):
-            # Get station matrix distance (input in m)
-            matrix_distance_m = dist_matrix_df.loc[item['from_station'],
-                                                   item['to_station']]
+            # Get station matrix distance (input in km)
+            matrix_distance_km = dist_matrix_df.loc[item['from_station'], item['to_station']]
 
             # If matrix pair exists do distance calculations
-            if matrix_distance_m:
+            if matrix_distance_km:
                 if isinstance(station_radius_df, pd.DataFrame):
                     stn1_radius = station_radius_df.loc[item['from_station'], 'radius']
                     stn2_radius = station_radius_df.loc[item['to_station'], 'radius']
 
-                    distance = max(geopy.distance.Distance(
-                        0).m, matrix_distance_m - stn1_radius.m - stn2_radius.m) * 1000
+                    distance = max(geopy.distance.Distance(0).km, matrix_distance_km - stn1_radius.km - stn2_radius.km)*1000
                 else:
-                    distance = max(geopy.distance.Distance(
-                        0).m, matrix_distance_m) * 1000
+                    distance = max(geopy.distance.Distance(0).km, matrix_distance_km)*1000
 
-                merged.loc[idx, 'distance_m'] = distance
+                merged.loc[idx, 'distance_m'] =  distance
 
                 time_interval = item['to_arrive'] - item['from_leave']
-                merged.loc[idx, 'intervaltime'] = time_interval
+                merged.loc[idx, 'intervaltime'] =  time_interval
                 merged.loc[idx, 'intervalseconds'] = time_interval.total_seconds()
 
                 if time_interval.seconds != 0:
-                    merged.loc[idx, 'metres_per_second'] = distance / \
-                        time_interval.seconds
+                    merged.loc[idx, 'metres_per_second']= distance / time_interval.seconds
 
     return merged

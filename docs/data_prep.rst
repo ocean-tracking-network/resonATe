@@ -10,16 +10,7 @@ The columns you need are as follows:
 - **datecollected** - Date and time of release or detection, all of which have the same timezone (example format: ``2018-02-02 04:09:45``).
 - **longitude** - The receiver location at time of detection in decimal degrees.
 - **latitude** -  The receiver location at time of detection in decimal degrees.
-- **scientificname** - The taxonmoic name for the animal detected.
-- **fieldnumber** - The unique number for the tag/device attached to the animal.
 - **unqdetecid** - A unique value assigned to each record in the data. resonATe includes a function to generate this column if needed. Details in :ref:`Unique Detections ID <unq_detections_id_page>`.
-
-The :ref:`Receiver Efficiency Index <receiver_efficiency_index_page>` also needs a deployment history for stations. The columns for deployments are as follows:
-
-- **station_name** - A unique identifier for the station or mooring where the receiver was located. This column is used in resonATe for grouping detections which should be considered to have occurred in the same place.
-- **deploy_date** - A date of when the receiver was placed in a water or is active (example format: ``2018-02-02``).
-- **recovery_date** - A date of when the receiver was removed from the water or became inactive (example format: ``2018-02-02``).
-- **last_download** - A date of the last time data was retrieved from the receiver (example format: ``2018-02-02``).
 
 All other columns are not required and will not affect the functions; however, they may be used in some functions. For example, ``receiver_group`` can be used color code data in the :ref:`Abacus Plot <abacus_plot_page>`.
 

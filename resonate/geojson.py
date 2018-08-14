@@ -1,10 +1,8 @@
-import datetime
-import os
-import sys
-
 import pandas as pd
-import resonate.compress as cp
+import os, sys
+import datetime
 import simplejson as json
+import resonate.compress as cp
 
 
 def unix_time_millis(dt):
@@ -16,6 +14,7 @@ def unix_time_millis(dt):
     """
     epoch = datetime.datetime.utcfromtimestamp(0)
     return (dt - epoch).total_seconds() * 1000.0
+
 
 
 def create_geojson(detections, title, dets_table='', inc=5000):
@@ -37,9 +36,9 @@ def create_geojson(detections, title, dets_table='', inc=5000):
     # Remove any release locations
     dets = dets[~dets['startunqdetecid'].astype(str).str.contains("release")]
 
+
     # Get a list of the unique stations
-    locs = detections[['station', 'longitude', 'latitude']
-                      ].drop_duplicates(subset='station')
+    locs = detections[['station', 'longitude', 'latitude']].drop_duplicates(subset='station')
 
     # Add the station location to the compressed detections
     data = pd.merge(locs, dets, on='station', how='inner')
@@ -54,10 +53,10 @@ def create_geojson(detections, title, dets_table='', inc=5000):
     data.index += 1
 
     # Create a hue index for each individual catalognumber and return a dictionary
-    hue_increment = 360 / data.catalognumber.unique().size
+    hue_increment = 360/data.catalognumber.unique().size
     animals = pd.DataFrame(data.catalognumber.unique())
-    animals['hue'] = animals.index * hue_increment
-    animals.columns = ['animals', 'hue']
+    animals['hue'] = animals.index*hue_increment
+    animals.columns = ['animals','hue']
     animals = animals.set_index(['animals'])
     animals = animals.T.to_dict()
 
@@ -67,13 +66,14 @@ def create_geojson(detections, title, dets_table='', inc=5000):
     center_y = data.latitude.median()
     center_x = data.longitude.median()
 
+
     start = 1
     end = inc
     cap = 100000
 
     # Loop through the detections and create sets of geojson detections the size of the increment
     while start < data.index.size and start <= cap:
-        geojson = {
+        geojson ={
             "type": "FeatureCollection",
             "features": [
                 {
@@ -91,23 +91,22 @@ def create_geojson(detections, title, dets_table='', inc=5000):
         }
         # Add the set of detections to the list
         detection_geojson.append(geojson)
-        start = end + 1
+        start = end+1
         end += inc
 
     # Print message if there are more than cap for detections, defaulting to 100000
     if start > cap:
-        print("Only first " + str(cap) +
-              " detections used, please subset your data to see more.")
+        print("Only first "+str(cap)+" detections used, please subset your data to see more.")
 
     # Write the geojson out to a json file
     json_name = title.lower().replace(' ', '_')
-    print("Writing JSON file to " + json_name + ".json")
-    output = open("./html/" + json_name + ".json", 'w')
+    print("Writing JSON file to " +json_name+".json")
+    output = open("./html/"+json_name+".json", 'w')
     json.dump(detection_geojson, output)
     output.close()
 
     # Create string with just the file name and no path
-    filename = json_name.replace("./html/", '') + ".json"
+    filename = json_name.replace("./html/", '')+".json"
 
     # Return the json object, filename, and the center points
     return {'json': detection_geojson, 'filename': filename, 'center_x': center_x, 'center_y': center_y}
