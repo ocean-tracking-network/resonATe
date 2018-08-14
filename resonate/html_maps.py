@@ -1,8 +1,9 @@
+import os
+
 import jinja2 as jin
 import pandas as pd
 import resonate.geojson as gj
 from IPython.display import IFrame
-import os
 
 template_file = os.path.join(os.path.dirname(__file__),
                              'templates/leaflet_timeline.html')
@@ -23,15 +24,16 @@ def create_leaflet_timeline(title, json, center_y=0, center_x=0, zoom=8,
     '''
 
     template = jin.Template(open(template_file, 'r').read())
-    html = template.render(title=title, json_file=json, zoom=zoom, center_y=center_y, center_x=center_x, steps=steps, layer=basemap)
-    output = open("./html/"+title+".html", 'w')
+    html = template.render(title=title, json_file=json, zoom=zoom,
+                           center_y=center_y, center_x=center_x, steps=steps, layer=basemap)
+    output = open("./html/" + title + ".html", 'w')
 
-    print("Writing html file to ./html/"+title+".html...")
+    print("Writing html file to ./html/" + title + ".html...")
 
     output.write(html)
     output.close()
 
-    return "HTML file written to ./html/"+title+".html"
+    return "HTML file written to ./html/" + title + ".html"
 
 
 def render_map(dets, title, width=900, height=450,
@@ -69,6 +71,6 @@ def render_map(dets, title, width=900, height=450,
                             basemap=basemap)
 
     # Create and return the IFrame to be rendered for the user
-    iframe = IFrame('./html/'+title+'.html', width=width, height=height)
+    iframe = IFrame('./html/' + title + '.html', width=width, height=height)
 
     return iframe

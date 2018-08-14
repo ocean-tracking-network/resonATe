@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from resonate.filter_detections import get_distance_matrix
+from resonate.filters import get_distance_matrix
 from resonate.compress import compress_detections
 from resonate.interval_data_tool import interval_data
 import pandas as pd
