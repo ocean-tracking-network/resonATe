@@ -1,9 +1,10 @@
-import pandas as pd
-from datetime import datetime
-import resonate.compress as cp
-import plotly.offline as py
-import plotly.graph_objs as go
 import math
+from datetime import datetime
+
+import pandas as pd
+import plotly.graph_objs as go
+import plotly.offline as py
+import resonate.compress as cp
 
 
 def total_days_diff(detections):
@@ -26,11 +27,8 @@ def total_days_diff(detections):
     first = datetime.strptime(detections.startdate.min(), "%Y-%m-%d %H:%M:%S")
     last = datetime.strptime(detections.enddate.max(), "%Y-%m-%d %H:%M:%S")
     total = last - first
-    total = total.total_seconds()/86400.0
+    total = total.total_seconds() / 86400.0
     return total
-
-
-
 
 
 def total_days_count(detections):
@@ -53,13 +51,12 @@ def total_days_count(detections):
     :return: An int in the number of days
 
     '''
-    detections['startdate'] = detections['startdate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",)).apply(datetime.date)
-    detections['enddate'] = detections['enddate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",)).apply(datetime.date)
+    detections['startdate'] = detections['startdate'].apply(
+        datetime.strptime, args=("%Y-%m-%d %H:%M:%S",)).apply(datetime.date)
+    detections['enddate'] = detections['enddate'].apply(
+        datetime.strptime, args=("%Y-%m-%d %H:%M:%S",)).apply(datetime.date)
     detections = pd.unique(detections[['startdate', 'enddate']].values.ravel())
     return detections.size
-
-
-
 
 
 def aggregate_total_with_overlap(detections):
@@ -76,8 +73,10 @@ def aggregate_total_with_overlap(detections):
 
     '''
     total = pd.Timedelta(0)
-    detections['startdate'] = detections['startdate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
-    detections['enddate'] = detections['enddate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
+    detections['startdate'] = detections['startdate'].apply(
+        datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
+    detections['enddate'] = detections['enddate'].apply(
+        datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
     detections['timedelta'] = detections['enddate'] - detections['startdate']
 
     for index, row in detections.iterrows():
@@ -86,10 +85,7 @@ def aggregate_total_with_overlap(detections):
         else:
             diff = pd.Timedelta('1 second')
         total += diff
-    return total.total_seconds()/86400.0
-
-
-
+    return total.total_seconds() / 86400.0
 
 
 def aggregate_total_no_overlap(detections):
@@ -109,9 +105,12 @@ def aggregate_total_no_overlap(detections):
     total = pd.Timedelta(0)
 
     # sort and convert datetimes
-    detections = detections.sort_values(by='startdate', ascending=False).reset_index(drop=True)
-    detections['startdate'] = detections['startdate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
-    detections['enddate'] = detections['enddate'].apply(datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
+    detections = detections.sort_values(
+        by='startdate', ascending=False).reset_index(drop=True)
+    detections['startdate'] = detections['startdate'].apply(
+        datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
+    detections['enddate'] = detections['enddate'].apply(
+        datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
 
     # A stack is used as an easy way to organize and maintain the detections
     detection_stack = list(detections.T.to_dict().values())
@@ -135,7 +134,8 @@ def aggregate_total_no_overlap(detections):
 
                 # Create the timedelta and add it to the total, assuming 1 second if the timedelta equals 0
                 diff = pd.Timedelta(0)
-                diff += current_time_block['enddate'] - current_time_block['startdate']
+                diff += current_time_block['enddate'] - \
+                    current_time_block['startdate']
                 if diff == pd.Timedelta(0):
                     diff = pd.Timedelta('1 second')
                 total += diff
@@ -145,14 +145,12 @@ def aggregate_total_no_overlap(detections):
             else:
 
                 # If there is overlap take a new endate, eliminating the overlap, and add it back into the stack for the next iteration
-                current_time_block['enddate'] = max([current_time_block['enddate'], next_time_block['enddate']])
+                current_time_block['enddate'] = max(
+                    [current_time_block['enddate'], next_time_block['enddate']])
                 detection_stack.append(current_time_block)
 
     # Return the value as a float in days
-    return total.total_seconds()/86400.0
-
-
-
+    return total.total_seconds() / 86400.0
 
 
 def get_days(dets, calculation_method='kessel'):
@@ -202,11 +200,12 @@ def get_station_location(station, detections):
     location = location[['station', 'longitude', 'latitude']]
     return location
 
+
 def plot_ri(ri_data, ipython_display=True,
-                    title = 'Bubble Plot', height=700,
-                    width=1000, plotly_geo=None, filename=None,
-                    marker_size = 6, scale_markers=False,
-                    colorscale='Viridis', mapbox_token=None):
+            title='Bubble Plot', height=700,
+            width=1000, plotly_geo=None, filename=None,
+            marker_size=6, scale_markers=False,
+            colorscale='Viridis', mapbox_token=None):
     '''
     plot_ri
 
@@ -232,11 +231,11 @@ def plot_ri(ri_data, ipython_display=True,
 
     if mapbox_token is not None:
         map_type = 'scattermapbox'
-        mapbox=dict(
+        mapbox = dict(
             accesstoken=mapbox_token,
             center=dict(
-                lon = ri_data.longitude.mean(),
-                lat = ri_data.latitude.mean()
+                lon=ri_data.longitude.mean(),
+                lat=ri_data.latitude.mean()
             ),
             zoom=5,
             style='light'
@@ -245,85 +244,83 @@ def plot_ri(ri_data, ipython_display=True,
     if scale_markers:
         marker_size = (ri_data.residency_index * marker_size + 5).tolist()
     else:
-        marker_size+=5
+        marker_size += 5
     data = [
         {
             'lon': ri_data.longitude.tolist(),
             'lat': ri_data.latitude.tolist(),
-            'text': ri_data.station+" : "+ri_data.residency_index.astype(str),
+            'text': ri_data.station + " : " + ri_data.residency_index.astype(str),
             'mode': 'markers',
             'marker': {
                 'color': ri_data.residency_index.tolist(),
-                'size':marker_size,
+                'size': marker_size,
                 'showscale': True,
-                'colorscale':colorscale,
-                'colorbar':{
-                    'title':'Detection Count'
+                'colorscale': colorscale,
+                'colorbar': {
+                    'title': 'Detection Count'
                 }
             },
-            'type':map_type
+            'type': map_type
         }
     ]
 
     if plotly_geo is None:
         plotly_geo = dict(
-            showland = True,
-            landcolor = "rgb(255, 255, 255)",
-            showocean = True,
-            oceancolor = "rgb(212,212,212)",
-            showlakes = True,
-            lakecolor = "rgb(212,212,212)",
-            showrivers = True,
-            rivercolor = "rgb(212,212,212)",
-            resolution = 50,
-            showcoastlines = False,
+            showland=True,
+            landcolor="rgb(255, 255, 255)",
+            showocean=True,
+            oceancolor="rgb(212,212,212)",
+            showlakes=True,
+            lakecolor="rgb(212,212,212)",
+            showrivers=True,
+            rivercolor="rgb(212,212,212)",
+            resolution=50,
+            showcoastlines=False,
             showframe=False,
-            projection = dict(
-                type = 'mercator',
+            projection=dict(
+                type='mercator',
             )
         )
     plotly_geo.update(
-        center = dict(
-            lon = ri_data.longitude.mean(),
-            lat = ri_data.latitude.mean()
+        center=dict(
+            lon=ri_data.longitude.mean(),
+            lat=ri_data.latitude.mean()
         ),
-        lonaxis = dict(
-            range= [ ri_data.longitude.min(), ri_data.longitude.max()],
+        lonaxis=dict(
+            range=[ri_data.longitude.min(), ri_data.longitude.max()],
         ),
-        lataxis = dict (
-            range= [ ri_data.latitude.min(), ri_data.latitude.max()],
+        lataxis=dict(
+            range=[ri_data.latitude.min(), ri_data.latitude.max()],
         )
     )
 
-
     if mapbox_token is None:
         layout = dict(
-            geo = plotly_geo,
-            title = title
+            geo=plotly_geo,
+            title=title
         )
     else:
         layout = dict(title=title,
-                        autosize=True,
-                        hovermode='closest',
-                        mapbox=mapbox
-                    )
+                      autosize=True,
+                      hovermode='closest',
+                      mapbox=mapbox
+                      )
 
     if ipython_display:
         layout.update(
             height=height,
             width=width
         )
-        fig = { 'data':data, 'layout':layout }
+        fig = {'data': data, 'layout': layout}
 
         py.init_notebook_mode()
         return py.iplot(fig)
     else:
-        fig = { 'data':data, 'layout':layout }
+        fig = {'data': data, 'layout': layout}
         return py.plot(fig, filename=filename)
 
 
 def residency_index(detections, calculation_method='kessel'):
-
     '''
     residency_index
 
@@ -356,7 +353,8 @@ def residency_index(detections, calculation_method='kessel'):
     # Remove any release locations
     dets = dets[~dets['startunqdetecid'].astype(str).str.contains("release")]
 
-    print('Creating the residency index using the {0} method.\nPlease be patient, I am currently working...'.format(calculation_method))
+    print('Creating the residency index using the {0} method.\nPlease be patient, I am currently working...'.format(
+        calculation_method))
 
     # Determine the total days from a copy of the DataFrame
     total_days = get_days(dets.copy(), calculation_method)
@@ -371,7 +369,7 @@ def residency_index(detections, calculation_method='kessel'):
         total = get_days(st_dets.copy(), calculation_method)
         location = get_station_location(station, detections)
         # Determine the RI and add the station to the list
-        station_dict = {'station': station, 'days_detected': total, 'residency_index': (total/(float(total_days))),
+        station_dict = {'station': station, 'days_detected': total, 'residency_index': (total / (float(total_days))),
                         'longitude': location['longitude'].values[0], 'latitude': location['latitude'].values[0]}
         station_list.append(station_dict)
 
@@ -379,7 +377,8 @@ def residency_index(detections, calculation_method='kessel'):
     all_stations = pd.DataFrame(station_list)
 
     # sort and reset the index for the station DataFrame
-    all_stations = all_stations.sort_values(by='days_detected', ascending=False).reset_index(drop=True)
+    all_stations = all_stations.sort_values(
+        by='days_detected', ascending=False).reset_index(drop=True)
 
     print("OK!")
     # Return the stations RI DataFrame

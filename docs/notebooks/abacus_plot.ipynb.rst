@@ -9,7 +9,7 @@ is used to group detections together and assign them a color.
 
 .. warning:: 
 
-    Input files must include ``datecollected`` as a column.
+   Input files must include ``datecollected`` as a column.
 
 .. code:: python
 

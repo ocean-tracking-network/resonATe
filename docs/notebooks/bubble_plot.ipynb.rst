@@ -9,7 +9,7 @@ individuals seen at each location by using ``type = 'individual'``.
 
 .. warning:: 
 
-    Input files must include ``station`` , ``catalognumber``, ``unqdetecid``, ``latitude``, ``longitude``, and ``datecollected`` as  columns.
+   Input files must include ``station`` , ``catalognumber``, ``unqdetecid``, ``latitude``, ``longitude``, and ``datecollected`` as  columns.
 
 .. code:: python
 

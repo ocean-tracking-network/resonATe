@@ -19,8 +19,8 @@ minutes (default is 60) to create the cohort dataframe.
 
 .. warning:: 
 
-       Input files must include ``station``, ``catalognumber``,
-        ``seq_num``, ``unqdetecid``, and ``datecollected`` as columns.
+      Input files must include ``station``, ``catalognumber``,
+       ``seq_num``, ``unqdetecid``, and ``datecollected`` as columns.
 
 .. code:: python
 
