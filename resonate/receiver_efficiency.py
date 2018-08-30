@@ -28,30 +28,28 @@ def REI(detections, deployments):
         # Copy and change the deployments to create dates in the 3 mandatory
         # date columns
         deployments = deployments.copy(deep=True)
+        detections = detections.copy(deep=True)
         deployments['recovery_notes'] = deployments.recovery_date.str.extract(
             '([A-Za-z\//:]+)', expand=False)
         deployments.recovery_date = deployments.recovery_date.str.extract(
             '(\d+-\d+-\d+)', expand=False)
+        deployments = deployments.replace('-', np.nan)
         deployments.loc[deployments.recovery_date.isnull(
         ), 'recovery_date'] = deployments.last_download
-        deployments = deployments[(
-            deployments.last_download != '-') &
-            (deployments.recovery_date != '-')]
 
+        deployments = deployments[~deployments.recovery_date.isnull()]
         # Cast the date columns to a datetime
         deployments.deploy_date = pd.to_datetime(deployments.deploy_date)
         deployments.recovery_date = pd.to_datetime(deployments.recovery_date)
         deployments.last_download = pd.to_datetime(deployments.last_download)
 
         # Calculate each receivers total days deployed
-        deployments['days_deployed'] = deployments[
-            ['last_download',
-             'recovery_date']
-        ].max(axis=1) - deployments.deploy_date
+        deployments['days_deployed'] = deployments.recovery_date - \
+            deployments.deploy_date
+
         days_active = deployments.groupby('station_name').agg(
             {'days_deployed': 'sum'}).reset_index()
         days_active.set_index('station_name', inplace=True)
-
         # Exclude all detections that are not registered with receivers in the
         # deployments
         detections = detections[detections.station.isin(
@@ -63,6 +61,11 @@ def REI(detections, deployments):
         days_with_detections = len(pd.to_datetime(
             detections.datecollected).dt.date.unique())
         station_reis = pd.DataFrame(columns=['station', 'rei'])
+
+        # Loop through each station in the detections and Calculate REI for
+        #  oeach station
+        detections.datecollected = pd.to_datetime(
+            detections.datecollected).dt.date
 
         # Loop through each station in the detections and Calculate REI for
         #  oeach station
@@ -91,6 +94,7 @@ def REI(detections, deployments):
 
         # Normalize REIs to value from 0 to 1
         station_reis.rei = station_reis.rei / station_reis.rei.sum()
+
         # Cleanup and return the station REI's
         del deployments
         return station_reis
