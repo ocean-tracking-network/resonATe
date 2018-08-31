@@ -9,6 +9,17 @@ py.init_notebook_mode()
 
 
 def consolidate_data(detections):
+    """
+
+    Takes set of detections, cleans and sumarises the detections for the
+    timeline.
+
+    :param detections: A Pandas DataFrame of animal detections
+
+    :return: A Pandas DataFrame of catalognumber, station, date, latitude,
+        longitude and detection counts by day
+    """
+
     detections = detections.copy(deep=True)
     detections = detections[~(detections.receiver == 'release')]
     detections['date'] = pd.to_datetime(detections.datecollected).dt.date
@@ -38,6 +49,17 @@ def consolidate_data(detections):
 
 
 def create_grid(detections):
+    """
+
+    Takes the a set of consolidaed detections (the output from
+    ``consolidate_data()``) and organizes them into a Plotly grid like format.
+
+    :param detections: A Pandas DataFrame of catalognumber, station, date,
+        latitude, longitude and detection counts by day
+
+    :return: A Plotly grid like dataframe
+    """
+
     total_grid = pd.DataFrame()
     for date, data in detections.groupby('date'):
         grid = pd.DataFrame()
@@ -54,6 +76,17 @@ def create_grid(detections):
 
 def create_trace(detections, total_grid, is_mapbox=False,
                  colorscale='Rainbow'):
+    """
+
+    :param detections: A Pandas DataFrame of catalognumber, station, date,
+        latitude, longitude and detection counts by day
+    :param total_grid: A Pandas DataFrame from ``create_grid()``
+    :param is_mapbox: A boolean indicating whether to return a Scattermapbox or
+        Scattergeo trace
+    :param colorscale:
+
+    :return: a Plotly Scattergeo or Scattermapbox trace of the first frame
+    """
     trace = dict(
         lon=total_grid['x-' + str(detections.date.min().date())].dropna(),
         lat=total_grid['y-' + str(detections.date.min().date())].dropna(),
@@ -81,6 +114,16 @@ def create_trace(detections, total_grid, is_mapbox=False,
 
 
 def create_frames(detections, total_grid, is_mapbox=False):
+    """
+
+    :param detections: A Pandas DataFrame of catalognumber, station, date,
+        latitude, longitude and detection counts by day
+    :param total_grid: A Pandas DataFrame from ``create_grid()``
+    :param is_mapbox: A boolean indicating whether to return a Scattermapbox or
+        Scattergeo trace
+
+    :return: An array of Plotly Frames
+    """
     frames = []
     for date in pd.date_range(detections.date.min(), detections.date.max()):
         date = date.date()
@@ -123,6 +166,10 @@ def create_frames(detections, total_grid, is_mapbox=False):
 
 
 def define_updatemenus(animation_time=1000, transition_time=300):
+    """
+    :param animation_time:
+    :param transition_time:
+    """
     updatemenus = dict(
         # GENERAL
         type="buttons",
@@ -173,6 +220,15 @@ def define_updatemenus(animation_time=1000, transition_time=300):
 
 
 def define_sliders(detections, animation_time=300, slider_transition_time=300):
+    """
+
+    :param detections: A Pandas DataFrame of catalognumber, station, date,
+        latitude, longitude and detection counts by day
+    :param animation_time:
+    :param slider_transition_time:
+
+    :return:
+    """
     sliders = dict(
         active=0,
         steps=[],
@@ -224,6 +280,15 @@ def define_sliders(detections, animation_time=300, slider_transition_time=300):
 
 def define_layout(detections, title, plotly_geo=None,  mapbox_token=None,
                   style='light'):
+    """
+
+    :param detections: A Pandas DataFrame of catalognumber, station, date,
+        latitude, longitude and detection counts by day
+    :param title:
+    :param plotly_geo:
+    :param mapbox_token:
+    :param style:
+    """
 
     if mapbox_token is None:
         if plotly_geo is None:
@@ -284,6 +349,23 @@ def timeline(detections, title='Timeline', height=700, width=1000,
              ipython_display=True, mapbox_token=None, plotly_geo=None,
              animation_time=1000, transition_time=300,
              slider_transition_time=300, colorscale='Rainbow', style='light'):
+    """
+
+    :param detections: A Pandas DataFrame of catalognumber, station, date,
+        latitude, longitude and detection counts by day
+    :param title:
+    :param height:
+    :param width:
+    :param ipython_display:
+    :param mapbox_token:
+    :param plotly_geo:
+    :param animation_time:
+    :param transition_time:
+    :param slider_transition_time:
+    :param colorscale:
+    :param style:
+
+    """
     detections = consolidate_data(detections)
     total_grid = create_grid(detections)
     if mapbox_token is None:
