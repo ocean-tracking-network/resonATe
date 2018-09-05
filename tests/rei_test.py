@@ -9,7 +9,7 @@ from resonate.receiver_efficiency import REI
 
 class REITest(unittest.TestCase):
 
-    def test_compression(self):
+    def test_rei(self):
         print(c.YELLOW + 'Testing REI...' + c.RESET)
 
         detections = pd.read_csv('tests/assertion_files/hfx_detections.csv')
