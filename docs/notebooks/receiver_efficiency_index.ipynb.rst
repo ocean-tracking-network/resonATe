@@ -31,7 +31,7 @@ REI =
 -  REI = Receiver Efficiency Index
 -  :math:`T_r` = The number of tags detected on the receievr
 -  :math:`T_a` = The number of tags detected across all receivers
--  :math:`S_r` = The number of species detected on the receievr
+-  :math:`S_r` = The number of species detected on the receiver
 -  :math:`S_a` = The number of species detected across all receivers
 -  :math:`DD_a` = The number of unique days with detections across all
    receivers

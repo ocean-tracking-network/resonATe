@@ -400,11 +400,12 @@ def timeline(detections, title='Timeline', height=700, width=1000,
         sliders=[sliders],
     ))
 
+    layout.update(
+        height=height,
+        width=width
+    )
+
     if ipython_display:
-        layout.update(
-            height=height,
-            width=width
-        )
         fig = {'data': [trace], 'layout': layout, 'frames': frames}
 
         py.init_notebook_mode()

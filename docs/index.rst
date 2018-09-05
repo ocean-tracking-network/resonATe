@@ -118,7 +118,7 @@ This tool will add a column to any file. The unique id will be sequential intege
 Visual Timeline
 ---------------
 
-This tool takes a detections extract file, compresses it, and generates an HTML and JSON file to an ``html`` folder. Details in :ref:`Visual Timeline <visual_timeline_page>`.
+This tool takes a detections extract file and generates a Plotly animated timeline, either in place in an iPython notebook or exported out to an HTML file. Details in :ref:`Visual Timeline <visual_timeline_page>`.
 
 Contents:
 ---------
