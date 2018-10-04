@@ -13,16 +13,10 @@ The receiver efficiency index implement is implemented based on the
 paper [paper place holder]. Each receiver’s index is calculated on the
 formula of:
 
-.. raw:: html
+.. container:: large-math
 
-   <div class="large-math">
-
-REI =
-:math:`\frac{\left(\frac{T_r}{T_a} \times \frac{S_r}{S_a}\right) / \left(\frac{DD_a}{DD_r}\right)}{D_r}`
-
-.. raw:: html
-
-   </div>
+   REI =
+   :math:`\frac{\left(\frac{T_r}{T_a} \times \frac{S_r}{S_a}\right) / \left(\frac{DD_a}{DD_r}\right)}{D_r}`
 
 .. raw:: html
 
