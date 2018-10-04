@@ -2,6 +2,7 @@ import datetime
 
 import numpy as np
 import pandas as pd
+from resonate.library.exceptions import GenericException
 
 
 def REI(detections, deployments):
