@@ -212,15 +212,18 @@ def plot_ri(ri_data, ipython_display=True,
     :param ri_data: A Pandas DataFrame generated from ``residency_index()``
     :param ipython_display: a boolean to show in a notebook
     :param title: the title of the plot
-    :param height: the height of the plotl
+    :param height: the height of the plotly
     :param width: the width of the plotly
-    :param plotly_geo: an optional dictionary to controle the
-        geographix aspects of the plot
+    :param plotly_geo: an optional dictionary to control the
+        geographic aspects of the plot
     :param filename: Plotly filename to write to
     :param mapbox_token: A string of mapbox access token
     :param marker_size: An int to indicate the diameter in pixels
-    :param scale_markers: A boolean to indicate whether or not markers are scaled by their value
-    :param colorscale: A string to indicate the color index
+    :param scale_markers: A boolean to indicate whether or not markers are
+        scaled by their value
+    :param colorscale: A string to indicate the color index. See here for
+        options:
+        https://community.plot.ly/t/what-colorscales-are-available-in-plotly-and-which-are-the-default/2079
 
     :return: A plotly geoscatter
 

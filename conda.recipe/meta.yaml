@@ -22,7 +22,6 @@ requirements:
     - numpy
     - sphinx
     - geopy
-    - simplejson
     - nose
     - colorama
     - plotly
@@ -34,7 +33,6 @@ requirements:
     - numpy
     - sphinx
     - geopy
-    - simplejson
     - nose
     - colorama
     - plotly

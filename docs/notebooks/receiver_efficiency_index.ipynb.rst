@@ -13,16 +13,10 @@ The receiver efficiency index implement is implemented based on the
 paper [paper place holder]. Each receiver’s index is calculated on the
 formula of:
 
-.. raw:: html
+.. container:: large-math
 
-   <div class="large-math">
-
-REI =
-:math:`\frac{\left(\frac{T_r}{T_a} \times \frac{S_r}{S_a}\right) / \left(\frac{DD_a}{DD_r}\right)}{D_r}`
-
-.. raw:: html
-
-   </div>
+   REI =
+   :math:`\frac{T_r}{T_a} \times \frac{S_r}{S_a} \times \frac{DD_r}{DD_a} \times \frac{D_a}{D_r}`
 
 .. raw:: html
 
@@ -31,12 +25,13 @@ REI =
 -  REI = Receiver Efficiency Index
 -  :math:`T_r` = The number of tags detected on the receievr
 -  :math:`T_a` = The number of tags detected across all receivers
--  :math:`S_r` = The number of species detected on the receievr
+-  :math:`S_r` = The number of species detected on the receiver
 -  :math:`S_a` = The number of species detected across all receivers
 -  :math:`DD_a` = The number of unique days with detections across all
    receivers
 -  :math:`DD_r` = The number of unique days with detections on the
    receiver
+-  :math:`D_a` = The number of days the array was active
 -  :math:`D_r` = The number of days the receiver was active
 
 Each REI is then normalized against the sum of all considered stations.

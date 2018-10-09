@@ -17,9 +17,12 @@ def compress_detections(detections, timefilter=3600):
     if not isinstance(detections, pd.DataFrame):
         raise GenericException('input parameter must be a Pandas dataframe')
 
-    mandatory_columns = set(['datecollected', 'catalognumber', 'unqdetecid'])
+    mandatory_columns = set(
+        ['datecollected', 'catalognumber', 'unqdetecid', 'latitude', 'longitude'])
 
     if mandatory_columns.issubset(detections.columns):
+        stations = detections.groupby('catalognumber').agg(
+            'mean')[['latitude', 'longitude']].reset_index()
 
         # Get unique list of animals (not tags), set indices to respect animal and date of detections
         anm_list = detections['catalognumber'].unique()
@@ -66,6 +69,8 @@ def compress_detections(detections, timefilter=3600):
         # Join stations to result. Could add lat/lon here as well.
         out_df = out_df[['catalognumber', 'station', 'seq_num']].drop_duplicates(
         ).merge(stat_df, on=['catalognumber', 'seq_num'])
+
+        out_df = out_df.merge(stations, on='catalognumber')
 
         return out_df
     else:

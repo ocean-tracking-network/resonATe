@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
-from geopy.distance import vincenty
+from geopy.distance import geodesic
 from resonate.library.exceptions import GenericException
 
 
@@ -28,7 +28,7 @@ def get_distance_matrix(detections):
                       stn_locs.loc[cstation, 'longitude'])
             rpoint = (stn_locs.loc[rstation, 'latitude'],
                       stn_locs.loc[rstation, 'longitude'])
-            dist_mtx.loc[rstation, cstation] = vincenty(cpoint, rpoint).m
+            dist_mtx.loc[rstation, cstation] = geodesic(cpoint, rpoint).m
     dist_mtx.index.name = None
     return dist_mtx
 

@@ -45,7 +45,7 @@ detection file and the project bounds.
 
 .. code:: python
 
-    from resonate import kessel_ri as ri
+    from resonate import residence_index as ri
     import pandas as pd
     
     detections = pd.read_csv('/Path/to/detections.csv')

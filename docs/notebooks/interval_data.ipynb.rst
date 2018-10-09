@@ -47,11 +47,11 @@ You can modify individual stations if needed by using
 
 .. code:: python
 
-    station_name = 'station'
+    station_name = 'HFX001'
     
     station_detection_radius = 500
     
-    station_det_radius.set_value(station_name, 'radius', geopy.distance.Distance( station_detection_radius/1000.0 ))
+    station_det_radius.at[station_name, 'radius'] = geopy.distance.Distance( station_detection_radius/1000.0 )
 
 Create the interval data by passing the compressed detections, the
 matrix, and the station radii.
