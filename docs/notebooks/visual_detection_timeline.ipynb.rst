@@ -10,7 +10,7 @@ This tool takes a detections extract file and generates a Plotly
 animated timeline, either in place in an iPython notebook or exported
 out to an HTML file.
 
-.. warning:: 
+.. warning::
 
    Input files must include ``datecollected``, ``catalognumber``, ``station``, ``latitude``, and ``longitude`` as columns.
 
@@ -44,7 +44,7 @@ much for responsive than standard Scattergeo plot.
 
     from resonate.visual_timeline import timeline
     import pandas as pd
-    
+
     mapbox_access_token = 'YOUR MAPBOX ACCESS TOKEN HERE'
     detections = pd.read_csv("/path/to/detection.csv")
     timeline(detections, "Title", mapbox_token=mapbox_access_token)
