@@ -31,11 +31,12 @@ def REI(detections, deployments):
         # date columns
         deployments = deployments.copy(deep=True)
         detections = detections.copy(deep=True)
-        deployments['recovery_notes'] = deployments.recovery_date.str.extract(
-            '([A-Za-z\//:]+)', expand=False)
-        deployments.recovery_date = deployments.recovery_date.str.extract(
-            '(\d+-\d+-\d+)', expand=False)
-        deployments = deployments.replace('-', np.nan)
+        if deployments.recovery_date.dtype != np.dtype('<M8[ns]'):
+            deployments['recovery_notes'] = deployments.recovery_date.str.extract(
+                '([A-Za-z\//:]+)', expand=False)
+            deployments.recovery_date = deployments.recovery_date.str.extract(
+                '(\d+-\d+-\d+)', expand=False)
+            deployments = deployments.replace('-', np.nan)
         deployments.loc[deployments.recovery_date.isnull(
         ), 'recovery_date'] = deployments.last_download
 
@@ -62,6 +63,9 @@ def REI(detections, deployments):
         array_unique_species = len(detections.scientificname.unique())
         days_with_detections = len(pd.to_datetime(
             detections.datecollected).dt.date.unique())
+        array_days_active = (max(deployments.last_download.max(
+        ), deployments.recovery_date.max()) - min(deployments.deploy_date)).days
+
         station_reis = pd.DataFrame(columns=['station', 'rei'])
 
         # Loop through each station in the detections and Calculate REI for
@@ -80,11 +84,10 @@ def REI(detections, deployments):
             if name in days_active.index:
                 receiver_days_active = days_active.loc[name].days_deployed.days
                 if receiver_days_active > 0:
-                    rei = ((receiver_unique_tags / array_unique_tags) *
-                           (receiver_unique_species / array_unique_species)
-                           ) / \
-                        (days_with_detections /
-                         receiver_days_with_detections) / receiver_days_active
+                    rei = (receiver_unique_tags / array_unique_tags) * \
+                        (receiver_unique_species / array_unique_species) * \
+                        (receiver_days_with_detections / days_with_detections) * \
+                        (array_days_active / receiver_days_active)
                     station_reis = station_reis.append({
                         'station': name,
                         'rei': rei,

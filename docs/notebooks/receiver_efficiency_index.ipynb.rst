@@ -16,7 +16,7 @@ formula of:
 .. container:: large-math
 
    REI =
-   :math:`\frac{\left(\frac{T_r}{T_a} \times \frac{S_r}{S_a}\right) / \left(\frac{DD_a}{DD_r}\right)}{D_r}`
+   :math:`\frac{T_r}{T_a} \times \frac{S_r}{S_a} \times \frac{DD_r}{DD_a} \times \frac{D_a}{D_r}`
 
 .. raw:: html
 
@@ -31,6 +31,7 @@ formula of:
    receivers
 -  :math:`DD_r` = The number of unique days with detections on the
    receiver
+-  :math:`D_a` = The number of days the array was active
 -  :math:`D_r` = The number of days the receiver was active
 
 Each REI is then normalized against the sum of all considered stations.

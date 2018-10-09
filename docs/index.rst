@@ -101,7 +101,7 @@ This residence index tool will take a compressed or uncompressed detection file 
 Receiver Efficiency Index
 -------------------------
 
-*(Ellis, R., Flaherty-Walia, K., Collins, A., Bickford, J., Walters Burnsed,  Lowerre-Barbieri S. 2018. Acoustic telemetry array evolution: from species- and project-specific designs to large-scale, multispecies, cooperative networks)*
+`(Ellis, R., Flaherty-Walia, K., Collins, A., Bickford, J., Walters Burnsed,  Lowerre-Barbieri S. 2018. Acoustic telemetry array evolution: from species- and project-specific designs to large-scale, multispecies, cooperative networks) <https://doi.org/10.1016/j.fishres.2018.09.015>`_
 
 The receiver efficiency index is number between ``0`` and ``1`` indicating the amount of relative activity at each receiver compared to the entire set of receivers, regardless of positioning. The function takes a set detections and a deployment history of the receivers to create a context for the detections. Both the amount of unique tags and number of species are taken into consideration in the calculation. For the exact method, see the details in :ref:`Receiver Efficiency Index<receiver_efficiency_index_page>`.
 
