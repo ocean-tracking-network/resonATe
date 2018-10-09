@@ -9,7 +9,7 @@ is used to group detections together and assign them a color.
 
 .. warning:: 
 
-    Input files must include ``datecollected`` as a column.
+   Input files must include ``datecollected`` as a column.
 
 .. code:: python
 
@@ -29,3 +29,4 @@ Or use the standard plotting function to save as HTML:
 .. code:: python
 
     abacus_plot(df, ipython_display=False, filename='example.html')
+

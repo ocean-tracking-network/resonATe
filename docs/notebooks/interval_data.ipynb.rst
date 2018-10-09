@@ -15,11 +15,11 @@ Many consecutive detections of an animal are replaced by one interval.
 
 .. warning:: 
 
-    Input files must include ``datecollected``, ``catalognumber``, and ``unqdetecid`` as columns.
+   Input files must include ``datecollected``, ``catalognumber``, and ``unqdetecid`` as columns.
 
 .. code:: python
 
-    from resonate.filter_detections import get_distance_matrix
+    from resonate.filters import get_distance_matrix
     from resonate.compress import compress_detections
     from resonate.interval_data_tool import interval_data
     import pandas as pd
@@ -47,11 +47,11 @@ You can modify individual stations if needed by using
 
 .. code:: python
 
-    station_name = 'station'
+    station_name = 'HFX001'
     
     station_detection_radius = 500
     
-    station_det_radius.set_value(station_name, 'radius', geopy.distance.Distance( station_detection_radius/1000.0 ))
+    station_det_radius.at[station_name, 'radius'] = geopy.distance.Distance( station_detection_radius/1000.0 )
 
 Create the interval data by passing the compressed detections, the
 matrix, and the station radii.

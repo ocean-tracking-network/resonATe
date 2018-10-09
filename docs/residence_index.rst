@@ -5,5 +5,5 @@
 Residence Index Functions
 -------------------------
 
-.. automodule:: kessel_ri
+.. automodule:: residence_index
    :members:
