@@ -2,19 +2,21 @@
 
 .. include:: notebooks/visual_detection_timeline.ipynb.rst
 
-Below is the sample output for blue sharks off of the coast of Nova Scotia.
+
+Example Output
+--------------
+
+Below is the sample output for blue sharks off of the coast of Nova Scotia,
+without using Mapbox.
 
 .. raw:: html
 
-  <iframe src="_static/nova_scotia_blue_sharks.html" height="400px" width="100%"></iframe>
+  <iframe src="_static/timeline.html" height="750px" width="750px"></iframe>
 
   <hr/>
 
 Visual Timeline Functions
 -------------------------
 
-.. automodule:: html_maps
-   :members:
-
-.. automodule:: geojson
+.. automodule:: visual_timeline
    :members:

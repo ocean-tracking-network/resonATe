@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup, find_packages
-from codecs import open
+
 
 with open('README', encoding='utf-8') as f:
     readme = f.read()
@@ -11,7 +11,7 @@ with open('LICENSE', encoding='utf-8') as f:
 
 setup(
     name='resonATe',
-    version='0.3.2',
+    version='1.0.0',
     description='resonate data analysis package',
     long_description=readme,
     author='Alex Nunes',
