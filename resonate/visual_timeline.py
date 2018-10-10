@@ -21,7 +21,8 @@ def consolidate_data(detections):
     """
 
     detections = detections.copy(deep=True)
-    detections = detections[~(detections.receiver == 'release')]
+    if 'receiver' in detections.columns:
+        detections = detections[~(detections.receiver == 'release')]
     detections['date'] = pd.to_datetime(detections.datecollected).dt.date
     detections['det_counts'] = 0
     detections = detections.groupby(
