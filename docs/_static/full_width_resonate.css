@@ -1,3 +1,8 @@
 .wy-nav-content {
     max-width: none !important;
 }
+
+
+.large-math > p {
+  font-size:2em !important;
+}
