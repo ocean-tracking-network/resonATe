@@ -25,15 +25,15 @@ the user to understand why it was flagged. There is also enough
 information to be able to reference the detection in the original file
 if the user wants to see what was happening at the same time.
 
-The input parameter is a time in minutes. We used 60 minutes as the
+The input parameter is a time in seconds. We used 3600 seconds as the
 default as this is what was used in Easton’s code. This value can be
 changed by the user. The output contains a record for each detection for
-which there has been more than xx minutes since the previous detection
+which there has been more than xx seconds since the previous detection
 (of that tag/animal) and more than the same amount of time until the
 next detection. It ignores which receiver the detection occurred at.
 That is all it does, nothing more and nothing less.
 
-Below the interval is set to 60 minutes and is not using a a user
+Below the interval is set to 3600 seconds and is not using a a user
 specified suspect file. The function will also create a distance matrix.
 
 .. warning:: 
@@ -48,7 +48,7 @@ specified suspect file. The function will also create a distance matrix.
     
     detections = pd.read_csv('/path/to/detections.csv')
     
-    time_interval = 60 # in Minutes
+    time_interval = 3600 # in seconds
     
     SuspectFile = None
     

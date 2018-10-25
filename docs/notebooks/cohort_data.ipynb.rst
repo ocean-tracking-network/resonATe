@@ -15,7 +15,7 @@ The function returns a dataframe which you can use to help identify
 animal cohorts. The cohort is created from the compressed data that is a
 result from the ``compress_detections()`` function. Pass the compressed
 dataframe into the ``cohort()`` function along with a time interval in
-minutes (default is 60) to create the cohort dataframe.
+seconds (default is 3600) to create the cohort dataframe.
 
 .. warning:: 
 
@@ -28,7 +28,7 @@ minutes (default is 60) to create the cohort dataframe.
     from resonate.compress import compress_detections
     import pandas as pd
     
-    time_interval = 60
+    time_interval = 3600 # in seconds
     
     data = pd.read_csv('/path/to/detections.csv')
     
