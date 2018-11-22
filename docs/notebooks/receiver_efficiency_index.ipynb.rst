@@ -10,8 +10,10 @@ create a context for the detections. Both the amount of unique tags and
 number of species are taken into consideration in the calculation.
 
 The receiver efficiency index implement is implemented based on the
-paper [paper place holder]. Each receiver’s index is calculated on the
-formula of:
+paper `Acoustic telemetry array evolution: From species- and
+project-specific designs to large-scale, multispecies, cooperative
+networks <https://doi.org/10.1016/j.fishres.2018.09.015>`__. Each
+receiver’s index is calculated on the formula of:
 
 .. container:: large-math
 
