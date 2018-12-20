@@ -1,6 +1,7 @@
 #!/bin/bash
-twine upload --repository-url https://test.pypi.org/legacy/ dist/*;
-twine upload dist/*;
+python setup.py sdist
+twine upload --skip-existing --repository-url https://test.pypi.org/legacy/ dist/*;
+twine upload --skip-existing dist/*;
 rm -f ~/anaconda3/conda-bld/osx-64/resonate*;
 conda-build conda.recipe &&
 rm -rf conda-dist &&
