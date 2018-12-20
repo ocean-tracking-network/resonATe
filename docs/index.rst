@@ -18,6 +18,7 @@ extracts from OTN and other marine telemetry data.
 * :ref:`Filtering  <filter>`
 * :ref:`Interval Data <interval>`
 * :ref:`Residence Index <residence_index>`
+* :ref:`Receiver Efficiency Index <receiver_efficiency>`
 * :ref:`Unique ID  <unqid>`
 * :ref:`Visual Timeline <timeline>`
 
@@ -65,7 +66,9 @@ OTN has developed a tool which will assist with filtering false detections. The 
 
 This is a very simple tool. It will take an input file of detections and based on an input parameter will identify suspect detections. The suspect detections will be put into a dataframe which the user can examine. There will be enough information for each suspect detection for the user to understand why it was flagged. There is also enough information to be able to reference the detection in the original file if the user wants to see what was happening at the same time.
 
-The input parameter is a time in minutes. We used 60 minutes as the default as this is what was used in Easton's code. This value can be changed by the user. The output contains a record for each detection for which there has been more than xx minutes since the previous detection (of that tag/animal) and more than the same amount of time until the next detection. It ignores which receiver the detection occurred at. That is all it does, nothing more and nothing less. Details are in :ref:`Filter Tool <filter_page>`.
+The input parameter is a time in minutes. We used 3600 seconds as the default as this is what was used in Easton's code. This value can be changed by the user. The output contains a record for each detection for which there has been more than xx minutes since the previous detection (of that tag/animal) and more than the same amount of time until the next detection. It ignores which receiver the detection occurred at. That is all it does, nothing more and nothing less. Details are in :ref:`Filter Tool <filter_page>`.
+
+Two other filtering tools are available as well, one based on distance alone and one based on velocity. They can be found at :ref:`Filter Tools <filter_page>` as well.
 
 
 .. _distance_matrix:
@@ -93,6 +96,16 @@ Residence Index
 This residence index tool will take a compressed or uncompressed detection file and caculate the residency index for each station/receiver in the detections. A CSV file will be written to the data directory for future use. A Pandas DataFrame is returned from the function, which can be used to plot the information. The information passed to the function is what is used to calculate the residence index, make sure you are only passing the data you want taken into consideration for the residence index (i.e. species, stations, tags, etc.). Details in :ref:`Residence Index Tool <residence_index_page>`.
 
 
+.. _receiver_efficiency:
+
+Receiver Efficiency Index
+-------------------------
+
+`(Ellis, R., Flaherty-Walia, K., Collins, A., Bickford, J., Walters Burnsed,  Lowerre-Barbieri S. 2018. Acoustic telemetry array evolution: from species- and project-specific designs to large-scale, multispecies, cooperative networks) <https://doi.org/10.1016/j.fishres.2018.09.015>`_
+
+The receiver efficiency index is number between ``0`` and ``1`` indicating the amount of relative activity at each receiver compared to the entire set of receivers, regardless of positioning. The function takes a set detections and a deployment history of the receivers to create a context for the detections. Both the amount of unique tags and number of species are taken into consideration in the calculation. For the exact method, see the details in :ref:`Receiver Efficiency Index<receiver_efficiency_index_page>`.
+
+
 .. _unqid:
 
 Unique Id
@@ -105,7 +118,7 @@ This tool will add a column to any file. The unique id will be sequential intege
 Visual Timeline
 ---------------
 
-This tool takes a detections extract file, compresses it, and generates an HTML and JSON file to an ``html`` folder. Details in :ref:`Visual Timeline <visual_timeline_page>`.
+This tool takes a detections extract file and generates a Plotly animated timeline, either in place in an iPython notebook or exported out to an HTML file. Details in :ref:`Visual Timeline <visual_timeline_page>`.
 
 Contents:
 ---------
@@ -123,6 +136,7 @@ Contents:
    filter
    interval_data
    residence_index
+   receiver_efficiency_index
    notebooks/data_subsetting.ipynb
    unqid
    visual_timeline

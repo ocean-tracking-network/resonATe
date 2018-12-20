@@ -1,6 +1,6 @@
 package:
   name: resonate
-  version: "0.3.2"
+  version: "1.0.3"
 
 source:
   git_rev: master
@@ -22,7 +22,6 @@ requirements:
     - numpy
     - sphinx
     - geopy
-    - simplejson
     - nose
     - colorama
     - plotly
@@ -34,7 +33,6 @@ requirements:
     - numpy
     - sphinx
     - geopy
-    - simplejson
     - nose
     - colorama
     - plotly

@@ -2,8 +2,7 @@ pandas
 numpy
 sphinx
 geopy
-simplejson
-nose
+pytest
 colorama
 nbconvert
 plotly

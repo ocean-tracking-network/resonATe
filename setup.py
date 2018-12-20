@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
 
-from setuptools import setup, find_packages
 from codecs import open
 
-with open('README', encoding='utf-8') as f:
+from setuptools import find_packages, setup
+
+with open('README') as f:
     readme = f.read()
 
-with open('LICENSE', encoding='utf-8') as f:
+with open('LICENSE') as f:
     license = f.read()
 
 setup(
     name='resonATe',
-    version='0.3.2',
+    version='1.0.3',
     description='resonate data analysis package',
     long_description=readme,
     author='Alex Nunes',
     include_package_data=True,
     author_email='anunes@dal.ca',
     url='https://gitlab.oceantrack.org/otndc/resonate',
-    download_url = 'https://gitlab.oceantrack.org/otndc/resonate',
+    download_url='https://gitlab.oceantrack.org/otndc/resonate',
     license=license,
     classifiers=[
         'Natural Language :: English',

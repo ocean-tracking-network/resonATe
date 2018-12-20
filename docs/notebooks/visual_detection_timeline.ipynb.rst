@@ -6,28 +6,45 @@ Visual Timeline
 
    <hr/>
 
-``render_map()`` takes a detection extract CSV file as a data source, as
-well as a string indicating what the title of the plot should be. The
-title string will also be the filename for the HTML output, located in
-an html file.
-
-You can supply a basemap argument to choose from a few alternate basemap
-tilesets. Available basemaps are:
-
--  No basemap set or ``basemap='dark_layer'`` - CartoDB/OpenStreetMap
-   Dark
--  ``basemap='Esri_OceanBasemap'`` - coarse ocean bathymetry
--  ``basemap='CartoDB_Positron'`` - grayscale land/ocean
--  ``basemap='Stamen_Toner'`` - Stamen Toner - high-contrast black and
-   white - black ocean
+This tool takes a detections extract file and generates a Plotly
+animated timeline, either in place in an iPython notebook or exported
+out to an HTML file.
 
 .. warning:: 
 
-    Input files must include ``datecollected``, ``catalognumber``, ``station``, ``latitude``, ``longitude``, and ``unqdetecid`` as columns.
+   Input files must include ``datecollected``, ``catalognumber``, ``station``, ``latitude``, and ``longitude`` as columns.
 
 .. code:: python
 
-    import resonate.html_maps as hmaps
+    from resonate.visual_timeline import timeline
     import pandas as pd
     detections = pd.read_csv("/path/to/detection.csv")
-    hmaps.render_map(detections, "Title")
+    timeline(detections, "Timeline")
+
+Exporting to an HTML File
+-------------------------
+
+You can export the map to an HTML file by setting ``ipython_display`` to
+``False``.
+
+.. code:: python
+
+    from resonate.visual_timeline import timeline
+    import pandas as pd
+    detections = pd.read_csv("/path/to/detection.csv")
+    timeline(detections, "Timeline", ipython_display=False)
+
+Mapbox
+------
+
+Alternatively you can use a Mapbox access token plot your map. Mapbox is
+much for responsive than standard Scattergeo plot.
+
+.. code:: python
+
+    from resonate.visual_timeline import timeline
+    import pandas as pd
+    
+    mapbox_access_token = 'YOUR MAPBOX ACCESS TOKEN HERE'
+    detections = pd.read_csv("/path/to/detection.csv")
+    timeline(detections, "Title", mapbox_token=mapbox_access_token)
