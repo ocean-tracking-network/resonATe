@@ -63,7 +63,7 @@ def REI(detections, deployments):
         array_unique_species = len(detections.scientificname.unique())
         days_with_detections = len(pd.to_datetime(
             detections.datecollected).dt.date.unique())
-        array_days_active = (max(deployments.last_download.max(
+        array_days_active = (max(deployments.last_download.fillna(deployments.deploy_date.min()).max(
         ), deployments.recovery_date.max()) - min(deployments.deploy_date)).days
 
         station_reis = pd.DataFrame(columns=['station', 'rei'])
@@ -98,11 +98,11 @@ def REI(detections, deployments):
                 print("No valid deployment record for " + name)
 
         # Normalize REIs to value from 0 to 1
-        station_reis.rei = station_reis.rei / station_reis.rei.sum()
+        # station_reis.rei = station_reis.rei / station_reis.rei.sum()
 
         # Cleanup and return the station REI's
         del deployments
         return station_reis
     else:
         raise GenericException("Missing required input columns: {}".format(
-            mandatory_columns - set(detections.columns)))
+            mandatory_detection_columns - set(detections.columns)))

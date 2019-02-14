@@ -15,10 +15,16 @@ project-specific designs to large-scale, multispecies, cooperative
 networks <https://doi.org/10.1016/j.fishres.2018.09.015>`__. Each
 receiver’s index is calculated on the formula of:
 
-.. container:: large-math
+.. raw:: html
 
-   REI =
-   :math:`\frac{T_r}{T_a} \times \frac{S_r}{S_a} \times \frac{DD_r}{DD_a} \times \frac{D_a}{D_r}`
+   <div class="large-math">
+
+REI =
+:math:`\frac{T_r}{T_a} \times \frac{S_r}{S_a} \times \frac{DD_r}{DD_a} \times \frac{D_a}{D_r}`
+
+.. raw:: html
+
+   </div>
 
 .. raw:: html
 
