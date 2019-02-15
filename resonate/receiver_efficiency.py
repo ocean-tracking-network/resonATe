@@ -33,9 +33,9 @@ def REI(detections, deployments):
         detections = detections.copy(deep=True)
         if deployments.recovery_date.dtype != np.dtype('<M8[ns]'):
             deployments['recovery_notes'] = deployments.recovery_date.str.extract(
-                '([A-Za-z\//:]+)', expand=False)
+                r'([A-Za-z\//:]+)', expand=False)
             deployments.recovery_date = deployments.recovery_date.str.extract(
-                '(\d+-\d+-\d+)', expand=False)
+                r'(\d+-\d+-\d+)', expand=False)
             deployments = deployments.replace('-', np.nan)
         deployments.loc[deployments.recovery_date.isnull(
         ), 'recovery_date'] = deployments.last_download
