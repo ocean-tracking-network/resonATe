@@ -1,6 +1,6 @@
 package:
   name: resonate
-  version: "1.0.3"
+  version: "1.0.4"
 
 source:
   git_rev: master
