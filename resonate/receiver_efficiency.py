@@ -98,7 +98,7 @@ def REI(detections, deployments):
                 print("No valid deployment record for " + name)
 
         # Normalize REIs to value from 0 to 1
-        # station_reis.rei = station_reis.rei / station_reis.rei.sum()
+        station_reis.rei = station_reis.rei / station_reis.rei.sum()
 
         # Cleanup and return the station REI's
         del deployments
