@@ -29,4 +29,3 @@ Or use the standard plotting function to save as HTML:
 .. code:: python
 
     abacus_plot(df, ipython_display=False, filename='example.html')
-

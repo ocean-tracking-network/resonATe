@@ -68,4 +68,3 @@ file to a desired location.
 .. code:: python
 
     interval.to_csv('/path/to/output.csv', index=False)
-
