@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
 from geopy.distance import geodesic
+
 from resonate.library.exceptions import GenericException
 
 
@@ -82,16 +83,17 @@ def filter_detections(detections, suspect_file=None,
         # If the space before + after > min_time_buffer
         # Remove that detection row from the detections and add it to suspect detections.
         # SQL that does this is in load_to_postgresql under createSuspect
-
+        detections = detections.copy(deep=True)
         ind = detections['catalognumber'].unique()
-        detections['datecollected'] = pd.to_datetime(
+        detections.loc[:, 'datecollected'] = pd.to_datetime(
             detections['datecollected'])
         user_int = timedelta(seconds=min_time_buffer)
         good_dets = pd.DataFrame()
         susp_dets = pd.DataFrame()
         grouped = detections.groupby('catalognumber')
         for anm in ind:
-            anm_dets = grouped.get_group(anm)
+            anm_dets = grouped.get_group(anm).sort_values(
+                'datecollected', ascending=True)
             intervals = anm_dets['datecollected'] - \
                 anm_dets['datecollected'].shift(1)
             post_intervals = anm_dets['datecollected'].shift(
