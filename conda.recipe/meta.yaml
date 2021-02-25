@@ -1,18 +1,14 @@
 package:
   name: resonate
-  version: "1.0.8"
+  version: "1.0.9"
 
 source:
   git_rev: master
   git_url: https://gitlab.oceantrack.org/otndc/resonate
 
 build:
-  number: 3
-
-python:
-  - 2.7
-  - 3.5
-  - 3.6
+  number: 0
+  noarch: python
 
 requirements:
   build:
