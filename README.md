@@ -7,16 +7,16 @@ extracts from OTN and other marine telemetry data.
 
 
 
-* [Abacus Plot] (#abacus-plot)
-* [Bubble Plot] (#bubble-plot)
-* [Cohort] (#cohort)
-* [Compress Detections] (#compressing-detections)
-* [Distance Matrix] (#distance-matrix)
-* [Filtering] (#filtering)
-* [Interval Data] (#interval-data)
-* [Residence Index] (#residence-index)
-* [Unique ID] (#unique-id)
-* [Visual Timeline] (#visual-timeline)
+* [Abacus Plot](#abacus-plot)
+* [Bubble Plot](#bubble-plot)
+* [Cohort](#cohort)
+* [Compress Detections](#compressing-detections)
+* [Distance Matrix](#distance-matrix)
+* [Filtering](#filtering)
+* [Interval Data](#interval-data)
+* [Residence Index](#residence-index)
+* [Unique ID](#unique-id)
+* [Visual Timeline](#visual-timeline)
 
 
 Abacus Plot

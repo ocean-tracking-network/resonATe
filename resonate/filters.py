@@ -160,18 +160,15 @@ def distance_filter(detections, maximum_distance=100000):
         dm = get_distance_matrix(detections)
 
         lead_lag_stn_df = pd.DataFrame()
-
-        for index, group in detections.sort_values(['datecollected']).groupby(['catalognumber']):
+        for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber']):
             group['lag_station'] = group.station.shift(1).fillna(group.station)
             group['lead_station'] = group.station.shift(
                 -1).fillna(group.station)
             lead_lag_stn_df = lead_lag_stn_df.append(group)
-
         del detections
 
         distance_df = pd.DataFrame()
-
-        for index, group in lead_lag_stn_df.groupby(['station', 'lag_station', 'lead_station']):
+        for _, group in lead_lag_stn_df.groupby(['station', 'lag_station', 'lead_station']):
             stn = group.station.unique()[0]
             lag_stn = group.lag_station.unique()[0]
             lead_stn = group.lead_station.unique()[0]
@@ -180,7 +177,6 @@ def distance_filter(detections, maximum_distance=100000):
             group['lag_distance_m'] = lag_distance
             group['lead_distance_m'] = lead_distance
             distance_df = distance_df.append(group)
-
         del lead_lag_stn_df
         distance_df.sort_index(inplace=True)
 
@@ -215,8 +211,7 @@ def velocity_filter(detections, maximum_velocity=10):
         dm = get_distance_matrix(detections)
 
         lead_lag_df = pd.DataFrame()
-
-        for index, group in detections.sort_values(['datecollected']).groupby(['catalognumber']):
+        for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber']):
             group['lag_station'] = group.station.shift(1).fillna(group.station)
             group['lead_station'] = group.station.shift(
                 -1).fillna(group.station)
@@ -226,13 +221,11 @@ def velocity_filter(detections, maximum_velocity=10):
                 timedelta(seconds=1))
             group['lead_time_diff'] = group.lag_time_diff.shift(
                 -1).fillna(timedelta(seconds=1))
-
             lead_lag_df = lead_lag_df.append(group)
-
         del detections
 
         vel_df = pd.DataFrame()
-        for index, group in lead_lag_df.groupby(['station', 'lag_station', 'lead_station']):
+        for _, group in lead_lag_df.groupby(['station', 'lag_station', 'lead_station']):
             stn = group.station.unique()[0]
             lag_stn = group.lag_station.unique()[0]
             lead_stn = group.lead_station.unique()[0]
@@ -243,9 +236,7 @@ def velocity_filter(detections, maximum_velocity=10):
             group['lag_distance_m'] = lag_distance
             group['lead_distance_m'] = lead_distance
             vel_df = vel_df.append(group)
-
         del lead_lag_df
-
         vel_df['lag_velocity'] = vel_df.lag_distance_m / \
             vel_df.lag_time_diff.dt.total_seconds()
         vel_df['lead_velocity'] = vel_df.lead_distance_m / \
@@ -254,8 +245,12 @@ def velocity_filter(detections, maximum_velocity=10):
         filtered_detections = dict()
         filtered_detections['filtered'] = vel_df[(vel_df.lag_velocity <= maximum_velocity) & (
             vel_df.lead_velocity <= maximum_velocity)].reset_index(drop=True)
-        filtered_detections['suspect'] = vel_df[(vel_df.lag_velocity > maximum_velocity) | (
-            vel_df.lead_velocity > maximum_velocity)].reset_index(drop=True)
+        filtered_detections['suspect'] = vel_df[
+            (vel_df.lag_velocity > maximum_velocity) |
+            (vel_df.lead_velocity > maximum_velocity) |
+            (vel_df.lag_velocity.isna()) |
+            (vel_df.lead_velocity.isna())
+        ].reset_index(drop=True)
         return filtered_detections
     else:
         raise GenericException("Missing required input columns: {}".format(
