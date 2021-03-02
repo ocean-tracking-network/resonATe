@@ -10,9 +10,16 @@ build:
   number: 0
   noarch: python
 
+python:
+  - 3.5
+  - 3.6
+  - 3.7
+  - 3.8
+  - 3.9
+
 requirements:
   build:
-    - python {{ python }}
+    - python >=2.7
     - setuptools
     - pandas
     - numpy
@@ -23,7 +30,7 @@ requirements:
     - plotly
     - nbconvert
   run:
-    - python {{ python }}
+    - python >=2.7
     - setuptools
     - pandas
     - numpy
@@ -39,5 +46,5 @@ test:
 
 about:
   home: https://gitlab.oceantrack.org/otndc/resonate
-  license: GPL
+  license: GPL-2.0-only
   license_file: LICENSE
