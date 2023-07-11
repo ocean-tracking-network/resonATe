@@ -164,7 +164,7 @@ def create_frames(detections, total_grid, is_mapbox=False):
             traces=[0]
         )
 
-        frames.append(frame)
+        frames = pd.concat([frames, frame])
     return frames
 
 

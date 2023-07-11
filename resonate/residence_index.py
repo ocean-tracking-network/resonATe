@@ -372,8 +372,13 @@ def residency_index(detections, calculation_method='kessel'):
         total = get_days(st_dets.copy(), calculation_method)
         location = get_station_location(station, detections)
         # Determine the RI and add the station to the list
-        station_dict = {'station': station, 'days_detected': total, 'residency_index': (total / (float(total_days))),
-                        'longitude': location['longitude'].values[0], 'latitude': location['latitude'].values[0]}
+        station_dict = {
+            'days_detected': total, 
+            'latitude': location['latitude'].values[0],
+            'longitude': location['longitude'].values[0], 
+            'residency_index': (total / (float(total_days))),
+            'station': station,
+        } 
         station_list.append(station_dict)
 
     # convert the station list to a Dataframe

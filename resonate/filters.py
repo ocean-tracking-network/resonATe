@@ -99,11 +99,12 @@ def filter_detections(detections, suspect_file=None,
             post_intervals = anm_dets['datecollected'].shift(
                 -1) - anm_dets['datecollected']
 
-            good_dets = good_dets.append(
+            good_dets = pd.concat([
+                good_dets, 
                 anm_dets[
                     (intervals <= user_int) | (post_intervals <= user_int)
                 ]
-            )
+            ])
 
         # If they aren't a good det, they're suspect!
         # TODO: Reporting: Decide if we want to report the big 'before/after'
@@ -164,7 +165,7 @@ def distance_filter(detections, maximum_distance=100000):
             group['lag_station'] = group.station.shift(1).fillna(group.station)
             group['lead_station'] = group.station.shift(
                 -1).fillna(group.station)
-            lead_lag_stn_df = lead_lag_stn_df.append(group)
+            lead_lag_stn_df = pd.concat([lead_lag_stn_df, group])
         del detections
 
         distance_df = pd.DataFrame()
@@ -176,7 +177,7 @@ def distance_filter(detections, maximum_distance=100000):
             lead_distance = dm.loc[stn, lead_stn]
             group['lag_distance_m'] = lag_distance
             group['lead_distance_m'] = lead_distance
-            distance_df = distance_df.append(group)
+            distance_df = pd.concat([distance_df, group])
         del lead_lag_stn_df
         distance_df.sort_index(inplace=True)
 
@@ -221,7 +222,7 @@ def velocity_filter(detections, maximum_velocity=10):
                 timedelta(seconds=1))
             group['lead_time_diff'] = group.lag_time_diff.shift(
                 -1).fillna(timedelta(seconds=1))
-            lead_lag_df = lead_lag_df.append(group)
+            lead_lag_df = pd.concat([lead_lag_df, group])
         del detections
 
         vel_df = pd.DataFrame()
@@ -235,7 +236,7 @@ def velocity_filter(detections, maximum_velocity=10):
 
             group['lag_distance_m'] = lag_distance
             group['lead_distance_m'] = lead_distance
-            vel_df = vel_df.append(group)
+            vel_df = pd.concat([vel_df, group])
         del lead_lag_df
         vel_df['lag_velocity'] = vel_df.lag_distance_m / \
             vel_df.lag_time_diff.dt.total_seconds()

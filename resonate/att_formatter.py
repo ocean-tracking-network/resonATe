@@ -62,7 +62,7 @@ def create_att_dictionary_format(dets_file=None, tags_file=None, deployment_file
     dets_joined_full['installation'] = None
     dets_joined_full['receiver_status'] = None
     # Create full receiver, if it's not already complete
-    if '-' not in dets_joined_full['ins_model_no'].all():
+    if not dets_joined_full['ins_model_no'].str.contains('-').all():
         dets_joined_full['receiver'] = dets_joined_full['ins_model_no'] + \
             '-' + dets_joined_full['receiver']
     att['station_information'] = dets_joined_full[
