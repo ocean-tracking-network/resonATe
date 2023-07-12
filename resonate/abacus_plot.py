@@ -4,7 +4,7 @@ import plotly.offline as py
 from resonate.library.exceptions import GenericException
 
 
-def abacus_plot(detections: pd.DataFrame, ycolumn='catalognumber', color_column=None, ipython_display=True, title='Abacus Plot', filename=None):
+def abacus_plot(detections, ycolumn='catalognumber', color_column=None, ipython_display=True, title='Abacus Plot', filename=None):
     '''
     Creates a plotly abacus plot from a pandas dataframe
 

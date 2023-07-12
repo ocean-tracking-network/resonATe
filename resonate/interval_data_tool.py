@@ -2,7 +2,7 @@ import geopy
 import pandas as pd
 
 
-def interval_data(compressed_df: pd.DataFrame, dist_matrix_df: pd.DataFrame, station_radius_df: pd.DataFrame=None):
+def interval_data(compressed_df, dist_matrix_df, station_radius_df=None):
     """
     Creates a detection interval file from a compressed detection, distance matrix and station detection radius DataFrames
 
