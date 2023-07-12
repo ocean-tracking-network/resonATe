@@ -151,7 +151,7 @@ def setup_deployment_sheet(path, pad_station=True):
     return subset_rename_df(deploys, deploy_cols, deploy_renames)
 
 
-def subset_rename_df(df, subset, names):
+def subset_rename_df(df: pd.DataFrame, subset, names):
     """Subsets a dataframe then renamed all the columns of the subset.
 
     Args:
@@ -212,7 +212,7 @@ def pad_number(num, size=3):
     return num
 
 
-def reindex_df(df):
+def reindex_df(df: pd.DataFrame):
     """Sets the index of a dataframe to 0 to (size - 1)
 
     Args:

@@ -7,7 +7,7 @@ import plotly.offline as py
 import resonate.compress as cp
 
 
-def total_days_diff(detections):
+def total_days_diff(detections: pd.DataFrame):
     """
     total_days_diff
     Determines the total days difference.
@@ -31,7 +31,7 @@ def total_days_diff(detections):
     return total
 
 
-def total_days_count(detections):
+def total_days_count(detections: pd.DataFrame):
     '''
     total_days_count
     The function below takes a Pandas DataFrame and determines the number of days any
@@ -59,7 +59,7 @@ def total_days_count(detections):
     return detections.size
 
 
-def aggregate_total_with_overlap(detections):
+def aggregate_total_with_overlap(detections: pd.DataFrame):
     '''
     aggregate_total_with_overlap
 
@@ -88,7 +88,7 @@ def aggregate_total_with_overlap(detections):
     return total.total_seconds() / 86400.0
 
 
-def aggregate_total_no_overlap(detections):
+def aggregate_total_no_overlap(detections: pd.DataFrame):
     '''
     aggregate_total_no_overlap
 
@@ -153,7 +153,7 @@ def aggregate_total_no_overlap(detections):
     return total.total_seconds() / 86400.0
 
 
-def get_days(dets, calculation_method='kessel'):
+def get_days(dets: pd.DataFrame, calculation_method='kessel'):
     '''
     get_days
 
@@ -183,7 +183,7 @@ def get_days(dets, calculation_method='kessel'):
     return days
 
 
-def get_station_location(station, detections):
+def get_station_location(station: str, detections: pd.DataFrame):
     '''
     get_station_location
 
@@ -201,7 +201,7 @@ def get_station_location(station, detections):
     return location
 
 
-def plot_ri(ri_data, ipython_display=True,
+def plot_ri(ri_data: pd.DataFrame, ipython_display=True,
             title='Bubble Plot', height=700,
             width=1000, plotly_geo=None, filename=None,
             marker_size=6, scale_markers=False,
@@ -323,7 +323,7 @@ def plot_ri(ri_data, ipython_display=True,
         return py.plot(fig, filename=filename)
 
 
-def residency_index(detections, calculation_method='kessel'):
+def residency_index(detections: pd.DataFrame, calculation_method='kessel'):
     '''
     residency_index
 
