@@ -7,7 +7,7 @@ from geopy.distance import geodesic
 from resonate.library.exceptions import GenericException
 
 
-def get_distance_matrix(detections):
+def get_distance_matrix(detections: pd.DataFrame):
     """
     Creates a distance matrix of all stations in the array or line.
 
@@ -16,7 +16,7 @@ def get_distance_matrix(detections):
     :return: A Pandas DataFrame matrix of station to station distances
 
     """
-    stn_grouped = detections.groupby('station')
+    stn_grouped = detections.groupby('station', dropna=False)
     stn_locs = stn_grouped[['longitude', 'latitude']].mean()
 
     dist_mtx = pd.DataFrame(
@@ -34,7 +34,7 @@ def get_distance_matrix(detections):
     return dist_mtx
 
 
-def filter_detections(detections, suspect_file=None,
+def filter_detections(detections: pd.DataFrame, suspect_file=None,
                       min_time_buffer=3600,
                       distance_matrix=False):
     """
@@ -90,7 +90,7 @@ def filter_detections(detections, suspect_file=None,
         user_int = timedelta(seconds=min_time_buffer)
         good_dets = pd.DataFrame()
         susp_dets = pd.DataFrame()
-        grouped = detections.groupby('catalognumber')
+        grouped = detections.groupby('catalognumber', dropna=False)
         for anm in ind:
             anm_dets = grouped.get_group(anm).sort_values(
                 'datecollected', ascending=True)
@@ -142,7 +142,7 @@ def filter_detections(detections, suspect_file=None,
     return output_dict
 
 
-def distance_filter(detections, maximum_distance=100000):
+def distance_filter(detections: pd.DataFrame, maximum_distance=100000):
     """
     :param detections: a Pandas DataFrame of acoustic detection
     :param maximum_distance: a umber in meters, default is 100000
@@ -161,7 +161,7 @@ def distance_filter(detections, maximum_distance=100000):
         dm = get_distance_matrix(detections)
 
         lead_lag_stn_df = pd.DataFrame()
-        for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber']):
+        for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber'], dropna=False):
             group['lag_station'] = group.station.shift(1).fillna(group.station)
             group['lead_station'] = group.station.shift(
                 -1).fillna(group.station)
@@ -169,7 +169,7 @@ def distance_filter(detections, maximum_distance=100000):
         del detections
 
         distance_df = pd.DataFrame()
-        for _, group in lead_lag_stn_df.groupby(['station', 'lag_station', 'lead_station']):
+        for _, group in lead_lag_stn_df.groupby(['station', 'lag_station', 'lead_station'], dropna=False):
             stn = group.station.unique()[0]
             lag_stn = group.lag_station.unique()[0]
             lead_stn = group.lead_station.unique()[0]
@@ -192,7 +192,7 @@ def distance_filter(detections, maximum_distance=100000):
             mandatory_columns - set(detections.columns)))
 
 
-def velocity_filter(detections, maximum_velocity=10):
+def velocity_filter(detections: pd.DataFrame, maximum_velocity=10):
     """
     :param detections:
     :param maximum_velocity:
@@ -212,7 +212,7 @@ def velocity_filter(detections, maximum_velocity=10):
         dm = get_distance_matrix(detections)
 
         lead_lag_df = pd.DataFrame()
-        for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber']):
+        for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber'], dropna=False):
             group['lag_station'] = group.station.shift(1).fillna(group.station)
             group['lead_station'] = group.station.shift(
                 -1).fillna(group.station)
@@ -226,7 +226,7 @@ def velocity_filter(detections, maximum_velocity=10):
         del detections
 
         vel_df = pd.DataFrame()
-        for _, group in lead_lag_df.groupby(['station', 'lag_station', 'lead_station']):
+        for _, group in lead_lag_df.groupby(['station', 'lag_station', 'lead_station'], dropna=False):
             stn = group.station.unique()[0]
             lag_stn = group.lag_station.unique()[0]
             lead_stn = group.lead_station.unique()[0]
