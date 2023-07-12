@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def cohort(compressed_df: pd.DataFrame, interval_time=3600):
+def cohort(compressed_df, interval_time=3600):
     """
     Creates a dataframe of cohorts using a compressed detection file
 
