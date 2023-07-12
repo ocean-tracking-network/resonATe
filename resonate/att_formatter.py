@@ -62,7 +62,7 @@ def create_att_dictionary_format(dets_file=None, tags_file=None, deployment_file
     dets_joined_full['installation'] = None
     dets_joined_full['receiver_status'] = None
     # Create full receiver, if it's not already complete
-    if '-' not in dets_joined_full['ins_model_no'].all():
+    if not dets_joined_full['ins_model_no'].str.contains('-').all():
         dets_joined_full['receiver'] = dets_joined_full['ins_model_no'] + \
             '-' + dets_joined_full['receiver']
     att['station_information'] = dets_joined_full[
@@ -151,7 +151,7 @@ def setup_deployment_sheet(path, pad_station=True):
     return subset_rename_df(deploys, deploy_cols, deploy_renames)
 
 
-def subset_rename_df(df, subset, names):
+def subset_rename_df(df: pd.DataFrame, subset, names):
     """Subsets a dataframe then renamed all the columns of the subset.
 
     Args:
@@ -212,7 +212,7 @@ def pad_number(num, size=3):
     return num
 
 
-def reindex_df(df):
+def reindex_df(df: pd.DataFrame):
     """Sets the index of a dataframe to 0 to (size - 1)
 
     Args:

@@ -4,7 +4,7 @@ import pandas as pd
 from resonate.library.exceptions import GenericException
 
 
-def compress_detections(detections, timefilter=3600):
+def compress_detections(detections: pd.DataFrame, timefilter=3600):
     '''
     Creates compressed dataframe from detection dataframe
 
@@ -21,8 +21,8 @@ def compress_detections(detections, timefilter=3600):
         ['datecollected', 'catalognumber', 'unqdetecid', 'latitude', 'longitude'])
 
     if mandatory_columns.issubset(detections.columns):
-        stations = detections.groupby('station').agg(
-            'mean')[['latitude', 'longitude']].reset_index()
+        stations = detections.groupby('station', dropna=False).agg(
+            'mean', 1)[['latitude', 'longitude']].reset_index()
 
         # Get unique list of animals (not tags), set indices to respect animal and date of detections
         anm_list = detections['catalognumber'].unique()
@@ -32,7 +32,7 @@ def compress_detections(detections, timefilter=3600):
 
         # Set up empty data structures and the animal-based groupby object
         detections['seq_num'] = np.nan
-        anm_group = detections.groupby('catalognumber')
+        anm_group = detections.groupby('catalognumber', dropna=False)
         out_df = pd.DataFrame()
 
         # for each animal's detections ordered by time, when station changes, seqnum is incremented.
@@ -43,9 +43,9 @@ def compress_detections(detections, timefilter=3600):
             a.datecollected = pd.to_datetime(a.datecollected)
             a['seq_num'] = ((a.station.shift(1) != a.station) | (
                 a.datecollected.diff().dt.total_seconds() > timefilter)).astype(int).cumsum()
-            out_df = out_df.append(a)
+            out_df = pd.concat([out_df, a])
 
-        stat_df = out_df.groupby(['catalognumber', 'seq_num']).agg({'datecollected': ['min', 'max'],
+        stat_df = out_df.groupby(['catalognumber', 'seq_num'], dropna=False).agg({'datecollected': ['min', 'max'],
                                                                     'unqdetecid': ['first', 'last'],
                                                                     'seq_num': 'count'})
 

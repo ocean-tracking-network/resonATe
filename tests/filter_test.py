@@ -17,6 +17,7 @@ class FilterTest(unittest.TestCase):
             'tests/assertion_files/nsbs.csv'))['filtered']
         dfb = pd.read_csv('tests/assertion_files/nsbs_filtered.csv')
         dfa.notes = dfa.notes.astype(float)
+        dfa.datecollected = pd.to_datetime(dfa.datecollected)
         dfb.datecollected = pd.to_datetime(dfb.datecollected)
         pt.assert_frame_equal(dfa.reset_index(drop=True), dfb)
         print(c.GREEN + 'OK!\n' + c.RESET)

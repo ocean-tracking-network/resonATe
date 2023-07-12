@@ -7,7 +7,7 @@ from geopy.distance import geodesic
 from resonate.library.exceptions import GenericException
 
 
-def get_distance_matrix(detections):
+def get_distance_matrix(detections: pd.DataFrame):
     """
     Creates a distance matrix of all stations in the array or line.
 
@@ -16,7 +16,7 @@ def get_distance_matrix(detections):
     :return: A Pandas DataFrame matrix of station to station distances
 
     """
-    stn_grouped = detections.groupby('station')
+    stn_grouped = detections.groupby('station', dropna=False)
     stn_locs = stn_grouped[['longitude', 'latitude']].mean()
 
     dist_mtx = pd.DataFrame(
@@ -34,7 +34,7 @@ def get_distance_matrix(detections):
     return dist_mtx
 
 
-def filter_detections(detections, suspect_file=None,
+def filter_detections(detections: pd.DataFrame, suspect_file=None,
                       min_time_buffer=3600,
                       distance_matrix=False):
     """
@@ -90,7 +90,7 @@ def filter_detections(detections, suspect_file=None,
         user_int = timedelta(seconds=min_time_buffer)
         good_dets = pd.DataFrame()
         susp_dets = pd.DataFrame()
-        grouped = detections.groupby('catalognumber')
+        grouped = detections.groupby('catalognumber', dropna=False)
         for anm in ind:
             anm_dets = grouped.get_group(anm).sort_values(
                 'datecollected', ascending=True)
@@ -99,11 +99,12 @@ def filter_detections(detections, suspect_file=None,
             post_intervals = anm_dets['datecollected'].shift(
                 -1) - anm_dets['datecollected']
 
-            good_dets = good_dets.append(
+            good_dets = pd.concat([
+                good_dets, 
                 anm_dets[
                     (intervals <= user_int) | (post_intervals <= user_int)
                 ]
-            )
+            ])
 
         # If they aren't a good det, they're suspect!
         # TODO: Reporting: Decide if we want to report the big 'before/after'
@@ -141,7 +142,7 @@ def filter_detections(detections, suspect_file=None,
     return output_dict
 
 
-def distance_filter(detections, maximum_distance=100000):
+def distance_filter(detections: pd.DataFrame, maximum_distance=100000):
     """
     :param detections: a Pandas DataFrame of acoustic detection
     :param maximum_distance: a umber in meters, default is 100000
@@ -160,15 +161,15 @@ def distance_filter(detections, maximum_distance=100000):
         dm = get_distance_matrix(detections)
 
         lead_lag_stn_df = pd.DataFrame()
-        for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber']):
+        for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber'], dropna=False):
             group['lag_station'] = group.station.shift(1).fillna(group.station)
             group['lead_station'] = group.station.shift(
                 -1).fillna(group.station)
-            lead_lag_stn_df = lead_lag_stn_df.append(group)
+            lead_lag_stn_df = pd.concat([lead_lag_stn_df, group])
         del detections
 
         distance_df = pd.DataFrame()
-        for _, group in lead_lag_stn_df.groupby(['station', 'lag_station', 'lead_station']):
+        for _, group in lead_lag_stn_df.groupby(['station', 'lag_station', 'lead_station'], dropna=False):
             stn = group.station.unique()[0]
             lag_stn = group.lag_station.unique()[0]
             lead_stn = group.lead_station.unique()[0]
@@ -176,7 +177,7 @@ def distance_filter(detections, maximum_distance=100000):
             lead_distance = dm.loc[stn, lead_stn]
             group['lag_distance_m'] = lag_distance
             group['lead_distance_m'] = lead_distance
-            distance_df = distance_df.append(group)
+            distance_df = pd.concat([distance_df, group])
         del lead_lag_stn_df
         distance_df.sort_index(inplace=True)
 
@@ -191,7 +192,7 @@ def distance_filter(detections, maximum_distance=100000):
             mandatory_columns - set(detections.columns)))
 
 
-def velocity_filter(detections, maximum_velocity=10):
+def velocity_filter(detections: pd.DataFrame, maximum_velocity=10):
     """
     :param detections:
     :param maximum_velocity:
@@ -211,7 +212,7 @@ def velocity_filter(detections, maximum_velocity=10):
         dm = get_distance_matrix(detections)
 
         lead_lag_df = pd.DataFrame()
-        for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber']):
+        for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber'], dropna=False):
             group['lag_station'] = group.station.shift(1).fillna(group.station)
             group['lead_station'] = group.station.shift(
                 -1).fillna(group.station)
@@ -221,11 +222,11 @@ def velocity_filter(detections, maximum_velocity=10):
                 timedelta(seconds=1))
             group['lead_time_diff'] = group.lag_time_diff.shift(
                 -1).fillna(timedelta(seconds=1))
-            lead_lag_df = lead_lag_df.append(group)
+            lead_lag_df = pd.concat([lead_lag_df, group])
         del detections
 
         vel_df = pd.DataFrame()
-        for _, group in lead_lag_df.groupby(['station', 'lag_station', 'lead_station']):
+        for _, group in lead_lag_df.groupby(['station', 'lag_station', 'lead_station'], dropna=False):
             stn = group.station.unique()[0]
             lag_stn = group.lag_station.unique()[0]
             lead_stn = group.lead_station.unique()[0]
@@ -235,7 +236,7 @@ def velocity_filter(detections, maximum_velocity=10):
 
             group['lag_distance_m'] = lag_distance
             group['lead_distance_m'] = lead_distance
-            vel_df = vel_df.append(group)
+            vel_df = pd.concat([vel_df, group])
         del lead_lag_df
         vel_df['lag_velocity'] = vel_df.lag_distance_m / \
             vel_df.lag_time_diff.dt.total_seconds()

@@ -8,7 +8,7 @@ from plotly.graph_objs import *
 py.init_notebook_mode()
 
 
-def consolidate_data(detections):
+def consolidate_data(detections: pd.DataFrame):
     """
 
     Takes set of detections, cleans and sumarises the detections for the
@@ -26,7 +26,7 @@ def consolidate_data(detections):
     detections['date'] = pd.to_datetime(detections.datecollected).dt.date
     detections['det_counts'] = 0
     detections = detections.groupby(
-        ['catalognumber', 'date', 'station'], as_index=False).agg({
+        ['catalognumber', 'date', 'station'], as_index=False, dropna=False).agg({
             'det_counts': 'count',
             'latitude': 'mean',
             'longitude': 'mean',
@@ -49,7 +49,7 @@ def consolidate_data(detections):
     return detections
 
 
-def create_grid(detections):
+def create_grid(detections: pd.DataFrame):
     """
 
     Takes the a set of consolidaed detections (the output from
@@ -75,7 +75,7 @@ def create_grid(detections):
     return total_grid
 
 
-def create_trace(detections, total_grid, is_mapbox=False,
+def create_trace(detections: pd.DataFrame, total_grid, is_mapbox=False,
                  colorscale='Rainbow'):
     """
 
@@ -116,7 +116,7 @@ def create_trace(detections, total_grid, is_mapbox=False,
     return trace
 
 
-def create_frames(detections, total_grid, is_mapbox=False):
+def create_frames(detections: pd.DataFrame, total_grid: pd.DataFrame, is_mapbox=False):
     """
 
     :param detections: A Pandas DataFrame of catalognumber, station, date,
@@ -164,7 +164,7 @@ def create_frames(detections, total_grid, is_mapbox=False):
             traces=[0]
         )
 
-        frames.append(frame)
+        frames = pd.concat([frames, frame])
     return frames
 
 
@@ -224,7 +224,7 @@ def define_updatemenus(animation_time=1000, transition_time=300):
     return updatemenus
 
 
-def define_sliders(detections, animation_time=300, slider_transition_time=300):
+def define_sliders(detections: pd.DataFrame, animation_time=300, slider_transition_time=300):
     """
 
     :param detections: A Pandas DataFrame of catalognumber, station, date,
@@ -284,7 +284,7 @@ def define_sliders(detections, animation_time=300, slider_transition_time=300):
     return sliders
 
 
-def define_layout(detections, title, plotly_geo=None,  mapbox_token=None,
+def define_layout(detections: pd.DataFrame, title, plotly_geo=None,  mapbox_token=None,
                   style='light'):
     """
 
@@ -355,7 +355,7 @@ def define_layout(detections, title, plotly_geo=None,  mapbox_token=None,
     return layout
 
 
-def timeline(detections, title='Timeline', height=700, width=1000,
+def timeline(detections: pd.DataFrame, title='Timeline', height=700, width=1000,
              ipython_display=True, mapbox_token=None, plotly_geo=None,
              animation_time=1000, transition_time=300,
              slider_transition_time=300, colorscale='Rainbow', style='light'):
@@ -393,7 +393,7 @@ def timeline(detections, title='Timeline', height=700, width=1000,
     updatemenus = define_updatemenus(animation_time, transition_time)
     sliders = define_sliders(detections, animation_time,
                              slider_transition_time)
-    layout = define_layout(detections, title, mapbox_token=mapbox_token,
+    layout = define_layout(detections, title, plotly_geo=plotly_geo, mapbox_token=mapbox_token,
                            style=style)
 
     layout.update(dict(
