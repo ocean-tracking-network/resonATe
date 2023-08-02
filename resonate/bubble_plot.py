@@ -8,23 +8,29 @@ def bubble_plot(detections: pd.DataFrame, type='detections', ipython_display=Tru
                 title='Bubble Plot', height=700, width=1000,
                 plotly_geo=None, filename=None, mapbox_token=None,
                 marker_size=10, colorscale='Viridis'):
-    '''
-    Creates a plotly abacus plot from a pandas dataframe
+    """_summary_
 
-    :param detections: detection dataframe
-    :param ipython_display: a boolean to show in a notebook
-    :param title: the title of the plot
-    :param height: the height of the plotl
-    :param width: the width of the plotly
-    :param plotly_geo: an optional dictionary to controle the
-        geographix aspects of the plot
-    :param filename: Plotly filename to write to
-    :param mapbox_token: A string of mapbox access token
-    :param marker_size: An int to indicate the diameter in pixels
-    :param colorscale: A string to indicate the color index
+    Args:
+        detections (pd.DataFrame): detection dataframe
+        type (str, optional): Counts detections if 'detection', or counts individuals if 'individual'. Defaults to 'detections'.
+        ipython_display (bool, optional): a boolean to show in a notebook. Defaults to True.
+        title (str, optional): the title of the plot. Defaults to 'Bubble Plot'.
+        height (int, optional): the height of the plot. Defaults to 700.
+        width (int, optional): the width of the plot. Defaults to 1000.
+        plotly_geo (dict, optional): an optional dictionary to controle the
+        geographix aspects of the plot. Defaults to None.
+        filename (str, optional): Plotly filename to write to. Defaults to None.
+        mapbox_token (str, optional): A string of mapbox access token. Defaults to None.
+        marker_size (int, optional): An int to indicate the diameter in pixels. Defaults to 10.
+        colorscale (str, optional): A string to indicate the color index. Defaults to 'Viridis'.
 
-    :return: A plotly geoscatter plot or mapbox plot
-    '''
+    Raises:
+        GenericException: Triggers if detections isn't a dataframe
+        GenericException: Triggers if detections is missing required columns
+
+    Returns:
+        (None|Any):  A plotly geoscatter plot or mapbox plot
+    """
 
     if not isinstance(detections, pd.DataFrame):
         raise GenericException('input parameter must be a Pandas dataframe')

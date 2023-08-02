@@ -1,4 +1,3 @@
-
 Filtering Detections on Distance / Time
 =======================================
 
@@ -58,6 +57,21 @@ specified suspect file. The function will also create a distance matrix.
                                             suspect_file=SuspectFile, 
                                             min_time_buffer=time_interval,
                                             distance_matrix=CreateDistanceMatrix)
+
+
+
+
+    ---------------------------------------------------------------------------
+
+    ModuleNotFoundError                       Traceback (most recent call last)
+
+    Cell In[1], line 1
+    ----> 1 from resonate.filters import get_distance_matrix
+          2 from resonate.filters import filter_detections
+          3 import pandas as pd
+
+
+    ModuleNotFoundError: No module named 'resonate'
 
 
 You can use the Pandas ``DataFrame.to_csv()`` function to output the

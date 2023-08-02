@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def create_att_dictionary_format(dets_file=None, tags_file=None, deployment_file=None, preprocessed=None):
+def create_att_dictionary_format(dets_file: str=None, tags_file: str=None, deployment_file: str=None, preprocessed:dict=None) -> dict:
     """Creates a dictionary with dataframes containing detections, tag metadata, and station metadata.
     Heavily inspired by VTrack's ATT format. Either the 3 file args must not be none or the preprocessed
     arg must not be none. If all are not none, preprocessed will be used.
@@ -80,7 +80,7 @@ def create_att_dictionary_format(dets_file=None, tags_file=None, deployment_file
     return att
 
 
-def setup_tag_sheet(path):
+def setup_tag_sheet(path: str):
     """Imports the tag sheet and extracts the parts that are needed for the ATT like dict.
 
     Args:
@@ -118,7 +118,7 @@ def setup_tag_sheet(path):
     return subset_rename_df(tags, tag_cols, tag_renames)
 
 
-def setup_deployment_sheet(path, pad_station=True):
+def setup_deployment_sheet(path:str, pad_station:bool=True):
     """Imports the deployment sheet and extracts the parts that are needed for the ATT like dict.
 
     Args:
@@ -151,7 +151,7 @@ def setup_deployment_sheet(path, pad_station=True):
     return subset_rename_df(deploys, deploy_cols, deploy_renames)
 
 
-def subset_rename_df(df: pd.DataFrame, subset, names):
+def subset_rename_df(df: pd.DataFrame, subset: list, names: list):
     """Subsets a dataframe then renamed all the columns of the subset.
 
     Args:
@@ -173,7 +173,7 @@ def subset_rename_df(df: pd.DataFrame, subset, names):
     return new_df
 
 
-def get_days_from_string(string):
+def get_days_from_string(string: str):
     """Attempts to convert written text to a time delta then return the amount of days
 
     Args:
@@ -204,7 +204,7 @@ def pad_number(num, size=3):
         size (int, optional): The length of the number after padding. Defaults to 3.
 
     Returns:
-        [type]: [description]
+        str: The given number padded on the front with zeros 
     """
     num = str(num)
     while len(num) < size:
