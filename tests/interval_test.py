@@ -40,11 +40,6 @@ class IntervalTest(unittest.TestCase):
         dfa.intervaltime = pd.to_timedelta(dfa.intervaltime)
         dfb.intervaltime = pd.to_timedelta(dfb.intervaltime)
 
-        dfa.intervalseconds = dfa.intervalseconds.astype(float)
-        dfa.distance_m = dfa.distance_m.astype(float)
-        dfa.metres_per_second = dfa.metres_per_second.astype(float)
-        
-
         pt.assert_frame_equal(dfa, dfb)
         print(c.GREEN + 'OK!\n' + c.RESET)
 

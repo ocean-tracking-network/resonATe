@@ -26,7 +26,7 @@ def consolidate_data(detections: pd.DataFrame):
     detections['date'] = pd.to_datetime(detections.datecollected).dt.date
     detections['det_counts'] = 0
     detections = detections.groupby(
-        ['catalognumber', 'date', 'station'], as_index=False, dropna=False).agg({
+        ['catalognumber', 'date', 'station'], as_index=False).agg({
             'det_counts': 'count',
             'latitude': 'mean',
             'longitude': 'mean',
@@ -119,7 +119,7 @@ def create_trace(detections: pd.DataFrame, total_grid, is_mapbox=False,
     return trace
 
 
-def create_frames(detections: pd.DataFrame, total_grid: pd.DataFrame, is_mapbox=False):
+def create_frames(detections, total_grid, is_mapbox=False):
     """
 
     Args:
@@ -169,7 +169,7 @@ def create_frames(detections: pd.DataFrame, total_grid: pd.DataFrame, is_mapbox=
             traces=[0]
         )
 
-        frames = pd.concat([frames, frame])
+        frames.append(frame)
     return frames
 
 
@@ -232,7 +232,7 @@ def define_updatemenus(animation_time=1000, transition_time=300):
     return updatemenus
 
 
-def define_sliders(detections: pd.DataFrame, animation_time=300, slider_transition_time=300):
+def define_sliders(detections, animation_time=300, slider_transition_time=300):
     """
 
     Args:
@@ -294,7 +294,7 @@ def define_sliders(detections: pd.DataFrame, animation_time=300, slider_transiti
     return sliders
 
 
-def define_layout(detections: pd.DataFrame, title, plotly_geo=None,  mapbox_token=None,
+def define_layout(detections, title, plotly_geo=None,  mapbox_token=None,
                   style='light'):
     """
 
@@ -368,7 +368,7 @@ def define_layout(detections: pd.DataFrame, title, plotly_geo=None,  mapbox_toke
     return layout
 
 
-def timeline(detections: pd.DataFrame, title='Timeline', height=700, width=1000,
+def timeline(detections, title='Timeline', height=700, width=1000,
              ipython_display=True, mapbox_token=None, plotly_geo=None,
              animation_time=1000, transition_time=300,
              slider_transition_time=300, colorscale='Rainbow', style='light'):
@@ -410,7 +410,7 @@ def timeline(detections: pd.DataFrame, title='Timeline', height=700, width=1000,
     updatemenus = define_updatemenus(animation_time, transition_time)
     sliders = define_sliders(detections, animation_time,
                              slider_transition_time)
-    layout = define_layout(detections, title, plotly_geo=plotly_geo, mapbox_token=mapbox_token,
+    layout = define_layout(detections, title, mapbox_token=mapbox_token,
                            style=style)
 
     layout.update(dict(

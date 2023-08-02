@@ -62,7 +62,7 @@ def create_att_dictionary_format(dets_file: str=None, tags_file: str=None, deplo
     dets_joined_full['installation'] = None
     dets_joined_full['receiver_status'] = None
     # Create full receiver, if it's not already complete
-    if not dets_joined_full['ins_model_no'].str.contains('-').all():
+    if '-' not in dets_joined_full['ins_model_no'].all():
         dets_joined_full['receiver'] = dets_joined_full['ins_model_no'] + \
             '-' + dets_joined_full['receiver']
     att['station_information'] = dets_joined_full[
@@ -212,7 +212,7 @@ def pad_number(num, size=3):
     return num
 
 
-def reindex_df(df: pd.DataFrame):
+def reindex_df(df):
     """Sets the index of a dataframe to 0 to (size - 1)
 
     Args:

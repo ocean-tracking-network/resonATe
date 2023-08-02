@@ -55,7 +55,7 @@ def REI(detections: pd.DataFrame, deployments: pd.DataFrame) -> pd.DataFrame:
         deployments['days_deployed'] = deployments.recovery_date - \
             deployments.deploy_date
 
-        days_active = deployments.groupby('station_name', dropna=False).agg(
+        days_active = deployments.groupby('station_name').agg(
             {'days_deployed': 'sum'}).reset_index()
         days_active.set_index('station_name', inplace=True)
         # Exclude all detections that are not registered with receivers in the
@@ -71,12 +71,7 @@ def REI(detections: pd.DataFrame, deployments: pd.DataFrame) -> pd.DataFrame:
         array_days_active = (max(deployments.last_download.fillna(deployments.deploy_date.min()).max(
         ), deployments.recovery_date.max()) - min(deployments.deploy_date)).days
 
-        station_reis = pd.DataFrame({
-            'station': pd.Series(dtype='str'),
-            'rei': pd.Series(dtype='float'),
-            'latitude': pd.Series(dtype='float'),
-            'longitude': pd.Series(dtype='float'),
-        })
+        station_reis = pd.DataFrame(columns=['station', 'rei'])
 
         # Loop through each station in the detections and Calculate REI for
         #  oeach station
@@ -85,7 +80,7 @@ def REI(detections: pd.DataFrame, deployments: pd.DataFrame) -> pd.DataFrame:
 
         # Loop through each station in the detections and Calculate REI for
         #  oeach station
-        for name, data in detections.groupby('station', dropna=False):
+        for name, data in detections.groupby('station'):
             receiver_unique_tags = len(data.fieldnumber.unique())
             receiver_unique_species = len(data.scientificname.unique())
             receiver_days_with_detections = len(
@@ -98,14 +93,15 @@ def REI(detections: pd.DataFrame, deployments: pd.DataFrame) -> pd.DataFrame:
                         (receiver_unique_species / array_unique_species) * \
                         (receiver_days_with_detections / days_with_detections) * \
                         (array_days_active / receiver_days_active)
-                    station_reis = pd.concat([station_reis, pd.DataFrame({
-                        'station': [name],
-                        'rei': [rei],
-                        'latitude': [data.latitude.mean()],
-                        'longitude': [data.longitude.mean()]})], ignore_index=True)
+                    station_reis = station_reis.append({
+                        'station': name,
+                        'rei': rei,
+                        'latitude': data.latitude.mean(),
+                        'longitude': data.longitude.mean()},
+                        ignore_index=True)
             else:
                 print("No valid deployment record for " + name)
-        print(station_reis)
+
         # Normalize REIs to value from 0 to 1
         station_reis.rei = station_reis.rei / station_reis.rei.sum()
 
