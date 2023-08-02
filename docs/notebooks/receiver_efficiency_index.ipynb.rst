@@ -1,4 +1,3 @@
-
 Receiver Efficiency Index
 =========================
 

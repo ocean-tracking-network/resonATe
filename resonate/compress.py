@@ -3,18 +3,17 @@ import numpy as np
 import pandas as pd
 from resonate.library.exceptions import GenericException
 
-
 def compress_detections(detections: pd.DataFrame, timefilter=3600, keep_columns=False, keep_columns_agg='first'):
     """Creates compressed dataframe from detection dataframe
 
     Args:
         detections (pd.DataFrame): detection dataframe
         timefilter (int, optional): A maximum amount of time in seconds that can pass before
-            a new detction event is started. Defaults to 3600.
+        a new detction event is started. Defaults to 3600.
         keep_columns (bool, optional): Keep the extra columns from the detection file not required to create 
-            the compressed dataframe. Defaults to False.
+        the compressed dataframe. Defaults to False.
         keep_columns_agg (str|func, optional): If keep_columns is true, defines how to handle aggregation 
-            of duplicate rows. Supports 'first', 'last', or a function. Defaults to 'first'.
+        of duplicate rows. Supports 'first', 'last', or a function. Defaults to 'first'.
 
     Raises:
         GenericException: Triggered if detections is not a dataframe.

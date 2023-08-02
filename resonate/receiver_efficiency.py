@@ -5,15 +5,20 @@ import pandas as pd
 from resonate.library.exceptions import GenericException
 
 
-def REI(detections: pd.DataFrame, deployments: pd.DataFrame):
-    '''
-    Calculates a returns a list of each station and the REI (defined here):
+def REI(detections: pd.DataFrame, deployments: pd.DataFrame) -> pd.DataFrame:
+    """Calculates a returns a list of each station and the REI (defined here):
 
-    :param detections: a pandas DataFrame of detections
-    :param deployments: a pandas DataFrame of station deployment histories
+    Args:
+        detections (pd.DataFrame): a pandas DataFrame of detections
+        deployments (pd.DataFrame): a pandas DataFrame of station deployment histories
 
-    :return: a pandas DataFrame of station, REI, latitude, and longitude
-    '''
+    Raises:
+        GenericException: Triggers when detections argument isn't a dataframe
+        GenericException: Triggers when detections argument doesnt have all the required columns
+
+    Returns:
+        pd.DataFrame: a pandas DataFrame of station, REI, latitude, and longitude
+    """
 
     # Check for proper dataframe and the correct columns
     if not isinstance(detections, pd.DataFrame):

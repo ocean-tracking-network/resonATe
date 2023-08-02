@@ -8,13 +8,13 @@ from resonate.library.exceptions import GenericException
 
 
 def get_distance_matrix(detections: pd.DataFrame):
-    """
-    Creates a distance matrix of all stations in the array or line.
+    """Creates a distance matrix of all stations in the array or line.
 
-    :param detections: a Pandas DataFrame of detections
+    Args:
+        detections (pd.DataFrame): Creates a distance matrix of all stations in the array or line. 
 
-    :return: A Pandas DataFrame matrix of station to station distances
-
+    Returns:
+        pd.DataFrame: A Pandas DataFrame matrix of station to station distances
     """
     stn_grouped = detections.groupby('station', dropna=False)
     stn_locs = stn_grouped[['longitude', 'latitude']].mean()
@@ -36,29 +36,34 @@ def get_distance_matrix(detections: pd.DataFrame):
 
 def filter_detections(detections: pd.DataFrame, suspect_file=None,
                       min_time_buffer=3600,
-                      distance_matrix=False):
-    """
-    Filters isolated detections that are more than min_time_buffer apart from
-    other dets. for a series of detections in detection_file. Returns Filtered
-    and Suspect dataframes.
-    suspect_file can be a file of existing suspect detections to remove before
-    filtering.
-    dist_matrix is created as a matrix of between-station distances from
-    stations defined in the input file.
+                      distance_matrix=False, add_column:bool=True):
+    """Filters isolated detections that are more than min_time_buffer apart from
+        other dets. for a series of detections in detection_file. Returns Filtered
+        and Suspect dataframes.
+        suspect_file can be a file of existing suspect detections to remove before
+        filtering.
+        dist_matrix is created as a matrix of between-station distances from
+        stations defined in the input file.
 
-    :param detections: A Pandas DataFrame of acoustic detections
+    Args:
+        detections (pd.DataFrame): A Pandas DataFrame of acoustic detections
+        suspect_file (str, optional): Path to a user specified suspect file, same format as 
+        the detections. Defaults to None.
+        min_time_buffer (int, optional): The minimum of time required for outlier detections
+        in seconds. Defaults to 3600.
+        distance_matrix (bool, optional):  A boolean of whether or not to generate the
+        distance matrix. Defaults to False.
+        add_column (bool, optional): If true, add a column to specify if the row passed the filtered 
+        or not. Otherwise, split into 2 dataframes. Defaults to True.
 
-    :param suspect_file: Path to a user specified suspect file, same format as the detections
+    Raises:
+        GenericException: Triggered if detections file is missing required columns for filtering.
+        GenericException: Triggered if detections file is missing required columns for generating
+        the distance matrix
 
-    :param min_time_buffer: The minimum of time required for outlier detections
-        in seconds
-
-    :param distance_matrix: A boolean of whether or not to generate the
-        distance matrix
-
-    :return: A list of Pandas DataFrames of filtered detections, suspect
-        detections, and a distance matrix
-
+    Returns:
+        dict|pd.DataFrame: if add_column is True, a Pandas Dataframe. Otherwise, a list of Pandas DataFrames of filtered detections and suspect
+        detections.
     """
 
     # Set of mandatory column names for detection_file
@@ -113,8 +118,8 @@ def filter_detections(detections: pd.DataFrame, suspect_file=None,
         # append.
         # For now, just a matter of putting the complement of the good dets in
         # the susp_dets
-        susp_dets = detections[~detections['unqdetecid'].isin(
-            good_dets['unqdetecid'])]
+        susp_dets = detections.loc[~detections['unqdetecid'].isin(
+            good_dets['unqdetecid'])].copy(deep=True)
 
     else:
         raise GenericException("Missing required input columns: {}".format(
@@ -138,17 +143,34 @@ def filter_detections(detections: pd.DataFrame, suspect_file=None,
             raise GenericException("Missing required input columns for \
                 distance matrix calc: {}".format(
                 dm_mandatory_columns - set(detections.columns)))
+    if add_column:
+        output_dict['filtered'].loc[:, 'passed_detection_filter'] = True
+        output_dict['suspect'].loc[output_dict['suspect'].index, 'passed_detection_filter'] = False
+        output_df = pd.concat(output_dict.values()).reset_index(drop=True)
+        if distance_matrix:
+            return {'detections': output_df, 'dist_mtrx': output_dict['dist_mtrx']}
+        else:
+            return output_df
+
 
     return output_dict
 
 
-def distance_filter(detections: pd.DataFrame, maximum_distance=100000):
-    """
-    :param detections: a Pandas DataFrame of acoustic detection
-    :param maximum_distance: a umber in meters, default is 100000
+def distance_filter(detections: pd.DataFrame, maximum_distance=100000, add_column:bool=True):
+    """Filters detections based on distance between detections.
 
-    :return: A list of Pandas DataFrames of filtered detections and suspect
-        detections
+    Args:
+        detections (pd.DataFrame): a Pandas DataFrame of acoustic detection
+        maximum_distance (int, optional): a number in meters. Defaults to 100000.
+        add_column (bool, optional): If true, add a column to specify if the row passed the filtered 
+        or not. Otherwise, split into 2 dataframes. Defaults to True.
+
+    Raises:
+        GenericException: Triggered if detections file is missing required columns
+
+    Returns:
+        dict|pd.DataFrame: if add_column is True, a Pandas Dataframe. Otherwise, a list of Pandas DataFrames of filtered detections and suspect
+        detections.
     """
     pd.options.mode.chained_assignment = None
 
@@ -180,25 +202,36 @@ def distance_filter(detections: pd.DataFrame, maximum_distance=100000):
             distance_df = pd.concat([distance_df, group])
         del lead_lag_stn_df
         distance_df.sort_index(inplace=True)
-
-        filtered_detections = dict()
-        filtered_detections['filtered'] = distance_df[(distance_df.lag_distance_m <= maximum_distance) & (
-            distance_df.lead_distance_m <= maximum_distance)].reset_index(drop=True)
-        filtered_detections['suspect'] = distance_df[(distance_df.lag_distance_m > maximum_distance) | (
-            distance_df.lead_distance_m > maximum_distance)].reset_index(drop=True)
-        return filtered_detections
+        if add_column:
+            distance_df['passed_distance_filter'] = (distance_df.lag_distance_m <= maximum_distance) & (distance_df.lead_distance_m <= maximum_distance)
+            return distance_df
+        else:
+            filtered_detections = dict()
+            filtered_detections['filtered'] = distance_df[(distance_df.lag_distance_m <= maximum_distance) & (
+                distance_df.lead_distance_m <= maximum_distance)].reset_index(drop=True)
+            filtered_detections['suspect'] = distance_df[(distance_df.lag_distance_m > maximum_distance) | (
+                distance_df.lead_distance_m > maximum_distance)].reset_index(drop=True)
+            return filtered_detections
     else:
         raise GenericException("Missing required input columns: {}".format(
             mandatory_columns - set(detections.columns)))
 
 
-def velocity_filter(detections: pd.DataFrame, maximum_velocity=10):
-    """
-    :param detections:
-    :param maximum_velocity:
+def velocity_filter(detections: pd.DataFrame, maximum_velocity=10,  add_column:bool=True):
+    """Filters detections based on the time it took to travel between locations.
 
-    :return: A list of Pandas DataFrames of filtered detections and suspect
-        detections
+    Args:
+        detections (pd.DataFrame):  a Pandas DataFrame of acoustic detection
+        maximum_velocity (int, optional): The maximum velocity the animals can travel. Defaults to 10.
+        add_column (bool, optional): If true, add a column to specify if the row passed the filtered 
+        or not. Otherwise, split into 2 dataframes. Defaults to True.
+
+    Raises:
+        GenericException: Triggered if detections file is missing required columns
+
+    Returns:
+        dict|pd.DataFrame: if add_column is True, a Pandas Dataframe. Otherwise, a dict of Pandas DataFrames of filtered detections and suspect
+        detections.
     """
     pd.options.mode.chained_assignment = None
 
@@ -243,16 +276,58 @@ def velocity_filter(detections: pd.DataFrame, maximum_velocity=10):
         vel_df['lead_velocity'] = vel_df.lead_distance_m / \
             vel_df.lead_time_diff.dt.total_seconds()
         vel_df.sort_index(inplace=True)
-        filtered_detections = dict()
-        filtered_detections['filtered'] = vel_df[(vel_df.lag_velocity <= maximum_velocity) & (
-            vel_df.lead_velocity <= maximum_velocity)].reset_index(drop=True)
-        filtered_detections['suspect'] = vel_df[
-            (vel_df.lag_velocity > maximum_velocity) |
-            (vel_df.lead_velocity > maximum_velocity) |
-            (vel_df.lag_velocity.isna()) |
-            (vel_df.lead_velocity.isna())
-        ].reset_index(drop=True)
-        return filtered_detections
+        if add_column:
+            vel_df['passed_velocity_filter'] = (
+                (vel_df.lag_velocity <= maximum_velocity) &
+                (vel_df.lead_velocity <= maximum_velocity) & 
+                (vel_df.lag_velocity.notna()) & vel_df.lag_velocity.notna())
+            return vel_df
+        else:
+            filtered_detections = dict()
+            filtered_detections['filtered'] = vel_df[(vel_df.lag_velocity <= maximum_velocity) & (
+                vel_df.lead_velocity <= maximum_velocity)].reset_index(drop=True)
+            filtered_detections['suspect'] = vel_df[
+                (vel_df.lag_velocity > maximum_velocity) |
+                (vel_df.lead_velocity > maximum_velocity) |
+                (vel_df.lag_velocity.isna()) |
+                (vel_df.lead_velocity.isna())
+            ].reset_index(drop=True)
+            return filtered_detections
     else:
         raise GenericException("Missing required input columns: {}".format(
             mandatory_columns - set(detections.columns)))
+
+
+def filter_all(detections: pd.DataFrame, min_time_buffer=3600, maximum_distance=100000, maximum_velocity=10):
+    """Runs all 3 filters on a given detection dataframe, returning 1 dataframe with 3 columns specifying
+        if the row passed each filter test. Does not return a distance matrix.
+
+    Args:
+        detections (pd.DataFrame): A Pandas DataFrame of acoustic detections
+        min_time_buffer (int, optional): The minimum of time required for outlier detections
+        in seconds. Defaults to 3600.
+        maximum_distance (int, optional): a number in meters. Defaults to 100000.
+        maximum_velocity (int, optional): The maximum velocity the animals can travel. Defaults to 10.
+
+    Raises:
+        GenericException: Triggered if detections file is missing required columns
+
+    Returns:
+        pd.DataFrame: A dataframe with all 3 filter columns added and populated
+    """
+    # Set of mandatory column names for detection_file
+    mandatory_columns = set(['station',
+                             'unqdetecid',
+                             'datecollected',
+                             'catalognumber'])
+    if mandatory_columns.issubset(detections.columns):
+        detections = detections.copy(deep=True)
+        detections = filter_detections(detections, min_time_buffer=min_time_buffer)
+        detections = distance_filter(detections, maximum_distance=maximum_distance)
+        detections = velocity_filter(detections, maximum_velocity=maximum_velocity)
+        return detections
+    else:
+        raise GenericException("Missing required input columns: {}".format(
+            mandatory_columns - set(detections.columns)))
+
+    

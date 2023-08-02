@@ -3,14 +3,17 @@ import pandas as pd
 
 
 def interval_data(compressed_df: pd.DataFrame, dist_matrix_df: pd.DataFrame, station_radius_df: pd.DataFrame=None):
-    """
-    Creates a detection interval file from a compressed detection, distance matrix and station detection radius DataFrames
+    """Creates a detection interval file from a compressed detection, distance matrix and station detection radius DataFrames
 
-    :param compressed_df: compressed detection dataframe
-    :param dist_matrix_df: station distance matrix dataframe
-    :param station_radius: station distance radius dataframe
-    :return: interval detection Dataframe
+    Args:
+        compressed_df (pd.DataFrame): compressed detection dataframe
+        dist_matrix_df (pd.DataFrame): station distance matrix dataframe
+        station_radius_df (pd.DataFrame, optional): station distance radius dataframe. Defaults to None.
+
+    Returns:
+        pd.DataFrame: interval detection Dataframe
     """
+    
 
     # Create two dataframes from input compressed detections and decrement the second's seq_num
     fst = compressed_df[

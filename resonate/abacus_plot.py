@@ -4,19 +4,29 @@ import plotly.offline as py
 from resonate.library.exceptions import GenericException
 
 
-def abacus_plot(detections: pd.DataFrame, ycolumn='catalognumber', color_column=None, ipython_display=True, title='Abacus Plot', filename=None):
-    '''
-    Creates a plotly abacus plot from a pandas dataframe
+def abacus_plot(detections: pd.DataFrame, ycolumn:str='catalognumber', color_column:str=None, ipython_display=True, title:str='Abacus Plot', filename:str=None):
+    """Creates a plotly abacus plot from a pandas dataframe
 
-    :param detections: detection dataframe
-    :param ycolumn: the series/column for the y axis of the plot
-    :param color_column: the series/column to group by and assign a color
-    :param ipython_display: a boolean to show in a notebook
-    :param title: the title of the plot
-    :param filename: Plotly filename to write to
+    Args:
+        detections (pd.DataFrame): detection dataframe
+        
+        ycolumn (str, optional): the series/column for the y axis of the plot. Defaults to 'catalognumber'.
+        
+        color_column (str, optional): the series/column to group by and assign a color. Defaults to None.
+        
+        ipython_display (bool, optional): a boolean to show in a notebook. Defaults to True.
+        
+        title (str, optional): the title of the plot. Defaults to 'Abacus Plot'.
+        
+        filename (str, optional): Plotly filename to write to. Defaults to None.
 
-    :return: A plotly scatter plot
-    '''
+    Raises:
+        GenericException: Triggers if detections argument isnt a dataframe
+        GenericException: Triggers dataframe is missing columns.
+
+    Returns:
+        (None|Any):  A plotly scatter plot or None if ipython_display is True
+    """
 
     if not isinstance(detections, pd.DataFrame):
         raise GenericException('input parameter must be a Pandas dataframe')

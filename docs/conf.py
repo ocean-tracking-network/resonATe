@@ -41,7 +41,7 @@ sys.path.insert(0, os.path.join(
 
 
 def setup(app):
-    app.add_stylesheet('full_width_resonate.css')
+    app.add_css_file('full_width_resonate.css')
 
 
 # -- General configuration -----------------------------------------------------
@@ -51,7 +51,7 @@ def setup(app):
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.mathjax']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.mathjax', 'sphinx.ext.napoleon']
 
 nbsphinx_execute = 'never'
 
@@ -69,7 +69,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'resonATe'
-copyright = u'2017 Ocean Tracking Network. All Rights Reserved.'
+copyright = u'2023 Ocean Tracking Network. All Rights Reserved.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

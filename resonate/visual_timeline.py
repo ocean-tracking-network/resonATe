@@ -9,14 +9,14 @@ py.init_notebook_mode()
 
 
 def consolidate_data(detections: pd.DataFrame):
-    """
-
-    Takes set of detections, cleans and sumarises the detections for the
+    """Takes set of detections, cleans and sumarises the detections for the
     timeline.
 
-    :param detections: A Pandas DataFrame of animal detections
+    Args:
+        detections (pd.DataFrame): A Pandas DataFrame of animal detections
 
-    :return: A Pandas DataFrame of catalognumber, station, date, latitude,
+    Returns:
+        pd.DataFrame: A Pandas DataFrame of catalognumber, station, date, latitude,
         longitude and detection counts by day
     """
 
@@ -50,15 +50,16 @@ def consolidate_data(detections: pd.DataFrame):
 
 
 def create_grid(detections: pd.DataFrame):
-    """
-
-    Takes the a set of consolidaed detections (the output from
+    """Takes the a set of consolidated detections (the output from
     ``consolidate_data()``) and organizes them into a Plotly grid like format.
 
-    :param detections: A Pandas DataFrame of catalognumber, station, date,
+
+    Args:
+        detections (pd.DataFrame): A Pandas DataFrame of catalognumber, station, date,
         latitude, longitude and detection counts by day
 
-    :return: A Plotly grid like dataframe
+    Returns:
+        pd.DataFrame: A Plotly grid like dataframe
     """
 
     total_grid = pd.DataFrame()
@@ -76,20 +77,22 @@ def create_grid(detections: pd.DataFrame):
 
 
 def create_trace(detections: pd.DataFrame, total_grid, is_mapbox=False,
-                 colorscale='Rainbow'):
+                 colorscale='Viridis'):
     """
 
-    :param detections: A Pandas DataFrame of catalognumber, station, date,
+    Args:
+        detections (pd.DataFrame): A Pandas DataFrame of catalognumber, station, date,
         latitude, longitude and detection counts by day
-    :param total_grid: A Pandas DataFrame from ``create_grid()``
-    :param is_mapbox: A boolean indicating whether to return a Scattermapbox or
-        Scattergeo trace
-    :param colorscale: A string to indicate the color index. See here for
-        options:
-        https://community.plot.ly/t/what-colorscales-are-available-in-plotly-and-which-are-the-default/2079
+        total_grid (pd.DataFrame): A Pandas DataFrame from ``create_grid()``
+        is_mapbox (bool, optional): A boolean indicating whether to return a Scattermapbox or
+        Scattergeo trace. Defaults to False.
+        colorscale (str, optional):  colorscale (str, optional): A string to indicate the color index. See here for options:
+        https://community.plot.ly/t/what-colorscales-are-available-in-plotly-and-which-are-the-default/2079. Defaults to 'Viridis'.
 
-    :return: a Plotly Scattergeo or Scattermapbox trace of the first frame
+    Returns:
+        Figure: A plotly scattergeo or a scattermapbox
     """
+    
     trace = dict(
         lon=total_grid['x-' + str(detections.date.min().date())].dropna(),
         lat=total_grid['y-' + str(detections.date.min().date())].dropna(),
@@ -119,13 +122,15 @@ def create_trace(detections: pd.DataFrame, total_grid, is_mapbox=False,
 def create_frames(detections: pd.DataFrame, total_grid: pd.DataFrame, is_mapbox=False):
     """
 
-    :param detections: A Pandas DataFrame of catalognumber, station, date,
+    Args:
+        detections (pd.DataFrame): A Pandas DataFrame of catalognumber, station, date,
         latitude, longitude and detection counts by day
-    :param total_grid: A Pandas DataFrame from ``create_grid()``
-    :param is_mapbox: A boolean indicating whether to return a Scattermapbox or
-        Scattergeo trace
+        total_grid (pd.DataFrame): A Pandas DataFrame from ``create_grid()``
+        is_mapbox (bool, optional): A boolean indicating whether to return a Scattermapbox or
+        Scattergeo trace. Defaults to False.
 
-    :return: An array of Plotly Frames
+    Returns:
+        list: An array of Plotly Frames
     """
     frames = []
     for date in pd.date_range(detections.date.min(), detections.date.max()):
@@ -170,10 +175,13 @@ def create_frames(detections: pd.DataFrame, total_grid: pd.DataFrame, is_mapbox=
 
 def define_updatemenus(animation_time=1000, transition_time=300):
     """
-    :param animation_time: The amount of time in milliseconds for each frame
-    :param transition_time: The smount of time in milliseconds between frames
 
-    :return: A dictionary for updatemenus and buttons in Plotly
+    Args:
+        animation_time (int, optional): The amount of time in milliseconds for each frame. Defaults to 1000.
+        transition_time (int, optional): The amount of time in milliseconds between frames. Defaults to 300.
+
+    Returns:
+        dict: dictionary of updatemenu settings
     """
     updatemenus = dict(
         # GENERAL
@@ -227,13 +235,15 @@ def define_updatemenus(animation_time=1000, transition_time=300):
 def define_sliders(detections: pd.DataFrame, animation_time=300, slider_transition_time=300):
     """
 
-    :param detections: A Pandas DataFrame of catalognumber, station, date,
+    Args:
+        detections (pd.DataFrame): A Pandas DataFrame of catalognumber, station, date,
         latitude, longitude and detection counts by day
-    :param transition_time: The amount of time in milliseconds between frames
-    :param slider_transition_time: The amount of time in milliseconds between
-        frames for the slider
+        animation_time (int, optional): The amount of time in milliseconds between frames. Defaults to 300.
+        slider_transition_time (int, optional): The amount of time in milliseconds between
+        frames for the slider. Defaults to 300.
 
-    :return: A Plotly sliders dictionary
+    Returns:
+        dict: A Plotly sliders dictionary
     """
     sliders = dict(
         active=0,
@@ -288,16 +298,19 @@ def define_layout(detections: pd.DataFrame, title, plotly_geo=None,  mapbox_toke
                   style='light'):
     """
 
-    :param detections: A Pandas DataFrame of catalognumber, station, date,
+    Args:
+        detections (pd.DataFrame): A Pandas DataFrame of catalognumber, station, date,
         latitude, longitude and detection counts by day
-    :param title: the title of the plot
-    :param plotly_geo: an optional dictionary to control the
-        geographic aspects of the plot
-    :param mapbox_token: A string of mapbox access token
-    :param style: The style for the Mapbox tileset:
-        https://plot.ly/python/reference/#layout-mapbox-style
+        title (str): the title of the plot
+        plotly_geo (dict, optional): an optional dictionary to control the
+        geographic aspects of the plot. Defaults to None.
+        mapbox_token (str, optional): A string of mapbox access token. Defaults to None.
+        style (str, optional): The style for the Mapbox tileset:
+        https://plot.ly/python/reference/#layout-mapbox-style. 
+        Defaults to 'light'.
 
-    :return: A plotly layout dictionary
+    Returns:
+        dict: A plotly layout dictionary
     """
 
     if mapbox_token is None:
@@ -359,27 +372,31 @@ def timeline(detections: pd.DataFrame, title='Timeline', height=700, width=1000,
              ipython_display=True, mapbox_token=None, plotly_geo=None,
              animation_time=1000, transition_time=300,
              slider_transition_time=300, colorscale='Rainbow', style='light'):
+    
     """
 
-    :param detections: A Pandas DataFrame of catalognumber, station, date,
+    Args:
+        detections (pd.DataFrame): A Pandas DataFrame of catalognumber, station, date,
         latitude, longitude and detection counts by day
-    :param ipython_display: a boolean to show in a notebook
-    :param title: the title of the plot
-    :param height: the height of the plotly
-    :param width: the width of the plotly
-    :param plotly_geo: an optional dictionary to control the
-        geographic aspects of the plot
-    :param mapbox_token: A string of mapbox access token
-    :param animation_time: The amount of time in milliseconds for each frame
-    :param transition_time: The amount of time in milliseconds between frames
-    :param slider_transition_time: The amount of time in milliseconds between
-        frames for the slider
-    :param colorscale: A string to indicate the color index. See here for
-        options:
-        https://community.plot.ly/t/what-colorscales-are-available-in-plotly-and-which-are-the-default/2079
-    :param style: The style for the Mapbox tileset:
-        https://plot.ly/python/reference/#layout-mapbox-style
+        title (str, optional): the title of the plot. Defaults to 'Timeline'.
+        height (int, optional): the height of the plotly. Defaults to 700.
+        width (int, optional): the width of the plotly. Defaults to 1000.
+        ipython_display (bool, optional): a boolean to show in a notebook. Defaults to True.
+        mapbox_token (str, optional): A string of mapbox access token. Defaults to None.
+        plotly_geo (dict, optional): an optional dictionary to control the
+        geographic aspects of the plot. Defaults to None.
+        animation_time (int, optional): The amount of time in milliseconds for each frame. Defaults to 1000.
+        transition_time (int, optional): The amount of time in milliseconds between frames. Defaults to 300.
+        slider_transition_time (int, optional): The amount of time in milliseconds between
+        frames for the slider. Defaults to 300.
+        colorscale (str, optional): A string to indicate the color index. See here for options:
+        https://community.plot.ly/t/what-colorscales-are-available-in-plotly-and-which-are-the-default/2079. Defaults to 'Rainbow'.
+        style (str, optional): The style for the Mapbox tileset:
+        https://plot.ly/python/reference/#layout-mapbox-style 
+        Defaults to 'light'.
 
+    Returns:
+        (None|Any): : A plotly object or None if ipython_display is True
     """
     detections = consolidate_data(detections)
     total_grid = create_grid(detections)

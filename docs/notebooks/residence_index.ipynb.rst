@@ -1,4 +1,3 @@
-
 Residence Index
 ===============
 
