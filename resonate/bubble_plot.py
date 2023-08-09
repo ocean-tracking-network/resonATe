@@ -4,7 +4,7 @@ import plotly.offline as py
 from resonate.library.exceptions import GenericException
 
 
-def bubble_plot(detections, type='detections', ipython_display=True,
+def bubble_plot(detections: pd.DataFrame, type='detections', ipython_display=True,
                 title='Bubble Plot', height=700, width=1000,
                 plotly_geo=None, filename=None, mapbox_token=None,
                 marker_size=10, colorscale='Viridis'):
@@ -46,7 +46,7 @@ def bubble_plot(detections, type='detections', ipython_display=True,
             detections = detections.drop(
                 ['unqdetecid', 'datecollected'], axis=1).drop_duplicates()
         detections = detections.groupby(
-            ['station', 'latitude', 'longitude']).size().reset_index(name='counts')
+            ['station', 'latitude', 'longitude'], dropna=False).size().reset_index(name='counts')
 
         map_type = 'scattergeo'
 

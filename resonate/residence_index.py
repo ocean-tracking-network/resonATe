@@ -20,6 +20,7 @@ def total_days_diff(detections: pd.DataFrame):
     Args:
         detections (pd.DataFrame):  Pandas DataFrame pulled from the compressed detections CSV
 
+
     Returns:
         float: An float in the number of days
     """
@@ -193,7 +194,7 @@ def get_station_location(station: str, detections: pd.DataFrame):
     return location
 
 
-def plot_ri(ri_data, ipython_display=True,
+def plot_ri(ri_data: pd.DataFrame, ipython_display=True,
             title='Bubble Plot', height=700,
             width=1000, plotly_geo=None, filename=None,
             marker_size=6, scale_markers=False,
@@ -362,8 +363,13 @@ def residency_index(detections: pd.DataFrame, calculation_method='kessel'):
         total = get_days(st_dets.copy(), calculation_method)
         location = get_station_location(station, detections)
         # Determine the RI and add the station to the list
-        station_dict = {'station': station, 'days_detected': total, 'residency_index': (total / (float(total_days))),
-                        'longitude': location['longitude'].values[0], 'latitude': location['latitude'].values[0]}
+        station_dict = {
+            'days_detected': total, 
+            'latitude': location['latitude'].values[0],
+            'longitude': location['longitude'].values[0], 
+            'residency_index': (total / (float(total_days))),
+            'station': station,
+        } 
         station_list.append(station_dict)
 
     # convert the station list to a Dataframe
