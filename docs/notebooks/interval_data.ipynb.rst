@@ -1,4 +1,3 @@
-
 Interval Data
 =============
 

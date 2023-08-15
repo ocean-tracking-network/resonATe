@@ -6,3 +6,5 @@ pytest
 colorama
 nbconvert
 plotly
+xlrd
+openpyxl

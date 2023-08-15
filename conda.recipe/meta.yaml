@@ -1,21 +1,20 @@
 package:
   name: resonate
-  version: "1.0.9"
+  version: "1.1"
 
 source:
   git_rev: master
-  git_url: https://gitlab.oceantrack.org/otndc/resonate
+  git_url: https://github.com/ocean-tracking-network/resonATe
 
 build:
   number: 0
   noarch: python
 
 python:
-  - 3.5
-  - 3.6
-  - 3.7
   - 3.8
   - 3.9
+  - 3.10
+  - 3.11
 
 requirements:
   build:
@@ -45,6 +44,6 @@ test:
     - resonate
 
 about:
-  home: https://gitlab.oceantrack.org/otndc/resonate
+  home: https://github.com/ocean-tracking-network/resonATe
   license: GPL-2.0-only
   license_file: LICENSE

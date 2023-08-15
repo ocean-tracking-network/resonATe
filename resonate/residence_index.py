@@ -7,10 +7,8 @@ import plotly.offline as py
 import resonate.compress as cp
 
 
-def total_days_diff(detections):
-    """
-    total_days_diff
-    Determines the total days difference.
+def total_days_diff(detections: pd.DataFrame):
+    """Determines the total days difference.
 
     The difference is determined
     by the minimal startdate of every detection and the maximum enddate of
@@ -19,11 +17,14 @@ def total_days_diff(detections):
     the number of seconds in a day (86400). The function returns a floating
     point number of days (i.e. 503.76834).
 
-    :param detections: Pandas DataFrame pulled from the compressed detections CSV
+    Args:
+        detections (pd.DataFrame):  Pandas DataFrame pulled from the compressed detections CSV
 
-    :return: An float in the number of days
 
+    Returns:
+        float: An float in the number of days
     """
+    
     first = datetime.strptime(detections.startdate.min(), "%Y-%m-%d %H:%M:%S")
     last = datetime.strptime(detections.enddate.max(), "%Y-%m-%d %H:%M:%S")
     total = last - first
@@ -31,10 +32,8 @@ def total_days_diff(detections):
     return total
 
 
-def total_days_count(detections):
-    '''
-    total_days_count
-    The function below takes a Pandas DataFrame and determines the number of days any
+def total_days_count(detections: pd.DataFrame):
+    """The function below takes a Pandas DataFrame and determines the number of days any
     detections were seen on the array.
 
     The function converst both the startdate and enddate columns into a date with no hours, minutes,
@@ -45,12 +44,13 @@ def total_days_count(detections):
     Possible rounding error may occur as a detection on 2016-01-01 23:59:59 and a detection on
     2016-01-02 00:00:01 would be counted as days when it is really 2-3 seconds.
 
+    Args:
+        detections (pd.DataFrame): Pandas DataFrame pulled from the compressed detections CSV
 
-    :param detections: Pandas DataFrame pulled from the compressed detections CSV
-
-    :return: An int in the number of days
-
-    '''
+    Returns:
+        int: An int in the number of days
+    """
+    
     detections['startdate'] = detections['startdate'].apply(
         datetime.strptime, args=("%Y-%m-%d %H:%M:%S",)).apply(datetime.date)
     detections['enddate'] = detections['enddate'].apply(
@@ -59,19 +59,18 @@ def total_days_count(detections):
     return detections.size
 
 
-def aggregate_total_with_overlap(detections):
-    '''
-    aggregate_total_with_overlap
-
-    The function below aggregates timedelta of startdate and enddate of each detection into
+def aggregate_total_with_overlap(detections: pd.DataFrame):
+    """The function below aggregates timedelta of startdate and enddate of each detection into
     a final timedelta then returns a float of the number of days. If the startdate and enddate
     are the same, a timedelta of one second is assumed.
 
-    :param detections: Pandas DataFrame pulled from the compressed detections CSV
+    Args:
+        detections (pd.DataFrame): Pandas DataFrame pulled from the compressed detections CSV
 
-    :return: An float in the number of days
-
-    '''
+    Returns:
+        float: An float in the number of days
+    """
+    
     total = pd.Timedelta(0)
     detections['startdate'] = detections['startdate'].apply(
         datetime.strptime, args=("%Y-%m-%d %H:%M:%S",))
@@ -88,20 +87,19 @@ def aggregate_total_with_overlap(detections):
     return total.total_seconds() / 86400.0
 
 
-def aggregate_total_no_overlap(detections):
-    '''
-    aggregate_total_no_overlap
-
-    The function below aggregates timedelta of startdate and enddate, excluding overlap between
+def aggregate_total_no_overlap(detections: pd.DataFrame):
+    """The function below aggregates timedelta of startdate and enddate, excluding overlap between
     detections. Any overlap between two detections is converted to a new detection using the earlier
     startdate and the latest enddate. If the startdate and enddate are the same, a timedelta of one
     second is assumed.
 
-    :param detections: pandas DataFrame pulled from the compressed detections CSV
+    Args:
+        detections (pd.DataFrame): pandas DataFrame pulled from the compressed detections CSV
 
-    :return: An float in the number of days
-
-    '''
+    Returns:
+        float: An float in the number of days
+    """
+    
     total = pd.Timedelta(0)
 
     # sort and convert datetimes
@@ -153,22 +151,19 @@ def aggregate_total_no_overlap(detections):
     return total.total_seconds() / 86400.0
 
 
-def get_days(dets, calculation_method='kessel'):
-    '''
-    get_days
-
-    Determines which calculation method to use for the residency index.
+def get_days(dets: pd.DataFrame, calculation_method='kessel'):
+    """Determines which calculation method to use for the residency index.
 
     Wrapper method for the calulation methods above.
 
-    :param dets: A Pandas DataFrame pulled from the compressed detections CSV
+    Args:
+        dets (pd.DataFrame): A Pandas DataFrame pulled from the compressed detections CSV
+        calculation_method (str, optional): determines which method above will be used to
+        count total time and station time. Defaults to 'kessel'.
 
-    :param calculation_method: determines which method above will be used to
-        count total time and station time
-
-    :return: An int in the number of days
-
-    '''
+    Returns:
+        int: An int in the number of days
+    """
     days = 0
 
     if calculation_method == 'aggregate_with_overlap':
@@ -183,51 +178,49 @@ def get_days(dets, calculation_method='kessel'):
     return days
 
 
-def get_station_location(station, detections):
-    '''
-    get_station_location
-
-    Returns the longitude and latitude of a station/receiver given the station
+def get_station_location(station: str, detections: pd.DataFrame):
+    """Returns the longitude and latitude of a station/receiver given the station
     and the table name.
 
-    :param station: String that contains the station name
-    :param detections: the table name in which to find the station
+    Args:
+        station (str): String that contains the station name
+        detections (pd.DataFrame): the table name in which to find the station
 
-    :return: A Pandas DataFrame of station, latitude, and longitude
-
-    '''
+    Returns:
+        pd.DataFrame: A Pandas DataFrame of station, latitude, and longitude
+    """
     location = detections[detections.station == station][:1]
     location = location[['station', 'longitude', 'latitude']]
     return location
 
 
-def plot_ri(ri_data, ipython_display=True,
+def plot_ri(ri_data: pd.DataFrame, ipython_display=True,
             title='Bubble Plot', height=700,
             width=1000, plotly_geo=None, filename=None,
             marker_size=6, scale_markers=False,
             colorscale='Viridis', mapbox_token=None):
-    '''
-    plot_ri
+    """Creates a bubble plot of residency index data.
 
-    :param ri_data: A Pandas DataFrame generated from ``residency_index()``
-    :param ipython_display: a boolean to show in a notebook
-    :param title: the title of the plot
-    :param height: the height of the plotly
-    :param width: the width of the plotly
-    :param plotly_geo: an optional dictionary to control the
-        geographic aspects of the plot
-    :param filename: Plotly filename to write to
-    :param mapbox_token: A string of mapbox access token
-    :param marker_size: An int to indicate the diameter in pixels
-    :param scale_markers: A boolean to indicate whether or not markers are
-        scaled by their value
-    :param colorscale: A string to indicate the color index. See here for
-        options:
-        https://community.plot.ly/t/what-colorscales-are-available-in-plotly-and-which-are-the-default/2079
+    Args:
+        ri_data (pd.DataFrame): A Pandas DataFrame generated from ``residency_index()``
+        ipython_display (bool, optional): a boolean to show in a notebook. Defaults to True.
+        title (str, optional): the title of the plot. Defaults to 'Bubble Plot'.
+        height (int, optional): the height of the plotly. Defaults to 700.
+        width (int, optional): the width of the plotly. Defaults to 1000.
+        plotly_geo (dict, optional): an optional dictionary to control the
+        geographic aspects of the plot. Defaults to None.
+        filename (str, optional): Plotly filename to write to. Defaults to None.
+        marker_size (int, optional): An int to indicate the diameter in pixels. Defaults to 6.
+        scale_markers (bool, optional): A boolean to indicate whether or not markers are
+        scaled by their value. Defaults to False.
+        colorscale (str, optional): A string to indicate the color index. See here for options:
+        https://community.plot.ly/t/what-colorscales-are-available-in-plotly-and-which-are-the-default/2079. Defaults to 'Viridis'.
+        mapbox_token (str, optional): A string of mapbox access token. Defaults to None.
 
-    :return: A plotly geoscatter
-
-    '''
+    Returns:
+        (None|Any): A plotly geoscatter or None if ipython_display is True
+    """
+    
     ri_data = ri_data.sort_values('residency_index')
 
     map_type = 'scattergeo'
@@ -323,30 +316,28 @@ def plot_ri(ri_data, ipython_display=True,
         return py.plot(fig, filename=filename)
 
 
-def residency_index(detections, calculation_method='kessel'):
-    '''
-    residency_index
-
-    This function takes in a detections CSV and determines the residency
+def residency_index(detections: pd.DataFrame, calculation_method='kessel'):
+    """This function takes in a detections CSV and determines the residency
     index for reach station.
 
     Residence Index (RI) was calculated as the number of days an individual
     fish was detected at each receiver station divided by the total number of
     days the fish was detected anywhere on the acoustic array. - Kessel et al.
 
-    :param detections: CSV Path
-    :param calculation_method: determines which method above will be used to
-        count total time and station time
 
-    :return: A residence index DataFrame with the following columns
+    Args:
+        detections (pd.DataFrame): Dataframe of detections
+        calculation_method (str, optional): determines which method above will be used to
+        count total time and station time. Defaults to 'kessel'.
 
-        * days_detected
-        * latitude
-        * longitude
-        * residency_index
-        * station
-
-    '''
+    Returns:
+        pd.DataFrame: A residence index DataFrame with the following columns
+            * days_detected
+            * latitude
+            * longitude
+            * residency_index
+            * station
+    """
     dets = cp.compress_detections(detections)
 
     # Converting start and end date to strings
@@ -372,8 +363,13 @@ def residency_index(detections, calculation_method='kessel'):
         total = get_days(st_dets.copy(), calculation_method)
         location = get_station_location(station, detections)
         # Determine the RI and add the station to the list
-        station_dict = {'station': station, 'days_detected': total, 'residency_index': (total / (float(total_days))),
-                        'longitude': location['longitude'].values[0], 'latitude': location['latitude'].values[0]}
+        station_dict = {
+            'days_detected': total, 
+            'latitude': location['latitude'].values[0],
+            'longitude': location['longitude'].values[0], 
+            'residency_index': (total / (float(total_days))),
+            'station': station,
+        } 
         station_list.append(station_dict)
 
     # convert the station list to a Dataframe
