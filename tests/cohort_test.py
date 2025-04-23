@@ -9,7 +9,6 @@ from resonate.compress import compress_detections
 
 
 class CohortTest(unittest.TestCase):
-
     def test_cohort(self):
         print(c.YELLOW + 'Testing Cohort...' + c.RESET)
         compressed = compress_detections(

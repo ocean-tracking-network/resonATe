@@ -3,16 +3,25 @@ import numpy as np
 import pandas as pd
 from resonate.library.exceptions import GenericException
 
+def compress_detections(detections: pd.DataFrame, timefilter=3600, keep_columns=False, keep_columns_agg='first'):
+    """Creates compressed dataframe from detection dataframe
 
-def compress_detections(detections, timefilter=3600):
-    '''
-    Creates compressed dataframe from detection dataframe
+    Args:
+        detections (pd.DataFrame): detection dataframe
+        timefilter (int, optional): A maximum amount of time in seconds that can pass before
+        a new detction event is started. Defaults to 3600.
+        keep_columns (bool, optional): Keep the extra columns from the detection file not required to create 
+        the compressed dataframe. Defaults to False.
+        keep_columns_agg (str|func, optional): If keep_columns is true, defines how to handle aggregation 
+        of duplicate rows. Supports 'first', 'last', or a function. Defaults to 'first'.
 
-    :param detections: detection dataframe
-    :param timefilter: A maximum amount of time in seconds that can pass before
-        a new detction event is started
-    :return: A Pandas DataFrame matrix of detections events
-    '''
+    Raises:
+        GenericException: Triggered if detections is not a dataframe.
+        GenericException: Triggered if detections file is missing required columns
+
+    Returns:
+        pd.DataFrame: A compressed dataframe of detection events.
+    """
 
     if not isinstance(detections, pd.DataFrame):
         raise GenericException('input parameter must be a Pandas dataframe')
@@ -21,8 +30,8 @@ def compress_detections(detections, timefilter=3600):
         ['datecollected', 'catalognumber', 'unqdetecid', 'latitude', 'longitude'])
 
     if mandatory_columns.issubset(detections.columns):
-        stations = detections.groupby('station').agg(
-            'mean')[['latitude', 'longitude']].reset_index()
+        stations = detections.groupby('station', dropna=False).agg(
+            'mean', 1)[['latitude', 'longitude']].reset_index()
 
         # Get unique list of animals (not tags), set indices to respect animal and date of detections
         anm_list = detections['catalognumber'].unique()
@@ -32,7 +41,7 @@ def compress_detections(detections, timefilter=3600):
 
         # Set up empty data structures and the animal-based groupby object
         detections['seq_num'] = np.nan
-        anm_group = detections.groupby('catalognumber')
+        anm_group = detections.groupby('catalognumber', dropna=False)
         out_df = pd.DataFrame()
 
         # for each animal's detections ordered by time, when station changes, seqnum is incremented.
@@ -43,9 +52,9 @@ def compress_detections(detections, timefilter=3600):
             a.datecollected = pd.to_datetime(a.datecollected)
             a['seq_num'] = ((a.station.shift(1) != a.station) | (
                 a.datecollected.diff().dt.total_seconds() > timefilter)).astype(int).cumsum()
-            out_df = out_df.append(a)
+            out_df = pd.concat([out_df, a])
 
-        stat_df = out_df.groupby(['catalognumber', 'seq_num']).agg({'datecollected': ['min', 'max'],
+        stat_df = out_df.groupby(['catalognumber', 'seq_num'], dropna=False).agg({'datecollected': ['min', 'max'],
                                                                     'unqdetecid': ['first', 'last'],
                                                                     'seq_num': 'count'})
 
@@ -61,14 +70,26 @@ def compress_detections(detections, timefilter=3600):
             stat_df['datecollected_max'] - stat_df['datecollected_min']) / np.maximum(1, stat_df['seq_num_count'] - 1)
 
         stat_df.rename(columns={'seq_num_count': 'total_count', 'datecollected_max': 'enddate',
-                                                                'datecollected_min': 'startdate', 'unqdetecid_first': 'startunqdetecid',
-                                                                'unqdetecid_last': 'endunqdetecid'}, inplace=True)
+                                'datecollected_min': 'startdate', 'unqdetecid_first': 'startunqdetecid',
+                                'unqdetecid_last': 'endunqdetecid'}, inplace=True)
         # Reduce indexes to regular columns for joining against station number.
         stat_df.reset_index(inplace=True)
 
-        # Join stations to result. Could add lat/lon here as well.
-        out_df = out_df[['catalognumber', 'station', 'seq_num']].drop_duplicates(
-        ).merge(stat_df, on=['catalognumber', 'seq_num'])
+        if keep_columns:
+            # Group and aggregate out_df to mimic drop_duplicates
+            agg_df = out_df.groupby(['catalognumber', 'station', 'seq_num']).agg(keep_columns_agg).reset_index()
+            # Rename lat and long columns in detections
+            if 'latitude' in agg_df.columns:
+                print("Found column named 'latitude' in detection dataframe, renaming to 'detection_latitude'.")
+                agg_df.rename(columns={'latitude': 'detection_latitude'}, inplace=True)
+            if 'longitude' in agg_df.columns:
+                print("Found column named 'longitude' in detection dataframe, renaming to 'detection_longitude'.")
+                agg_df.rename(columns={'longitude': 'detection_longitude'}, inplace=True)
+            out_df = agg_df.merge(stat_df, on=['catalognumber', 'seq_num'])
+        else:
+            # Join stations to result. Could add lat/lon here as well.
+            out_df = out_df[['catalognumber', 'station', 'seq_num']].drop_duplicates(
+            ).merge(stat_df, on=['catalognumber', 'seq_num'])
 
         out_df = out_df.merge(stations, on='station')
 

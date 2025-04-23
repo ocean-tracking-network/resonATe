@@ -14,6 +14,10 @@ class ResidenceIndexTest(unittest.TestCase):
         dfa = ri.residency_index(pd.read_csv(
             'tests/assertion_files/nsbs.csv'), calculation_method='kessel')
         dfb = pd.read_csv('tests/assertion_files/nsbs_kessel_ri.csv')
+        dfa.sort_values(['station', 'days_detected'], inplace=True)
+        dfb.sort_values(['station', 'days_detected'], inplace=True)
+        dfa.reset_index(inplace=True, drop=True)
+        dfb.reset_index(inplace=True, drop=True)
         pt.assert_frame_equal(dfa, dfb)
         print(c.GREEN + 'OK!\n' + c.RESET)
 
@@ -22,6 +26,10 @@ class ResidenceIndexTest(unittest.TestCase):
         dfa = ri.residency_index(pd.read_csv(
             'tests/assertion_files/nsbs.csv'), calculation_method='timedelta')
         dfb = pd.read_csv('tests/assertion_files/nsbs_timedelta_ri.csv')
+        dfa.sort_values(['station', 'days_detected'], inplace=True)
+        dfb.sort_values(['station', 'days_detected'], inplace=True)
+        dfa.reset_index(inplace=True, drop=True)
+        dfb.reset_index(inplace=True, drop=True)
         pt.assert_frame_equal(dfa, dfb)
         print(c.GREEN + 'OK!\n' + c.RESET)
 
@@ -31,6 +39,10 @@ class ResidenceIndexTest(unittest.TestCase):
             'tests/assertion_files/nsbs.csv'), calculation_method='aggregate_with_overlap')
         dfb = pd.read_csv(
             'tests/assertion_files/nsbs_aggregate_with_overlap_ri.csv')
+        dfa.sort_values(['station', 'days_detected'], inplace=True)
+        dfb.sort_values(['station', 'days_detected'], inplace=True)
+        dfa.reset_index(inplace=True, drop=True)
+        dfb.reset_index(inplace=True, drop=True)
         pt.assert_frame_equal(dfa, dfb)
         print(c.GREEN + 'OK!\n' + c.RESET)
 
@@ -40,6 +52,10 @@ class ResidenceIndexTest(unittest.TestCase):
             'tests/assertion_files/nsbs.csv'), calculation_method='aggregate_no_overlap')
         dfb = pd.read_csv(
             'tests/assertion_files/nsbs_aggregate_no_overlap_ri.csv')
+        dfa.sort_values(['station', 'days_detected'], inplace=True)
+        dfb.sort_values(['station', 'days_detected'], inplace=True)
+        dfa.reset_index(inplace=True, drop=True)
+        dfb.reset_index(inplace=True, drop=True)
         pt.assert_frame_equal(dfa, dfb)
         print(c.GREEN + 'OK!\n' + c.RESET)
 

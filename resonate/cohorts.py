@@ -1,24 +1,25 @@
 import pandas as pd
 
 
-def cohort(compressed_df, interval_time=3600):
-    """
-    Creates a dataframe of cohorts using a compressed detection file
+def cohort(compressed_df: pd.DataFrame, interval_time: int=3600):
+    """Creates a dataframe of cohorts using a compressed detection file
 
-    :param compressed_df: compressed dataframe
-    :param interval_time: cohort detection time interval (in seconds)
-    :return: cohort dataframe with the following columns
+    Args:
+        compressed_df (pd.DataFrame): compressed dataframe
+        interval_time (int, optional): cohort detection time interval (in seconds). Defaults to 3600.
 
-        * anml_1
-        * anml_1_seq
-        * station
-        * anml_2
-        * anml_2_seq
-        * anml_2_arrive
-        * anml_2_depart
-        * anml_2_startunqdetecid
-        * anml_2_endunqdetecid
-        * anml_2_detcount
+    Returns:
+        pd.DataFrame: cohort dataframe with the following columns:
+            * anml_1
+            * anml_1_seq
+            * station
+            * anml_2
+            * anml_2_seq
+            * anml_2_arrive
+            * anml_2_depart
+            * anml_2_startunqdetecid
+            * anml_2_endunqdetecid
+            * anml_2_detcount
 
     """
 

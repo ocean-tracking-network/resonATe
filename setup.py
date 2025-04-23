@@ -12,15 +12,15 @@ with open('LICENSE') as f:
 
 setup(
     name='resonATe',
-    version='1.0.9',
+    version='1.1',
     description='resonate data analysis package',
     long_description=readme,
     long_description_content_type='text/markdown',
-    author='Alex Nunes',
+    author='Ryan Gosse',
     include_package_data=True,
-    author_email='anunes@dal.ca',
-    url='https://gitlab.oceantrack.org/otndc/resonate',
-    download_url='https://gitlab.oceantrack.org/otndc/resonate',
+    author_email='ryan.gosse@dal.ca',
+    url='https://github.com/ocean-tracking-network/resonATe',
+    download_url='https://github.com/ocean-tracking-network/resonATe',
     license='GPLv2',
     classifiers=[
         'Natural Language :: English',

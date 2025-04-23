@@ -5,11 +5,12 @@ import pandas as pd
 import pandas.testing as pt
 from colorama import Fore as c
 import pickle
+import pytest
 from resonate.att_formatter import create_att_dictionary_format
 
 
-class CohortTest(unittest.TestCase):
-
+class ATTFormatterTest(unittest.TestCase):
+    @pytest.mark.filterwarnings("ignore:Workbook contains no default style, apply openpyxl's default")
     def test_att_formatter(self):
         print(c.YELLOW + 'Testing ATT Formatter...' + c.RESET)
         dets = "tests/assertion_files/nsbs_2014_short.csv"
