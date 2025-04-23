@@ -145,7 +145,8 @@ def filter_detections(detections: pd.DataFrame, suspect_file=None,
                 dm_mandatory_columns - set(detections.columns)))
     if add_column:
         output_dict['filtered'].loc[:, 'passed_detection_filter'] = True
-        output_dict['suspect'].loc[output_dict['suspect'].index, 'passed_detection_filter'] = False
+        if output_dict.get('suspect'):
+            output_dict['suspect'].loc[output_dict['suspect'].index, 'passed_detection_filter'] = False
         output_df = pd.concat(output_dict.values()).reset_index(drop=True)
         if distance_matrix:
             return {'detections': output_df, 'dist_mtrx': output_dict['dist_mtrx']}
