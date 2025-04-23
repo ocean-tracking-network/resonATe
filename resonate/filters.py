@@ -420,11 +420,26 @@ def filter_all(detections: pd.DataFrame, min_time_buffer=3600, maximum_distance=
     Returns:
         pd.DataFrame: A dataframe with all 3 filter columns added and populated
     """
+
+    # what we expect the input data format to be
+    data_format_guess = 'otn_old'
     # Set of mandatory column names for detection_file
-    mandatory_columns = set(['station',
+
+    if 'catalogNumber' in detections.columns:  # the new version of otn det extracts uses camel case
+        data_format_guess = 'otn_2025'
+
+    # Set of mandatory column names for detection_file
+    if data_format_guess == 'otn_old':
+        mandatory_columns = set(['station',
                              'unqdetecid',
                              'datecollected',
                              'catalognumber'])
+    elif data_format_guess == 'otn_2025':
+        mandatory_columns = set(['station',
+                             'unqDetecID',
+                             'dateCollected',
+                             'catalogNumber'])
+        
     if mandatory_columns.issubset(detections.columns):
         detections = detections.copy(deep=True)
         detections = filter_detections(detections, min_time_buffer=min_time_buffer)
