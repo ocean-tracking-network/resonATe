@@ -16,20 +16,42 @@ def get_distance_matrix(detections: pd.DataFrame):
     Returns:
         pd.DataFrame: A Pandas DataFrame matrix of station to station distances
     """
-    stn_grouped = detections.groupby('station', dropna=False)
-    stn_locs = stn_grouped[['longitude', 'latitude']].mean()
+    # what we expect the input data format to be
+    data_format_guess = 'otn_old'
+
+    if 'catalogNumber' in detections.columns:  # the new version of otn det extracts uses camel case
+        data_format_guess = 'otn_2025'
+    
+    
+    # set the stations locations to their deployments' mean lat and lon
+
+    if data_format_guess == 'otn_old':
+        stn_grouped = detections.groupby('station', dropna=False)
+        stn_locs = stn_grouped[['longitude', 'latitude']].mean()
+    elif: data_format_guess == 'otn_2025':
+        stn_grouped = detections.groupby('station', dropna=False)
+        stn_locs = stn_grouped[['decimalLongitude', 'decimalLatitude']].mean()
 
     dist_mtx = pd.DataFrame(
         np.zeros(len(stn_locs) ** 2).reshape(len(stn_locs), len(stn_locs)),
         index=stn_locs.index, columns=stn_locs.index)
 
-    for cstation in dist_mtx.columns:
-        for rstation in dist_mtx.index:
-            cpoint = (stn_locs.loc[cstation, 'latitude'],
-                      stn_locs.loc[cstation, 'longitude'])
-            rpoint = (stn_locs.loc[rstation, 'latitude'],
-                      stn_locs.loc[rstation, 'longitude'])
-            dist_mtx.loc[rstation, cstation] = geodesic(cpoint, rpoint).m
+    if data_format_guess == 'otn_old':
+        for cstation in dist_mtx.columns:
+            for rstation in dist_mtx.index:
+                cpoint = (stn_locs.loc[cstation, 'latitude'],
+                        stn_locs.loc[cstation, 'longitude'])
+                rpoint = (stn_locs.loc[rstation, 'latitude'],
+                        stn_locs.loc[rstation, 'longitude'])
+                dist_mtx.loc[rstation, cstation] = geodesic(cpoint, rpoint).m
+    elif data_format_guess == 'otn_2025':
+        for cstation in dist_mtx.columns:
+            for rstation in dist_mtx.index:
+                cpoint = (stn_locs.loc[cstation, 'decimalLatitude'],
+                        stn_locs.loc[cstation, 'decimalLongitude'])
+                rpoint = (stn_locs.loc[rstation, 'decimalLatitude'],
+                        stn_locs.loc[rstation, 'decimalLongitude'])
+                dist_mtx.loc[rstation, cstation] = geodesic(cpoint, rpoint).m
     dist_mtx.index.name = None
     return dist_mtx
 
@@ -66,7 +88,18 @@ def filter_detections(detections: pd.DataFrame, suspect_file=None,
         detections.
     """
 
+    # what we expect the input data format to be
+    data_format_guess = 'otn_old'
     # Set of mandatory column names for detection_file
+
+    if 'catalogNumber' in detections.columns:  # the new version of otn det extracts uses camel case
+        data_format_guess = 'otn_2025'
+        mandatory_columns = set(['station',
+                                'unqDetecID',
+                                'dateCollectedUTC',
+                                'catalogNumber'])
+
+    else:  # the original OTN detections did not use camel case.
     mandatory_columns = set(['station',
                              'unqdetecid',
                              'datecollected',
@@ -88,28 +121,47 @@ def filter_detections(detections: pd.DataFrame, suspect_file=None,
         # If the space before + after > min_time_buffer
         # Remove that detection row from the detections and add it to suspect detections.
         # SQL that does this is in load_to_postgresql under createSuspect
-        detections = detections.copy(deep=True)
-        ind = detections['catalognumber'].unique()
-        detections.loc[:, 'datecollected'] = pd.to_datetime(
-            detections['datecollected'])
-        user_int = timedelta(seconds=min_time_buffer)
-        good_dets = pd.DataFrame()
-        susp_dets = pd.DataFrame()
-        grouped = detections.groupby('catalognumber', dropna=False)
-        for anm in ind:
-            anm_dets = grouped.get_group(anm).sort_values(
-                'datecollected', ascending=True)
-            intervals = anm_dets['datecollected'] - \
-                anm_dets['datecollected'].shift(1)
-            post_intervals = anm_dets['datecollected'].shift(
-                -1) - anm_dets['datecollected']
 
-            good_dets = pd.concat([
-                good_dets, 
-                anm_dets[
-                    (intervals <= user_int) | (post_intervals <= user_int)
-                ]
-            ])
+        detections = detections.copy(deep=True)
+
+        if data_format_guess == 'otn_old':
+            ind = detections['catalognumber'].unique()
+            detections.loc[:, 'datecollected'] = pd.to_datetime(
+                detections['datecollected'])
+            user_int = timedelta(seconds=min_time_buffer)
+            good_dets = pd.DataFrame()
+            susp_dets = pd.DataFrame()
+            grouped = detections.groupby('catalognumber', dropna=False)
+            for anm in ind:
+                anm_dets = grouped.get_group(anm).sort_values(
+                    'datecollected', ascending=True)
+                intervals = anm_dets['datecollected'] - \
+                    anm_dets['datecollected'].shift(1)
+                post_intervals = anm_dets['datecollected'].shift(
+                    -1) - anm_dets['datecollected']
+                
+        elif data_format_guess == 'otn_2025': 
+            ind = detections['catalogNumber'].unique()
+            detections.loc[:, 'dateCollectedUTC'] = pd.to_datetime(
+                detections['dateCollectedUTC'])
+            user_int = timedelta(seconds=min_time_buffer)
+            good_dets = pd.DataFrame()
+            susp_dets = pd.DataFrame()
+            grouped = detections.groupby('catalogNumber', dropna=False)
+            for anm in ind:
+                anm_dets = grouped.get_group(anm).sort_values(
+                    'dateCollectedUTC', ascending=True)
+                intervals = anm_dets['dateCollectedUTC'] - \
+                    anm_dets['dateCollectedUTC'].shift(1)
+                post_intervals = anm_dets['dateCollectedUTC'].shift(
+                    -1) - anm_dets['dateCollectedUTC']
+                
+        good_dets = pd.concat([
+            good_dets, 
+            anm_dets[
+                (intervals <= user_int) | (post_intervals <= user_int)
+            ]
+        ])
 
         # If they aren't a good det, they're suspect!
         # TODO: Reporting: Decide if we want to report the big 'before/after'
@@ -118,8 +170,12 @@ def filter_detections(detections: pd.DataFrame, suspect_file=None,
         # append.
         # For now, just a matter of putting the complement of the good dets in
         # the susp_dets
-        susp_dets = detections.loc[~detections['unqdetecid'].isin(
-            good_dets['unqdetecid'])].copy(deep=True)
+        if data_format_guess == 'otn_old':
+            susp_dets = detections.loc[~detections['unqdetecid'].isin(
+                good_dets['unqdetecid'])].copy(deep=True)
+        elif data_format_guess == 'otn_2025':
+            susp_dets = detections.loc[~detections['unqDetecID'].isin(
+                good_dets['unqDetecID'])].copy(deep=True)
 
     else:
         raise GenericException("Missing required input columns: {}".format(
@@ -132,9 +188,12 @@ def filter_detections(detections: pd.DataFrame, suspect_file=None,
     output_dict = {"filtered": good_dets, "suspect": susp_dets}
 
     if distance_matrix:
-
         # Must now have lat and long columns as well.
-        dm_mandatory_columns = set(['latitude', 'longitude'])
+        if data_format_guess == 'otn_old':
+            dm_mandatory_columns = set(['latitude', 'longitude'])
+        elif: data_format_guess == 'otn_2025':
+            dm_mandatory_columns = set(['decimalLatitude', 'decimalLongitude'])
+            
         if dm_mandatory_columns.issubset(detections.columns):
             output_dict['dist_mtrx'] = get_distance_matrix(detections)
             print("There are {0} station locations in the distance \
@@ -175,20 +234,40 @@ def distance_filter(detections: pd.DataFrame, maximum_distance=100000, add_colum
     """
     pd.options.mode.chained_assignment = None
 
-    mandatory_columns = set(['station',
+    # what we expect the input data format to be
+    data_format_guess = 'otn_old'
+    # Set of mandatory column names for detection_file
+
+    if 'catalogNumber' in detections.columns:  # the new version of otn det extracts uses camel case
+        data_format_guess = 'otn_2025'
+
+    if data_format_guess == 'otn_old':
+        mandatory_columns = set(['station',
                              'unqdetecid',
                              'datecollected',
                              'catalognumber'])
+    elif data_format_guess == 'otn_2025':
+        mandatory_columns = set(['station',
+                             'unqDetecID',
+                             'dateCollectedUTC',
+                             'catalogNumber'])
 
     if mandatory_columns.issubset(detections.columns):
         dm = get_distance_matrix(detections)
 
         lead_lag_stn_df = pd.DataFrame()
-        for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber'], dropna=False):
-            group['lag_station'] = group.station.shift(1).fillna(group.station)
-            group['lead_station'] = group.station.shift(
-                -1).fillna(group.station)
-            lead_lag_stn_df = pd.concat([lead_lag_stn_df, group])
+        if data_format_guess == 'otn_old':
+            for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber'], dropna=False):
+                group['lag_station'] = group.station.shift(1).fillna(group.station)
+                group['lead_station'] = group.station.shift(
+                    -1).fillna(group.station)
+                lead_lag_stn_df = pd.concat([lead_lag_stn_df, group])
+        elif data_format_guess == 'otn_2025':
+            for _, group in detections.sort_values(['dateCollected']).groupby(['catalogNumber'], dropna=False):
+                group['lag_station'] = group.station.shift(1).fillna(group.station)
+                group['lead_station'] = group.station.shift(
+                    -1).fillna(group.station)
+                lead_lag_stn_df = pd.concat([lead_lag_stn_df, group])
         del detections
 
         distance_df = pd.DataFrame()
@@ -235,28 +314,53 @@ def velocity_filter(detections: pd.DataFrame, maximum_velocity=10,  add_column:b
         detections.
     """
     pd.options.mode.chained_assignment = None
+    # what we expect the input data format to be
+    data_format_guess = 'otn_old'
+    # Set of mandatory column names for detection_file
 
-    mandatory_columns = set(['station',
+    if 'catalogNumber' in detections.columns:  # the new version of otn det extracts uses camel case
+        data_format_guess = 'otn_2025'
+    
+    if data_format_guess == 'otn_old':
+        mandatory_columns = set(['station',
                              'unqdetecid',
                              'datecollected',
                              'catalognumber'])
-
+    elif data_format_guess == 'otn_2025':
+        mandatory_columns = set(['station',
+                             'unqDetecID',
+                             'dateCollected',
+                             'catalogNumber'])
+        
     if mandatory_columns.issubset(detections.columns):
 
         dm = get_distance_matrix(detections)
 
         lead_lag_df = pd.DataFrame()
-        for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber'], dropna=False):
-            group['lag_station'] = group.station.shift(1).fillna(group.station)
-            group['lead_station'] = group.station.shift(
-                -1).fillna(group.station)
+        if data_format_guess == 'otn_old':
+            for _, group in detections.sort_values(['datecollected']).groupby(['catalognumber'], dropna=False):
+                group['lag_station'] = group.station.shift(1).fillna(group.station)
+                group['lead_station'] = group.station.shift(
+                    -1).fillna(group.station)
 
-            group.datecollected = pd.to_datetime(group.datecollected)
-            group['lag_time_diff'] = group.datecollected.diff().fillna(
-                timedelta(seconds=1))
-            group['lead_time_diff'] = group.lag_time_diff.shift(
-                -1).fillna(timedelta(seconds=1))
-            lead_lag_df = pd.concat([lead_lag_df, group])
+                group.datecollected = pd.to_datetime(group.datecollected)
+                group['lag_time_diff'] = group.datecollected.diff().fillna(
+                    timedelta(seconds=1))
+                group['lead_time_diff'] = group.lag_time_diff.shift(
+                    -1).fillna(timedelta(seconds=1))
+                lead_lag_df = pd.concat([lead_lag_df, group])
+        elif data_format_guess == 'otn_2025':
+            for _, group in detections.sort_values(['dateCollectedUTC']).groupby(['catalogNumber'], dropna=False):
+                group['lag_station'] = group.station.shift(1).fillna(group.station)
+                group['lead_station'] = group.station.shift(
+                    -1).fillna(group.station)
+
+                group.datecollected = pd.to_datetime(group.datecollected)
+                group['lag_time_diff'] = group.datecollected.diff().fillna(
+                    timedelta(seconds=1))
+                group['lead_time_diff'] = group.lag_time_diff.shift(
+                    -1).fillna(timedelta(seconds=1))
+                lead_lag_df = pd.concat([lead_lag_df, group])
         del detections
 
         vel_df = pd.DataFrame()
