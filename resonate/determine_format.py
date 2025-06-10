@@ -5,6 +5,7 @@ def detect(dataframe: pd.DataFrame) -> dict:
     formats = [
         {
             "col_datecollected": "dateCollectedUTC",
+            "col_collectioncode": "collectionCode",
             "col_unique_id": "unqDetecID",
             "col_scientificname": "scientificName",
             "col_longitude": "decimalLongitude",
@@ -15,6 +16,7 @@ def detect(dataframe: pd.DataFrame) -> dict:
         },
         {
             "col_datecollected": "datecollected",
+            "col_collectioncode": "collectioncode",
             "col_unique_id": "unqdetecid",
             "col_scientificname": "scientificname",
             "col_longitude": "longitude",

@@ -1,7 +1,11 @@
 import pandas as pd
 
 
-def create_att_dictionary_format(dets_file: str=None, tags_file: str=None, deployment_file: str=None, preprocessed:dict=None) -> dict:
+def create_att_dictionary_format(dets_file: str=None, tags_file: str=None, deployment_file: str=None, preprocessed:dict=None, 
+                                 col_catalognumber:str='catalogNumber', col_station:str='station', col_latitude:str='decimalLatitude', 
+                                 col_collectioncode:str='collectionCode',
+                                 col_fieldnumber:str='tagName',
+                                 col_longitude:str='decimalLongitude', col_datecollected:str='dateCollectedUTC', col_unique_id:str='unqDetecID',**kwargs) -> dict:
     """Creates a dictionary with dataframes containing detections, tag metadata, and station metadata.
     Heavily inspired by VTrack's ATT format. Either the 3 file args must not be none or the preprocessed
     arg must not be none. If all are not none, preprocessed will be used.
@@ -31,18 +35,18 @@ def create_att_dictionary_format(dets_file: str=None, tags_file: str=None, deplo
         raise RuntimeError("Arguments incorrect, please insure that all file args are there or the preprocessed dict is there.")
 
     # clean up station and receiver so they don't show (lost/found)
-    dets['station_name'] = dets['station'].str.extract(
+    dets['station_name'] = dets[col_station].str.extract(
         '([A-Za-z0-9]*)(\\(lost/found\\))?')[0]
     dets['receiver'] = dets['receiver'].str.extract(
         '([0-9]*)(\\(lost/found\\))?')[0]
-    dets.rename({'tagname': 'transmitter_id'}, inplace=True, axis=1)
+    dets.rename({col_fieldnumber: 'transmitter_id'}, inplace=True, axis=1)
     dets_joined_tags = dets.merge(
         tags, how='left', left_on='transmitter_id', right_on='transmitter_id')  # Add tag data to dets
 
     dets_joined_tags.rename({
-        'catalognumber': 'tag_id',
+        col_catalognumber: 'tag_id',
         'transmitter_id': 'transmitter',
-        'collectioncode': 'tag_project',
+        col_collectioncode: 'tag_project',
     }, inplace=True, axis=1)
 
     # We don't track tag_status or bio, set to none
