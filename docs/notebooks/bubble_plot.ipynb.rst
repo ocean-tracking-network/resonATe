@@ -16,7 +16,7 @@ individuals seen at each location by using ``type = 'individual'``.
     import pandas as pd
     import plotly.offline as py
     
-    df = pd.read_csv('/path/to/detections.csv')
+    df = pd.read_csv('/path/to/detections.csv', low_memory=False)
 
 To display the plot in iPython use:
 

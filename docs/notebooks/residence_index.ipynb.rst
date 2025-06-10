@@ -47,7 +47,7 @@ detection file and the project bounds.
     from resonate import residence_index as ri
     import pandas as pd
     
-    detections = pd.read_csv('/Path/to/detections.csv')
+    detections = pd.read_csv('/path/to/detections.csv', low_memory=False)
 
 Kessel Residence Index Calculation
 ----------------------------------

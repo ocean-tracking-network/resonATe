@@ -15,7 +15,7 @@ is used to group detections together and assign them a color.
     from resonate.abacus_plot import abacus_plot
     import pandas as pd
     
-    df = pd.read_csv('/path/to/detections.csv')
+    df = pd.read_csv('/path/to/detections.csv', low_memory=False)
 
 To display the plot in iPython use:
 

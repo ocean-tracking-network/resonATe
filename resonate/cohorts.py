@@ -1,7 +1,8 @@
 import pandas as pd
 
 
-def cohort(compressed_df: pd.DataFrame, interval_time: int=3600):
+def cohort(compressed_df: pd.DataFrame, interval_time: int=3600, col_catalognumber:str='catalogNumber',
+           col_station:str='station', **kwargs):
     """Creates a dataframe of cohorts using a compressed detection file
 
     Args:
@@ -27,7 +28,7 @@ def cohort(compressed_df: pd.DataFrame, interval_time: int=3600):
     interval_time = pd.to_timedelta(interval_time, unit='s')
 
     # Sort input compressed data file
-    cmps = compressed_df.sort_values(['catalognumber', 'seq_num'])
+    cmps = compressed_df.sort_values([col_catalognumber, 'seq_num'])
 
     # Loop through rows in the compressed data file and choose
     # cohorts if the times are within range
@@ -36,8 +37,8 @@ def cohort(compressed_df: pd.DataFrame, interval_time: int=3600):
 
     for idx1, item1 in cmps.iterrows():
         match = cmps[
-            (cmps.station == item1.station) &
-            (cmps.catalognumber != item1.catalognumber) &
+            (cmps[col_station] == item1[col_station]) &
+            (cmps[col_catalognumber] != item1[col_catalognumber]) &
             (~cmps.index.to_series().apply(lambda x: (x, idx1)).isin(seen)) &
             ((cmps.startdate > item1.startdate - interval_time) &
                 (cmps.startdate < item1.enddate + interval_time) |
@@ -45,10 +46,10 @@ def cohort(compressed_df: pd.DataFrame, interval_time: int=3600):
                 (cmps.enddate < item1.enddate + interval_time))]
 
         if not match.empty:
-            match.insert(0, 'anml_1', item1.catalognumber)
+            match.insert(0, 'anml_1', item1[col_catalognumber])
             match.insert(1, 'anml_1_seq', item1.seq_num)
-            final_set.extend(match[['anml_1', 'anml_1_seq', 'station',
-                                    'catalognumber', 'seq_num', 'startdate',
+            final_set.extend(match[['anml_1', 'anml_1_seq', col_station,
+                                    col_catalognumber, 'seq_num', 'startdate',
                                     'enddate', 'startunqdetecid',
                                     'endunqdetecid', 'total_count'
                                     ]].values.tolist())
@@ -57,7 +58,7 @@ def cohort(compressed_df: pd.DataFrame, interval_time: int=3600):
     output_df = pd.DataFrame(final_set)
     output_df.columns = ['anml_1',
                          'anml_1_seq',
-                         'station',
+                         col_station,
                          'anml_2',
                          'anml_2_seq',
                          'anml_2_arrive',

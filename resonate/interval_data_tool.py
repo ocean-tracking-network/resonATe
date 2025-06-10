@@ -2,7 +2,8 @@ import geopy
 import pandas as pd
 
 
-def interval_data(compressed_df: pd.DataFrame, dist_matrix_df: pd.DataFrame, station_radius_df: pd.DataFrame=None):
+def interval_data(compressed_df: pd.DataFrame, dist_matrix_df: pd.DataFrame, station_radius_df: pd.DataFrame=None, col_catalognumber:str='catalogNumber',
+                 col_station:str='station'):
     """Creates a detection interval file from a compressed detection, distance matrix and station detection radius DataFrames
 
     Args:
@@ -17,19 +18,19 @@ def interval_data(compressed_df: pd.DataFrame, dist_matrix_df: pd.DataFrame, sta
 
     # Create two dataframes from input compressed detections and decrement the second's seq_num
     fst = compressed_df[
-        ['catalognumber', 'station', 'seq_num', 'total_count', 'startdate', 'enddate', 'endunqdetecid']].copy()
+        [col_catalognumber, col_station, 'seq_num', 'total_count', 'startdate', 'enddate', 'endunqdetecid']].copy()
     snd = compressed_df[
-        ['catalognumber', 'station', 'seq_num', 'total_count', 'startdate', 'enddate', 'endunqdetecid']].copy()
+        [col_catalognumber, col_station, 'seq_num', 'total_count', 'startdate', 'enddate', 'endunqdetecid']].copy()
     snd.seq_num -= 1
 
     # Rename columns
-    fst.columns = ['catalognumber', 'from_station', 'seq_num', 'from_detcnt',
+    fst.columns = [col_catalognumber, 'from_station', 'seq_num', 'from_detcnt',
                    'from_arrive', 'from_leave', 'unqdetid_from']
-    snd.columns = ['catalognumber', 'to_station', 'seq_num', 'to_detcnt',
+    snd.columns = [col_catalognumber, 'to_station', 'seq_num', 'to_detcnt',
                    'to_arrive', 'to_leave', 'unqdetid_arrive']
 
     # Merge the two DataFrames together linking catalognumber and seq_num
-    merged = pd.merge(fst, snd, how='left', on=['catalognumber', 'seq_num'])
+    merged = pd.merge(fst, snd, how='left', on=[col_catalognumber, 'seq_num'])
 
     # Create additional column placeholders
     merged['intervaltime'] = None

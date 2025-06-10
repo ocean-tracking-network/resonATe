@@ -8,7 +8,9 @@ from plotly.graph_objs import *
 py.init_notebook_mode()
 
 
-def consolidate_data(detections: pd.DataFrame):
+def consolidate_data(detections: pd.DataFrame, col_catalognumber:str='catalogNumber',
+                     col_station:str='station', col_latitude:str='decimalLatitude', col_longitude:str='decimalLongitude',
+                     col_datecollected:str='dateCollectedUTC'):
     """Takes set of detections, cleans and sumarises the detections for the
     timeline.
 
@@ -23,33 +25,34 @@ def consolidate_data(detections: pd.DataFrame):
     detections = detections.copy(deep=True)
     if 'receiver' in detections.columns:
         detections = detections[~(detections.receiver == 'release')]
-    detections['date'] = pd.to_datetime(detections.datecollected).dt.date
+    detections['date'] = pd.to_datetime(detections[col_datecollected]).dt.date
     detections['det_counts'] = 0
     detections = detections.groupby(
-        ['catalognumber', 'date', 'station'], as_index=False, dropna=False).agg({
+        [col_catalognumber, 'date', col_station], as_index=False, dropna=False).agg({
             'det_counts': 'count',
-            'latitude': 'mean',
-            'longitude': 'mean',
-        })[['catalognumber',
+            col_latitude: 'mean',
+            col_longitude: 'mean',
+        })[[col_catalognumber,
             'date',
-            'station',
+            col_station,
             'det_counts',
-            'latitude',
-            'longitude']]
+            col_latitude,
+            col_longitude]]
     detections.det_counts = (detections.det_counts / 10.0) + 5
     detections['date'] = pd.to_datetime(detections['date'])
 
     detections.sort_values('date', inplace=True)
 
     catalognumbers = pd.DataFrame(
-        detections.catalognumber.unique(), columns=['catalognumber'])
+        detections[col_catalognumber].unique(), columns=[col_catalognumber])
     catalognumbers['color'] = catalognumbers.index + 1
 
-    detections = detections.merge(catalognumbers, on='catalognumber')
+    detections = detections.merge(catalognumbers, on=col_catalognumber)
     return detections
 
 
-def create_grid(detections: pd.DataFrame):
+def create_grid(detections: pd.DataFrame, col_catalognumber:str='catalogNumber',
+                col_station:str='station', col_latitude:str='decimalLatitude', col_longitude:str='decimalLongitude'):
     """Takes the a set of consolidated detections (the output from
     ``consolidate_data()``) and organizes them into a Plotly grid like format.
 
@@ -65,12 +68,12 @@ def create_grid(detections: pd.DataFrame):
     total_grid = pd.DataFrame()
     for date, data in detections.groupby('date'):
         grid = pd.DataFrame()
-        grid['x-' + str(date.date())] = data.longitude
-        grid['y-' + str(date.date())] = data.latitude
+        grid['x-' + str(date.date())] = data[col_longitude]
+        grid['y-' + str(date.date())] = data[col_latitude]
         grid['size-' + str(date.date())] = data.det_counts
-        grid['station-' + str(date.date())] = data.station
+        grid['station-' + str(date.date())] = data[col_station]
         grid['color-' + str(date.date())] = data.color
-        grid['catalognumber-' + str(date.date())] = data.catalognumber
+        grid['catalognumber-' + str(date.date())] = data[col_catalognumber]
         grid.reset_index(inplace=True, drop=True)
         total_grid = pd.concat([total_grid, grid], ignore_index=False, axis=1)
     return total_grid
@@ -169,7 +172,7 @@ def create_frames(detections: pd.DataFrame, total_grid: pd.DataFrame, is_mapbox=
             traces=[0]
         )
 
-        frames = pd.concat([frames, frame])
+        frames.append(frame)
     return frames
 
 
@@ -295,7 +298,8 @@ def define_sliders(detections: pd.DataFrame, animation_time=300, slider_transiti
 
 
 def define_layout(detections: pd.DataFrame, title, plotly_geo=None,  mapbox_token=None,
-                  style='light'):
+                  style='light',
+                  col_latitude:str='decimalLatitude', col_longitude:str='decimalLongitude'):
     """
 
     Args:
@@ -333,14 +337,14 @@ def define_layout(detections: pd.DataFrame, title, plotly_geo=None,  mapbox_toke
             )
         plotly_geo.update(
             center=dict(
-                lon=detections.longitude.mean(),
-                lat=detections.latitude.mean()
+                lon=detections[col_longitude].mean(),
+                lat=detections[col_latitude].mean()
             ),
             lonaxis=dict(
-                range=[detections.longitude.min(), detections.longitude.max()],
+                range=[detections[col_longitude].min(), detections[col_longitude].max()],
             ),
             lataxis=dict(
-                range=[detections.latitude.min(), detections.latitude.max()],
+                range=[detections[col_latitude].min(), detections[col_latitude].max()],
             )
         )
         layout = dict(
@@ -353,8 +357,8 @@ def define_layout(detections: pd.DataFrame, title, plotly_geo=None,  mapbox_toke
         mapbox = dict(
             accesstoken=mapbox_token,
             center=dict(
-                lon=detections.longitude.mean(),
-                lat=detections.latitude.mean()
+                lon=detections[col_longitude].mean(),
+                lat=detections[col_latitude].mean()
             ),
             zoom=5,
             style=style
@@ -371,7 +375,10 @@ def define_layout(detections: pd.DataFrame, title, plotly_geo=None,  mapbox_toke
 def timeline(detections: pd.DataFrame, title='Timeline', height=700, width=1000,
              ipython_display=True, mapbox_token=None, plotly_geo=None,
              animation_time=1000, transition_time=300,
-             slider_transition_time=300, colorscale='Rainbow', style='light'):
+             slider_transition_time=300, colorscale='Rainbow', style='light',
+             col_catalognumber:str='catalogNumber',
+             col_station:str='station', col_latitude:str='decimalLatitude', col_longitude:str='decimalLongitude',
+             col_datecollected:str='dateCollectedUTC', **kwargs):
     
     """
 
@@ -398,8 +405,22 @@ def timeline(detections: pd.DataFrame, title='Timeline', height=700, width=1000,
     Returns:
         (None|Any): : A plotly object or None if ipython_display is True
     """
-    detections = consolidate_data(detections)
-    total_grid = create_grid(detections)
+    detections = consolidate_data(
+        detections,
+        col_catalognumber=col_catalognumber,
+        col_datecollected=col_datecollected,
+        col_longitude=col_longitude,
+        col_latitude=col_latitude,
+        col_station=col_station,
+    )
+    total_grid = create_grid(
+        detections,
+        col_datecollected=col_datecollected,
+        col_longitude=col_longitude,
+        col_latitude=col_latitude,
+        col_station=col_station,
+        col_catalognumber=col_catalognumber,
+    )
     if mapbox_token is None:
         trace = create_trace(detections, total_grid, colorscale=colorscale)
         frames = create_frames(detections, total_grid)
@@ -411,7 +432,7 @@ def timeline(detections: pd.DataFrame, title='Timeline', height=700, width=1000,
     sliders = define_sliders(detections, animation_time,
                              slider_transition_time)
     layout = define_layout(detections, title, plotly_geo=plotly_geo, mapbox_token=mapbox_token,
-                           style=style)
+                           style=style,col_longitud=col_longitude,col_latitude=col_latitude)
 
     layout.update(dict(
         updatemenus=[updatemenus],

@@ -5,7 +5,10 @@ import pandas as pd
 from resonate.library.exceptions import GenericException
 
 
-def REI(detections: pd.DataFrame, deployments: pd.DataFrame) -> pd.DataFrame:
+def REI(detections: pd.DataFrame, deployments: pd.DataFrame, col_fieldnumber='tagName',
+                col_station:str='station', col_latitude:str='decimalLatitude', col_longitude:str='decimalLongitude',
+                col_datecollected:str='dateCollectedUTC',col_scientificname='scientificName',
+                **kwargs) -> pd.DataFrame:
     """Calculates a returns a list of each station and the REI (defined here):
 
     Args:
@@ -25,7 +28,7 @@ def REI(detections: pd.DataFrame, deployments: pd.DataFrame) -> pd.DataFrame:
         raise GenericException('input parameter must be a Pandas dataframe')
 
     mandatory_detection_columns = set(
-        ['datecollected', 'fieldnumber', 'scientificname', 'station'])
+        [col_datecollected, col_fieldnumber, col_scientificname, col_station])
     mandatory_deployment_columns = set(
         ['station_name', 'deploy_date', 'recovery_date', 'last_download'])
 
@@ -60,14 +63,14 @@ def REI(detections: pd.DataFrame, deployments: pd.DataFrame) -> pd.DataFrame:
         days_active.set_index('station_name', inplace=True)
         # Exclude all detections that are not registered with receivers in the
         # deployments
-        detections = detections[detections.station.isin(
+        detections = detections[detections[col_station].isin(
             deployments.station_name)]
 
         # Calculate array counts and initialize the dataframe
-        array_unique_tags = len(detections.fieldnumber.unique())
-        array_unique_species = len(detections.scientificname.unique())
+        array_unique_tags = len(detections[col_fieldnumber].unique())
+        array_unique_species = len(detections[col_scientificname].unique())
         days_with_detections = len(pd.to_datetime(
-            detections.datecollected).dt.date.unique())
+            detections[col_datecollected]).dt.date.unique())
         array_days_active = (max(deployments.last_download.fillna(deployments.deploy_date.min()).max(
         ), deployments.recovery_date.max()) - min(deployments.deploy_date)).days
 
@@ -80,16 +83,16 @@ def REI(detections: pd.DataFrame, deployments: pd.DataFrame) -> pd.DataFrame:
 
         # Loop through each station in the detections and Calculate REI for
         #  oeach station
-        detections.datecollected = pd.to_datetime(
-            detections.datecollected).dt.date
+        detections[col_datecollected] = pd.to_datetime(
+            detections[col_datecollected]).dt.date
 
         # Loop through each station in the detections and Calculate REI for
         #  oeach station
-        for name, data in detections.groupby('station', dropna=False):
-            receiver_unique_tags = len(data.fieldnumber.unique())
-            receiver_unique_species = len(data.scientificname.unique())
+        for name, data in detections.groupby(col_station, dropna=False):
+            receiver_unique_tags = len(data[col_fieldnumber].unique())
+            receiver_unique_species = len(data[col_scientificname].unique())
             receiver_days_with_detections = len(
-                pd.to_datetime(data.datecollected).dt.date.unique())
+                pd.to_datetime(data[col_datecollected]).dt.date.unique())
 
             if name in days_active.index:
                 receiver_days_active = days_active.loc[name].days_deployed.days
@@ -101,8 +104,8 @@ def REI(detections: pd.DataFrame, deployments: pd.DataFrame) -> pd.DataFrame:
                     station_reis = pd.concat([station_reis, pd.DataFrame({
                         'station': [name],
                         'rei': [rei],
-                        'latitude': [data.latitude.mean()],
-                        'longitude': [data.longitude.mean()]})], ignore_index=True)
+                        'latitude': [data[col_latitude].mean()],
+                        'longitude': [data[col_longitude].mean()]})], ignore_index=True)
             else:
                 print("No valid deployment record for " + name)
         print(station_reis)
@@ -113,5 +116,12 @@ def REI(detections: pd.DataFrame, deployments: pd.DataFrame) -> pd.DataFrame:
         del deployments
         return station_reis
     else:
-        raise GenericException("Missing required input columns: {}".format(
-            mandatory_detection_columns - set(detections.columns)))
+        deployments_missing_columns = mandatory_deployment_columns - set(deployments.columns)
+        detection_missing_columns = mandatory_detection_columns - set(detections.columns)
+
+        error = ''
+        if deployments_missing_columns:
+            error = f"Missing required deployment input columns: {deployments_missing_columns}."
+        if detection_missing_columns:
+            error += f"Missing required detection input columns: {detection_missing_columns}."
+        raise GenericException(error)

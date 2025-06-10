@@ -29,7 +29,7 @@ seconds (default is 3600) to create the cohort dataframe.
     
     time_interval = 3600 # in seconds
     
-    data = pd.read_csv('/path/to/detections.csv')
+    data = pd.read_csv('/path/to/detections.csv', low_memory=False)
     
     compressed_df = compress_detections(data)
     

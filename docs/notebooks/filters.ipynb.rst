@@ -45,7 +45,7 @@ specified suspect file. The function will also create a distance matrix.
     from resonate.filters import filter_detections
     import pandas as pd
     
-    detections = pd.read_csv('/path/to/detections.csv')
+    detections = pd.read_csv('/path/to/detections.csv', low_memory=False)
     
     time_interval = 3600 # in seconds
     
@@ -103,7 +103,7 @@ considered suspect.
     from resonate.filters import distance_filter
     import pandas as pd
     
-    detections = pd.read_csv('/path/to/detections.csv')
+    detections = pd.read_csv('/path/to/detections.csv', low_memory=False)
     
     
     filtered_detections = distance_filter(detections)
@@ -135,7 +135,7 @@ suspect.
     from resonate.filters import velocity_filter
     import pandas as pd
     
-    detections = pd.read_csv('/path/to/detections.csv')
+    detections = pd.read_csv('/path/to/detections.csv', low_memory=False)
     
     
     filtered_detections = velocity_filter(detections)

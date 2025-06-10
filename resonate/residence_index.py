@@ -178,7 +178,9 @@ def get_days(dets: pd.DataFrame, calculation_method='kessel'):
     return days
 
 
-def get_station_location(station: str, detections: pd.DataFrame):
+def get_station_location(station: str, detections: pd.DataFrame, col_catalognumber:str='catalogNumber',
+                col_station:str='station', col_latitude:str='decimalLatitude', col_longitude:str='decimalLongitude',
+                col_datecollected:str='dateCollectedUTC', col_unique_id:str='unqDetecID'):
     """Returns the longitude and latitude of a station/receiver given the station
     and the table name.
 
@@ -189,8 +191,8 @@ def get_station_location(station: str, detections: pd.DataFrame):
     Returns:
         pd.DataFrame: A Pandas DataFrame of station, latitude, and longitude
     """
-    location = detections[detections.station == station][:1]
-    location = location[['station', 'longitude', 'latitude']]
+    location = detections[detections[col_station] == station][:1]
+    location = location[[col_station, col_longitude, col_latitude]]
     return location
 
 
@@ -316,7 +318,9 @@ def plot_ri(ri_data: pd.DataFrame, ipython_display=True,
         return py.plot(fig, filename=filename)
 
 
-def residency_index(detections: pd.DataFrame, calculation_method='kessel'):
+def residency_index(detections: pd.DataFrame, calculation_method='kessel', col_catalognumber:str='catalogNumber',
+                col_station:str='station', col_latitude:str='decimalLatitude', col_longitude:str='decimalLongitude',
+                col_datecollected:str='dateCollectedUTC', col_unique_id:str='unqDetecID', **kwargs):
     """This function takes in a detections CSV and determines the residency
     index for reach station.
 
@@ -338,7 +342,8 @@ def residency_index(detections: pd.DataFrame, calculation_method='kessel'):
             * residency_index
             * station
     """
-    dets = cp.compress_detections(detections)
+    dets = cp.compress_detections(detections, col_catalognumber=col_catalognumber, col_station=col_station, col_latitude=col_latitude,
+                                  col_longitude=col_longitude, col_datecollected=col_datecollected, col_unique_id=col_unique_id)
 
     # Converting start and end date to strings
     dets['startdate'] = dets['startdate'].astype(str)
@@ -358,15 +363,15 @@ def residency_index(detections: pd.DataFrame, calculation_method='kessel'):
 
     # For each unique station determine the total number of days there were
     # detections at the station
-    for station in dets['station'].unique():
-        st_dets = pd.DataFrame(dets[dets['station'] == station])
+    for station in dets[col_station].unique():
+        st_dets = pd.DataFrame(dets[dets[col_station] == station])
         total = get_days(st_dets.copy(), calculation_method)
         location = get_station_location(station, detections)
         # Determine the RI and add the station to the list
         station_dict = {
             'days_detected': total, 
-            'latitude': location['latitude'].values[0],
-            'longitude': location['longitude'].values[0], 
+            'latitude': location[col_latitude].values[0],
+            'longitude': location[col_longitude].values[0], 
             'residency_index': (total / (float(total_days))),
             'station': station,
         } 

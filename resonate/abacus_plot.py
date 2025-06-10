@@ -4,8 +4,9 @@ import plotly.offline as py
 from resonate.library.exceptions import GenericException
 
 
-def abacus_plot(detections: pd.DataFrame, date_column='datecollected', uniqueid_column='unqdetecid',
-                ycolumn:str='catalognumber', color_column:str=None, ipython_display=True, title:str='Abacus Plot', filename:str=None):
+def abacus_plot(detections: pd.DataFrame, col_datecollected='dateCollectedUTC', col_unique_id='unqDetecID',
+                ycolumn:str='catalogNumber', color_column:str=None, ipython_display=True, title:str='Abacus Plot', filename:str=None,
+                **kwargs):
     """Creates a plotly abacus plot from a pandas dataframe
 
     Args:
@@ -32,14 +33,14 @@ def abacus_plot(detections: pd.DataFrame, date_column='datecollected', uniqueid_
     if not isinstance(detections, pd.DataFrame):
         raise GenericException('input parameter must be a Pandas dataframe')
 
-    mandatory_columns = set([date_column, ycolumn])
+    mandatory_columns = set([col_datecollected, ycolumn])
 
     if color_column is not None:
         mandatory_columns.add(color_column)
 
     if mandatory_columns.issubset(detections.columns):
 
-        detections = detections[~detections[uniqueid_column].str.contains(
+        detections = detections[~detections[col_unique_id].str.contains(
             'release')].reset_index(drop=True)
 
         if color_column is not None:
@@ -48,7 +49,7 @@ def abacus_plot(detections: pd.DataFrame, date_column='datecollected', uniqueid_
             for group in detections.groupby(color_column):
                 data.append(
                     {
-                        'x': group[1][date_column].tolist(),
+                        'x': group[1][col_datecollected].tolist(),
                         'y': group[1][ycolumn].tolist(),
                         'mode': 'markers',
                         'name': group[0]
@@ -57,7 +58,7 @@ def abacus_plot(detections: pd.DataFrame, date_column='datecollected', uniqueid_
         else:
             data = [
                 {
-                    'x': detections[date_column].tolist(),
+                    'x': detections[col_datecollected].tolist(),
                     'y': detections[ycolumn].tolist(),
                     'mode': 'markers',
                 }
@@ -67,8 +68,8 @@ def abacus_plot(detections: pd.DataFrame, date_column='datecollected', uniqueid_
             title=title,
             xaxis=dict(
                 autorange=False,
-                range=[detections[date_column].min(
-                ), detections[date_column].max()]
+                range=[detections[col_datecollected].min(
+                ), detections[col_datecollected].max()]
             ),
             yaxis=dict(
                 autorange=True
