@@ -59,7 +59,7 @@ section.
 
     from resonate.receiver_efficiency import REI
     
-    detections = pd.read_csv('/path/to/detections.csv')
+    detections = pd.read_csv('/path/to/detections.csv', low_memory=False)
     deployments = pd.read_csv('/path/to/deployments.csv')
     
     station_REIs = REI(detections = detections, deployments = deployments)

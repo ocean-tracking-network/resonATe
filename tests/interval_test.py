@@ -8,6 +8,7 @@ from colorama import Fore as c
 from resonate.compress import compress_detections
 from resonate.filters import get_distance_matrix
 from resonate.interval_data_tool import interval_data
+from resonate.determine_format import detect
 
 
 class IntervalTest(unittest.TestCase):
@@ -15,8 +16,8 @@ class IntervalTest(unittest.TestCase):
     def test_filter(self):
         print(c.YELLOW + 'Testing Interval...' + c.RESET)
         input_file = pd.read_csv('tests/assertion_files/nsbs.csv')
-        compressed = compress_detections(input_file)  # compressed detections
-        matrix = get_distance_matrix(input_file)  # station distance matrix
+        compressed = compress_detections(input_file, **detect(input_file))  # compressed detections
+        matrix = get_distance_matrix(input_file, **detect(input_file))  # station distance matrix
 
         # (in meters) applies same detection radius to all stations
         detection_radius = 400
@@ -25,7 +26,7 @@ class IntervalTest(unittest.TestCase):
         station_det_radius.set_index('station', inplace=True)
         station_det_radius  # preview radius values
         dfa = interval_data(compressed_df=compressed,
-                            dist_matrix_df=matrix, station_radius_df=station_det_radius)
+                            dist_matrix_df=matrix, station_radius_df=station_det_radius, **detect(input_file))
 
         dfb = pd.read_csv('tests/assertion_files/nsbs_interval.csv')
 

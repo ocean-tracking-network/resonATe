@@ -2,12 +2,14 @@ import pandas as pd
 import plotly.graph_objs as go
 import plotly.offline as py
 from resonate.library.exceptions import GenericException
+from typing import Dict
 
-
-def bubble_plot(detections: pd.DataFrame, type='detections', ipython_display=True,
-                title='Bubble Plot', height=700, width=1000,
-                plotly_geo=None, filename=None, mapbox_token=None,
-                marker_size=10, colorscale='Viridis'):
+def bubble_plot(detections: pd.DataFrame, type:str='detections', ipython_display:bool=True,
+                title:str='Bubble Plot', height:int=700, width:int=1000,
+                plotly_geo:Dict=None, filename:str=None, mapbox_token:str=None,
+                marker_size:int=10, colorscale:str='Viridis', col_catalognumber:str='catalogNumber',
+                col_station:str='station', col_latitude:str='decimalLatitude', col_longitude:str='decimalLongitude',
+                col_datecollected:str='dateCollectedUTC', col_unique_id:str='unqDetecID', **kwargs):
     """_summary_
 
     Args:
@@ -36,17 +38,17 @@ def bubble_plot(detections: pd.DataFrame, type='detections', ipython_display=Tru
         raise GenericException('input parameter must be a Pandas dataframe')
 
     mandatory_columns = set(
-        ['station', 'catalognumber', 'unqdetecid', 'latitude', 'longitude', 'datecollected'])
+        [col_station, col_catalognumber, col_unique_id, col_latitude, col_longitude, col_datecollected])
 
     if mandatory_columns.issubset(detections.columns):
-        detections = detections[['station', 'catalognumber', 'unqdetecid',
-                                 'latitude', 'longitude', 'datecollected']].reset_index(drop=True)
+        detections = detections[[col_station, col_catalognumber, col_unique_id,
+                                 col_latitude, col_longitude, col_datecollected]].reset_index(drop=True)
 
         if type == 'individual':
             detections = detections.drop(
-                ['unqdetecid', 'datecollected'], axis=1).drop_duplicates()
+                [col_unique_id, col_datecollected], axis=1).drop_duplicates()
         detections = detections.groupby(
-            ['station', 'latitude', 'longitude'], dropna=False).size().reset_index(name='counts')
+            [col_station, col_latitude, col_longitude], dropna=False).size().reset_index(name='counts')
 
         map_type = 'scattergeo'
 
@@ -55,8 +57,8 @@ def bubble_plot(detections: pd.DataFrame, type='detections', ipython_display=Tru
             mapbox = dict(
                 accesstoken=mapbox_token,
                 center=dict(
-                    lon=detections.longitude.mean(),
-                    lat=detections.latitude.mean()
+                    lon=detections[col_longitude].mean(),
+                    lat=detections[col_latitude].mean()
                 ),
                 zoom=5,
                 style='light'
@@ -64,9 +66,9 @@ def bubble_plot(detections: pd.DataFrame, type='detections', ipython_display=Tru
 
         data = [
             {
-                'lon': detections.longitude.tolist(),
-                'lat': detections.latitude.tolist(),
-                'text': detections.station + " : " + detections.counts.astype(str),
+                'lon': detections[col_longitude].tolist(),
+                'lat': detections[col_latitude].tolist(),
+                'text': detections[col_station] + " : " + detections.counts.astype(str),
                 'mode': 'markers',
                 'marker': {
                     'color': detections.counts.tolist(),
@@ -101,14 +103,14 @@ def bubble_plot(detections: pd.DataFrame, type='detections', ipython_display=Tru
 
         plotly_geo.update(
             center=dict(
-                lon=detections.longitude.mean(),
-                lat=detections.latitude.mean()
+                lon=detections[col_longitude].mean(),
+                lat=detections[col_latitude].mean()
             ),
             lonaxis=dict(
-                range=[detections.longitude.min(), detections.longitude.max()],
+                range=[detections[col_longitude].min(), detections[col_longitude].max()],
             ),
             lataxis=dict(
-                range=[detections.latitude.min(), detections.latitude.max()],
+                range=[detections[col_latitude].min(), detections[col_latitude].max()],
             )
         )
 

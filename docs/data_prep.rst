@@ -38,7 +38,7 @@ Renaming Columns
 
     import pandas as pd
 
-    df = pd.read_csv('/path/to/detections.csv')
+    df = pd.read_csv('/path/to/detections.csv', low_memory=False)
 
     df.rename(index=str, columns={
       'your_animal_id_column':'catalognumber',

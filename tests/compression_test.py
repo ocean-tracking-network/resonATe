@@ -5,14 +5,15 @@ import pandas as pd
 import pandas.testing as pt
 from colorama import Fore as c
 from resonate.compress import compress_detections
+from resonate.determine_format import detect
 
 
 class CompressionTest(unittest.TestCase):
 
     def test_compression(self):
         print(c.YELLOW + 'Testing Compression...' + c.RESET)
-        dfa = compress_detections(pd.read_csv(
-            'tests/assertion_files/nsbs.csv'))
+        input_file = pd.read_csv('tests/assertion_files/nsbs.csv')
+        dfa = compress_detections(input_file, **detect(input_file))
         dfb = pd.read_csv('tests/assertion_files/nsbs_compressed.csv')
         dfb.startdate = pd.to_datetime(dfb.startdate)
         dfb.enddate = pd.to_datetime(dfb.enddate)
@@ -22,8 +23,8 @@ class CompressionTest(unittest.TestCase):
 
     def test_compression_keep_columns(self):
         print(c.YELLOW + 'Testing Compression...' + c.RESET)
-        dfa = compress_detections(pd.read_csv(
-            'tests/assertion_files/nsbs.csv'), keep_columns=True)
+        input_file = pd.read_csv('tests/assertion_files/nsbs.csv')
+        dfa = compress_detections(input_file, keep_columns=True, **detect(input_file))
         dfb = pd.read_csv('tests/assertion_files/nsbs_compressed_keep.csv')
         dfb.startdate = pd.to_datetime(dfb.startdate)
         dfb.enddate = pd.to_datetime(dfb.enddate)

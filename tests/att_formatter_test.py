@@ -7,7 +7,7 @@ from colorama import Fore as c
 import pickle
 import pytest
 from resonate.att_formatter import create_att_dictionary_format
-
+from resonate.determine_format import detect
 
 class ATTFormatterTest(unittest.TestCase):
     @pytest.mark.filterwarnings("ignore:Workbook contains no default style, apply openpyxl's default")
@@ -19,7 +19,8 @@ class ATTFormatterTest(unittest.TestCase):
 
         att = create_att_dictionary_format(dets,
                                      tags,
-                                     deployments,)
+                                     deployments,
+                                     **detect(dets))
         with open("tests/assertion_files/att_archive.pkl", 'rb') as f:
             att_archive = pickle.load(f)
         pt.assert_frame_equal(att['tag_detections'], att_archive['tag_detections'])
