@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def interval_data(compressed_df: pd.DataFrame, dist_matrix_df: pd.DataFrame, station_radius_df: pd.DataFrame=None, col_catalognumber:str='catalogNumber',
-                 col_station:str='station'):
+                 col_station:str='station', **kwargs):
     """Creates a detection interval file from a compressed detection, distance matrix and station detection radius DataFrames
 
     Args:

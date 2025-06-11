@@ -5,7 +5,7 @@ import pandas as pd
 import pandas.testing as pt
 from colorama import Fore as c
 from resonate.receiver_efficiency import REI
-
+from resonate.determine_format import detect
 
 class REITest(unittest.TestCase):
 
@@ -15,7 +15,7 @@ class REITest(unittest.TestCase):
         detections = pd.read_csv('tests/assertion_files/hfx_detections.csv')
         deployments = pd.read_csv('tests/assertion_files/hfx_deployments.csv')
 
-        dfa = REI(detections, deployments)
+        dfa = REI(detections, deployments, **detect(detections))
         dfb = pd.read_csv('tests/assertion_files/hfx_rei.csv')
         pt.assert_frame_equal(dfa, dfb)
         print(c.GREEN + 'OK!\n' + c.RESET)

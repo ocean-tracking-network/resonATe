@@ -31,12 +31,22 @@ def detect(dataframe: pd.DataFrame) -> dict:
             "col_longitude": "decimalLongitude",
             "col_latitude": "decimalLatitude",
             "col_station": "station",
-            "col_catalognumber": "catalogNumber"},
+            "col_catalognumber": "catalogNumber",
+            "col_unique_id": "unqDetecID"},
         {   "col_datecollected": "datecollected",
             "col_longitude": "longitude",
             "col_latitude": "latitude",
             "col_station": "station",
-            "col_catalognumber": "catalognumber"}
+            "col_catalognumber": "catalognumber",
+            "col_unique_id": "unqdetecid",},
+            {"col_datecollected": 'datecollected',
+             "col_fieldnumber": 'fieldnumber',
+             "col_scientificname": "scientificname",
+             "col_station":"station", 
+             'col_latitude' :'latitude',
+             'col_longitude': 'longitude'},
+            {"col_catalognumber":"catalognumber",
+             "col_station":"station"}
     ]
 
     columns = dataframe.columns

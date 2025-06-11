@@ -178,9 +178,8 @@ def get_days(dets: pd.DataFrame, calculation_method='kessel'):
     return days
 
 
-def get_station_location(station: str, detections: pd.DataFrame, col_catalognumber:str='catalogNumber',
-                col_station:str='station', col_latitude:str='decimalLatitude', col_longitude:str='decimalLongitude',
-                col_datecollected:str='dateCollectedUTC', col_unique_id:str='unqDetecID'):
+def get_station_location(station: str, detections: pd.DataFrame,
+                         col_station:str='station', col_latitude:str='decimalLatitude', col_longitude:str='decimalLongitude'):
     """Returns the longitude and latitude of a station/receiver given the station
     and the table name.
 
@@ -366,7 +365,7 @@ def residency_index(detections: pd.DataFrame, calculation_method='kessel', col_c
     for station in dets[col_station].unique():
         st_dets = pd.DataFrame(dets[dets[col_station] == station])
         total = get_days(st_dets.copy(), calculation_method)
-        location = get_station_location(station, detections)
+        location = get_station_location(station, detections, col_longitude=col_longitude, col_station=col_station, col_latitude=col_latitude)
         # Determine the RI and add the station to the list
         station_dict = {
             'days_detected': total, 
